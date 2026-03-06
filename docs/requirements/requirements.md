@@ -480,8 +480,11 @@ RF-008: Consultar Información del Torneo (Calendario, resultados, estadísticas
 
 ## Anexos
 
-Diagramas de Casos de Uso:
-![alt text](../images/Diagrama-Casos-De-Uso.png)
+Diagrama de Casos de Uso:
+
+[Diagrama-Casos-De-Uso3.asta](..%2Fuml%2FDiagrama-Casos-De-Uso3.asta)
+
+![Diagrama-Casos-De-Uso.png](..%2Fimages%2FDiagrama-Casos-De-Uso.png)
 
 ## Mockup:
 
