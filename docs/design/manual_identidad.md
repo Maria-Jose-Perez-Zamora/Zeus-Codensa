@@ -17,20 +17,25 @@ Nuestro **elemento central** es la convergencia entre la pasión visceral por el
 - **Nombre de la Marca:** TECHCUP FÚTBOL
 - **Eslogan Propuesto:** *"Tu torneo, tu estadio, tus reglas."* 
 
-Logo: 
-![alt text](image.png)
+**Logo Principal (Imagotipo):** 
+Uso primario en la aplicación, encabezados, documentos oficiales y material promocional de alto impacto. Debe ser la primera opción siempre que el espacio lo permita.
+![Logotipo Principal](image.png)
 
-Isilogo (Logo sin texto): 
-![alt text](image-2.png)
+**Isologo (Símbolo sin texto):** 
+Uso destinado para avatares, favicons, iconos de aplicación móvil (App Icon) o en espacios cuadrados reducidos donde la lectura del texto de la marca sea imposible.
+![Isologo](image-2.png)
 
-Isilogo Horizontal: 
-![alt text](image-3.png)
+**Isologo Horizontal:** 
+Uso óptimo para barras de navegación superiores (*Topbars* o *Sidebars* colapsados) y banners donde el espacio vertical sea extremadamente limitado.
+![Isologo Horizontal](image-3.png)
 
-Isologo Monocromático: 
-![alt text](image-5.png)
+**Isologo Monocromático:** 
+Uso restringido para fondos fotográficos complejos, marcas de agua corporativas, material impreso a una tinta o en estados neutros/inactivos de la UI.
+![Isologo Monocromático](image-5.png)
 
-Isologo Simbolo en contorno: 
-![alt text](image-6.png)
+**Símbolo en Contorno (Wireframe/Outline):** 
+Uso en detalles estéticos de fondo (marcas de agua gigantes opacas deportivas), cargadores (*loaders*), o en aplicaciones de bordado y serigrafía simple.
+![Simbolo en contorno](image-6.png)
 
 
 
@@ -88,6 +93,12 @@ La voz visual de la marca es limpia, geométrica y sin adornos innecesarios, gar
   - **Puntuaciones y Estadísticas Numéricas:** Uso frecuente de *Semi-Bold* (600) para que las métricas relevantes llamen la atención inmediatamente.
   - **Descripciones Tabulares y Textos Comunes:** Grosores *Regular* (400) favoreciendo una lectura que evite la fatiga ocular y simplifique visualmente pantallas muy cargadas.
 
+*Muestra del espécimen tipográfico principal:*
+![Fuente Principal](image-15.png)
+
+*Abecedario y variaciones de grosores de la fuente:*
+![Abecedario tipográfico](image-16.png)
+
 ## 6. Imágenes Utilizadas
 
 El uso fotográfico y gráfico en la plataforma se basa en el contraste, reforzando la narrativa de "tecnología + pasión".
@@ -98,6 +109,9 @@ El uso fotográfico y gráfico en la plataforma se basa en el contraste, reforza
 - **Avatares y Escudos:**
   - Las imágenes cargadas por los usuarios (escudos de equipo, perfiles) van enmarcadas en geométricos estilizados (polígonos, círculos con bordes de `#1C2434`), con tratamientos que resalten los logos de los equipos y minimicen fondos ruidosos.
 - **Ausencia de Imágenes Genéricas:** Evitamos a toda costa "fotos de stock corporativas" sonrientes. El tono es sudor, cancha, luces de estadio tácticas y pizarras de estrategia.
+
+*Moodboard referencial:*
+![Moodboard fotográfico general](image-17.png)
 
 ## 7. Elementos Visuales del Diseño (Guía de Estilo UI)
 
@@ -115,3 +129,9 @@ El uso fotográfico y gráfico en la plataforma se basa en el contraste, reforza
 
 ### 7.4. Formularios y Entradas (Inputs)
 - Las cajas de introducción de texto contrastan sensiblemente su fondo (`#0B111A`) sobre la superficie de las tarjetas (`#121926`). Se enfocan (*Focus State*) rodeando el input con un destello en Verde Principal (`#00B37E`), retroalimentando positivamente la interacción del usuario sin margen de error.
+
+*Referencias visuales de los componentes UI interactivos (Botones, Iconografía e Inputs):*
+
+![Botón de Acción Primaria](image-18.png)
+![Componentes y Controles](image-19.png)
+![Input y Componentes Visuales](image-20.png)
