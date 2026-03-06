@@ -19,24 +19,28 @@ Nuestro **elemento central** es la convergencia entre la pasión visceral por el
 
 **Logo Principal (Imagotipo):** 
 Uso primario en la aplicación, encabezados, documentos oficiales y material promocional de alto impacto. Debe ser la primera opción siempre que el espacio lo permita.
-![Logotipo Principal](image.png)
+
+![alt text](image-21.png)
 
 **Isologo (Símbolo sin texto):** 
 Uso destinado para avatares, favicons, iconos de aplicación móvil (App Icon) o en espacios cuadrados reducidos donde la lectura del texto de la marca sea imposible.
-![Isologo](image-2.png)
+
+![alt text](image-22.png)
 
 **Isologo Horizontal:** 
 Uso óptimo para barras de navegación superiores (*Topbars* o *Sidebars* colapsados) y banners donde el espacio vertical sea extremadamente limitado.
-![Isologo Horizontal](image-3.png)
+
+![alt text](image-23.png)
 
 **Isologo Monocromático:** 
 Uso restringido para fondos fotográficos complejos, marcas de agua corporativas, material impreso a una tinta o en estados neutros/inactivos de la UI.
-![Isologo Monocromático](image-5.png)
+
+![alt text](image-24.png)
 
 **Símbolo en Contorno (Wireframe/Outline):** 
 Uso en detalles estéticos de fondo (marcas de agua gigantes opacas deportivas), cargadores (*loaders*), o en aplicaciones de bordado y serigrafía simple.
-![Simbolo en contorno](image-6.png)
 
+![alt text](image-25.png)
 
 
 ## 3. Público Objetivo
@@ -53,29 +57,30 @@ Nuestra plataforma está diseñada y optimizada para dos perfiles principales:
 
 ## 4. Paleta de Colores
 
-Nuestra arquitectura de color comunica solidez tecnológica (*Dark Mode*) y vitalidad deportiva (acento vibrante).
+Nuestra arquitectura de color ha evolucionado para comunicar accesibilidad y legibilidad a través de un espacio luminoso (*Light Mode*), contrastado con una vitalidad deportiva mediante un verde lima/manzana de muy alta energía.
 
-- **Verde Principal (Acento y Energía): `#00B37E`**
-  - El núcleo visual de la marca. Evoca el césped del campo de juego fresco y las resoluciones afirmativas del ecosistema digital ("Éxito", "Adelante").
-  - *Uso:* Logotipo principal, botones de acción primarios (CTA), resaltado de estadísticas clave y enlaces activos.
+- **Verde Principal (Acento y Energía): `#84CC16` (Verde Lima Vibrante)**
+  - El núcleo visual de la marca y foco de atención. Evoca el césped de día, modernidad y actividad constante.
+  - *Uso:* Logotipo principal, botones de acción primarios (CTA: "Iniciar Sesión"), resaltes de estadísticas fundamentales (ej. Puntos en la tabla), estados afirmativos ("EN CURSO").
 
   ![alt text](image-7.png)
 
-- **Verde Secundario (Apoyo Interactivo): `#0A2B27`**
-  - Un tono profundo y sutil.
-  - *Uso:* Fondos de selección, estados activos sutiles y transiciones de elementos enfocados (*hover states*).
+- **Verde Secundario (Apoyo Interactivo y Pastel): `#ECFCCB` (Verde Claro Suave)**
+  - Tono pastel derivado del principal para acompañamiento sutil, generando volumen sin quitar protagonismo a los textos.
+  - *Uso:* Fondos de botones de navegación destacados (Ej. "Panel Principal"), etiquetas de temporada o contenedores promocionales (Ej. "Sorteo de Cuartos").
 
  ![alt text](image-8.png)  
   
-- **Oscuros y Neutros (Estructura y Base): `#0B111A`, `#121926`, `#1C2434`**
-  - Configuran la profundidad de la aplicación. Inspirados en una noche de estadio y paneles de análisis de datos.
-  - *Uso:* Fondos globales (`#0B111A`), tarjetas/paneles (`#121926`) separadores estructurales y modales contextuales.
+- **Superficies y Fondos Objeto (Estructura y Base): `#FFFFFF`, `#F8FAFC`, `#E5E7EB`**
+  - Generan el contraste negativo necesario para la legibilidad perfecta de un dashboard denso en datos.
+  - *Uso:* El fondo principal de la aplicación es un gris muy claro (`#F8FAFC`), mientras que las tarjetas o contenedores se elevan visualmente usando blanco puro (`#FFFFFF`). Los bordes y líneas divisorias de las tablas son grises tenues (`#E5E7EB`).
 
  ![alt text](image-9.png) ![alt text](image-10.png) ![alt text](image-11.png)
 
-- **Colores de Semántica y Texto (Comunicación de Estados):`#FFFFFF`, `#94A3B8`, `#EF4444`**
-  - Las alertas de disciplina (Tarjetas Rojas, exclusiones) emplean el **Rojo `#EF4444`**.
-  - Los textos principales van en color **Blanco (`#FFFFFF`)**, mientras que las etiquetas descriptivas y metadatos se utilizan en **Gris Azulado (`#94A3B8`)** para definir jerarquías sin saturar la lectura.
+- **Colores de Semántica y Texto (Lectura Crítica): `#111827`, `#6B7280`, `#EF4444`**
+  - Los textos principales (títulos y posiciones) se leen en un gris oscuro muy cercano al negro (`#111827` o `#1F2937`), sustituyendo al negro puro por confort visual.
+  - Los metadatos (fechas, subtítulos inactivos y cabeceras de tabla) emplean un gris medio (`#6B7280`).
+  - El color rojo semántico (`#EF4444`) se mantiene reservado estrictamente para advertencias o sanciones (Tarjetas Rojas).
  
 ![alt text](image-12.png) 
 ![alt text](image-13.png)
