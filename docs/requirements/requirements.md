@@ -1,6 +1,4 @@
-
-
-Requerimientos funcionales principales
+# Requerimientos funcionales principales
 
 1. Gestionar torneos: crear, iniciar, finalizar y consultar torneos.
 2. Registrar usuarios y jugadores por rol (estudiante, graduado, profesor, administrativo, familiar, capitán, organizador, árbitro, administrador).
@@ -11,7 +9,7 @@ Requerimientos funcionales principales
 7. Calcular automáticamente tabla de posiciones y generar llaves eliminatorias.
 8. Consultar información del torneo: calendario, resultados, estadísticas e información para árbitros.
 
-Requerimientos no funcionales principales
+# Requerimientos no funcionales principales
 
 1. Diseño responsivo: la plataforma debe adaptarse correctamente a pantallas de celular y computador.
 2. Seguridad y acceso: autenticación según tipo de usuario (correo institucional o Gmail) y control de roles/permisos.
@@ -22,12 +20,12 @@ Requerimientos no funcionales principales
 7. Integridad de datos: validaciones automáticas de reglas del torneo para evitar inconsistencias.
 
 
-Requerimientos funcionales detallados
+# Requerimientos funcionales detallados
 
 
 RF-001: Gestionar Torneos
 
-Funcionalidad
+## Funcionalidad
 
 | Código | Nombre |
 |--------|--------|
@@ -37,7 +35,7 @@ Funcionalidad
 |-------------|-----------------|-----------------|-----------------|
 | El sistema permite crear, configurar, iniciar y finalizar torneos. Un organizador puede definir la información básica del torneo (fechas, cantidad de equipos, costo) y cambiar su estado entre Borrador, Activo, En progreso y Finalizado. | El organizador accede a la sección de torneos y crea uno nuevo con los datos básicos. Luego puede iniciar el torneo cuando sea el momento. | Organizador | El usuario debe tener rol de organizador. |
 
-Datos de entrada
+## Datos de entrada
 
 | Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
 |--------|-------------|----------------|-------------------|-------------|
@@ -47,7 +45,7 @@ Datos de entrada
 | Cantidad de equipos | Número de equipos que participarán | Número | Mínimo 4, máximo 32 | Sí |
 | Costo por equipo | Valor a pagar por cada equipo | Dinero | Valor en pesos colombianos | Sí |
 
-Datos de salida
+## Datos de salida
 
 | Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
 |--------|-------------|----------------|-------------------|-------------|
@@ -55,7 +53,7 @@ Datos de salida
 | Estado del torneo | Estado actual del torneo | Selección | Borrador, Activo, En progreso, Finalizado | Sí |
 | Mensaje de confirmación | Confirmación de la acción realizada | Texto | Mensaje de éxito o error | Sí |
 
-Flujo básico
+## Flujo básico
 
 | Paso | Actor | Descripción | Excepciones |
 |------|-------|-------------|-------------|
@@ -66,7 +64,7 @@ Flujo básico
 | 5 | Sistema | Valida datos y crea el torneo con estado "Borrador" | Datos incompletos: mostrar error |
 | 6 | Sistema | Genera ID único y confirma creación | - |
 
-Flujo alterno
+## Flujo alterno
 
 | Paso | Actor | Descripción | Excepciones |
 |------|-------|-------------|-------------|
@@ -79,7 +77,7 @@ Flujo alterno
 
 RF-002: Registrar Usuarios y Jugadores
 
-Funcionalidad
+## Funcionalidad
 
 | Código | Nombre |
 |--------|--------|
@@ -89,7 +87,7 @@ Funcionalidad
 |-------------|-----------------|-----------------|-----------------|
 | Cada participante (estudiante, graduado, profesor, administrativo, familiar) se registra en el sistema con su correo (institucional o Gmail según corresponda), crea su perfil deportivo indicando posiciones, dorsal y sube foto. Puede marcarse como disponible para que capitanes lo contacten. | El usuario accede a la plataforma, elige su tipo de rol, se autentica con correo, completa su perfil deportivo y confirma disponibilidad. | Jugador/Estudiante/Graduado/Profesor/Administrativo/Familiar | Ninguna (primer acceso) |
 
-Datos de entrada
+## Datos de entrada
 
 | Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
 |--------|-------------|----------------|-------------------|-------------|
@@ -104,7 +102,7 @@ Datos de entrada
 | Género | Género del jugador | Selección | Masculino, Femenino, Otro | Sí |
 | Edad | Edad del jugador | Número | Mayor o igual a 16 | Sí |
 
-Datos de salida
+## Datos de salida
 
 | Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
 |--------|-------------|----------------|-------------------|-------------|
@@ -112,7 +110,7 @@ Datos de salida
 | Perfil completado | Confirmación de registro | Booleano | Sí/No | Sí |
 | Mensaje de confirmación | Confirmación de créación | Texto | Mensaje de éxito | Sí |
 
-Flujo básico
+## Flujo básico
 
 | Paso | Actor | Descripción | Excepciones |
 |------|-------|-------------|-------------|
@@ -124,7 +122,7 @@ Flujo básico
 | 6 | Sistema | Valida datos y crea el perfil deportivo | - |
 | 7 | Sistema | Confirma registro exitoso | - |
 
-Flujo alterno
+## Flujo alterno
 
 | Paso | Actor | Descripción | Excepciones |
 |------|-------|-------------|-------------|
@@ -136,7 +134,7 @@ Flujo alterno
 
 RF-003: Gestionar Equipos (Creación, invitaciones, búsqueda de jugadores)
 
-Funcionalidad
+## Funcionalidad
 
 | Código | Nombre |
 |--------|--------|
@@ -146,7 +144,7 @@ Funcionalidad
 |-------------|-----------------|-----------------|-----------------|
 | Los capitanes crean equipos con nombre, escudo, colores de uniforme. Invitan jugadores a sus equipos respetando las reglas: mínimo 7 jugadores, máximo 12, sin duplicidad de jugador en equipos, más de la mitad de los miembros deben ser de los programas de Ingeniería de Sistemas, IA, Ciberseguridad y Estadística. Los capitanes pueden buscar jugadores disponibles por posición, semestre, edad, género, nombre e identificación. | El capitán accede a su panel, crea el equipo ingresando nombre, carga escudo e indica colores. Luego busca jugadores por criterios y envía invitaciones. Los jugadores aceptan o rechazan iniciativas. | Capitán | El usuario debe tener o cambiar a rol de capitán. Debe existir un torneo activo. |
 
-Datos de entrada (Crear equipo)
+## Datos de entrada (Crear equipo)
 
 | Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
 |--------|-------------|----------------|-------------------|-------------|
@@ -155,7 +153,7 @@ Datos de entrada (Crear equipo)
 | Color uniforme (primario) | Color principal del uniforme | Color | Código hexadecimal | Sí |
 | Color uniforme (secundario) | Color secundario del uniforme | Color | Código hexadecimal | No |
 
-Datos de entrada (Búsqueda de jugadores)
+## Datos de entrada (Búsqueda de jugadores)
 
 | Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
 |--------|-------------|----------------|-------------------|-------------|
@@ -166,7 +164,7 @@ Datos de entrada (Búsqueda de jugadores)
 | Nombre | Búsqueda por nombre | Texto | Búsqueda parcial permitida | No |
 | Identificación | Búsqueda por ID | Texto | Búsqueda exacta | No |
 
-Datos de salida
+## Datos de salida
 
 | Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
 |--------|-------------|----------------|-------------------|-------------|
@@ -175,7 +173,7 @@ Datos de salida
 | Estado de invitación | Estado de la invitación enviada | Selección | Pendiente, Aceptada, Rechazada | Sí |
 | Mensaje de confirmación | Confirmación de acción | Texto | Mensaje de éxito o error | Sí |
 
-Flujo básico
+## Flujo básico
 
 | Paso | Actor | Descripción | Excepciones |
 |------|-------|-------------|-------------|
@@ -192,7 +190,7 @@ Flujo básico
 | 11 | Jugador | Recibe invitación y acepta o rechaza | Rechaza: no se suma al equipo |
 | 12 | Sistema | Actualiza lista de miembros del equipo | - |
 
-Flujo alterno
+## Flujo alterno
 
 | Paso | Actor | Descripción | Excepciones |
 |------|-------|-------------|-------------|
@@ -204,7 +202,7 @@ Flujo alterno
 
 RF-004: Gestionar Inscripciones y Pagos
 
-Funcionalidad
+## Funcionalidad
 
 | Código | Nombre |
 |--------|--------|
@@ -214,7 +212,7 @@ Funcionalidad
 |-------------|-----------------|-----------------|-----------------|
 | El capitán realiza el pago por NEQUI o efectivo al coordinador del evento y luego sube el comprobante a la plataforma. El organizador revisa el documento y cambia el estado de la inscripción de Pendiente a En revisión, Aprobado (inscrito) o Rechazado. Solo equipos aprobados pueden participar en el torneo. | El capitán sube el comprobante de pago en la sección de inscripciones. El organizador revisa la imagen y aprueba o rechaza según validación de pago. | Capitán (sube comprobante), Organizador (revisa y aprueba) | Torneo debe estar activo. Equipo debe estar completamente conformado. |
 
-Datos de entrada (Capitán)
+## Datos de entrada (Capitán)
 
 | Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
 |--------|-------------|----------------|-------------------|-------------|
@@ -222,14 +220,14 @@ Datos de entrada (Capitán)
 | Referencia de pago | Número de referencia de transferencia | Texto | Proporcionado por banco/NEQUI | Sí |
 | Monto pagado | Valor pagado | Dinero | Debe coincidir con costo del torneo | Sí |
 
-Datos de entrada (Organizador)
+## Datos de entrada (Organizador)
 
 | Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
 |--------|-------------|----------------|-------------------|-------------|
 | Decisión de revisión | Aprobar o rechazar inscripción | Selección | Aprobado, Rechazado | Sí |
 | Motivo de rechazo (si aplica) | Explicación por la que se rechaza | Texto | Libre | No |
 
-Datos de salida
+## Datos de salida
 
 | Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
 |--------|-------------|----------------|-------------------|-------------|
@@ -237,7 +235,7 @@ Datos de salida
 | Mensaje de confirmación | Confirmación de acción | Texto | Mensaje de éxito o error | Sí |
 | Notificación al capitán | Notificación de aceptación/rechazo | Correo electrónico | Enviado automáticamente | Sí |
 
-Flujo básico
+## Flujo básico
 
 | Paso | Actor | Descripción | Excepciones |
 |------|-------|-------------|-------------|
@@ -253,7 +251,7 @@ Flujo básico
 | 10 | Sistema | Cambia estado a "Aprobado" o "Rechazado" | - |
 | 11 | Sistema | Envía notificación al correo del capitán | - |
 
-Flujo alterno
+## Flujo alterno
 
 | Paso | Actor | Descripción | Excepciones |
 |------|-------|-------------|-------------|
@@ -264,7 +262,7 @@ Flujo alterno
 
 RF-005: Configurar Torneo (Reglamento, fechas, horarios, canchas, sanciones)
 
-Funcionalidad
+## Funcionalidad
 
 | Código | Nombre |
 |--------|--------|
@@ -274,7 +272,7 @@ Funcionalidad
 |-------------|-----------------|-----------------|-----------------|
 | Después de crear el torneo, el organizador define el reglamento, fechas importantes (cierre de inscripciones, inicio de fase de grupos), horarios de partidos, canchas disponibles y sanciones. Esta información se publica en la plataforma para que todos los participantes la vean. | El organizador accede a la sección "Configuración" del torneo y completa cada campo. Los cambios se guardan y se publican inmediatamente en la sección de información del torneo. | Organizador | Torneo debe existir y estar en estado "Borrador" o "Activo". |
 
-Datos de entrada
+## Datos de entrada
 
 | Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
 |--------|-------------|----------------|-------------------|-------------|
@@ -285,14 +283,14 @@ Datos de entrada
 | Canchas | Listado de canchas disponibles | Texto | Nombre y ubicación de cada cancha | Sí |
 | Sanciones | Definición de tarjetas y expulsiones | Texto largo | Máximo 5000 caracteres | Sí |
 
-Datos de salida
+## Datos de salida
 
 | Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
 |--------|-------------|----------------|-------------------|-------------|
 | Confirmación de configuración | Confirmación de guardado | Booleano | Sí/No | Sí |
 | Mensaje de éxito | Confirmación de cambios guardados | Texto | Mensaje de éxito | Sí |
 
-Flujo básico
+## Flujo básico
 
 | Paso | Actor | Descripción | Excepciones |
 |------|-------|-------------|-------------|
@@ -309,7 +307,7 @@ Flujo básico
 
 RF-006: Registrar Partidos y Resultados
 
-Funcionalidad
+## Funcionalidad
 
 | Código | Nombre |
 |--------|--------|
@@ -319,7 +317,7 @@ Funcionalidad
 |-------------|-----------------|-----------------|-----------------|
 | El organizador registra los resultados de los partidos: marcador final, goleadores (con minuto de gol), tarjetas amarillas y tarjetas rojas. Esta información se actualiza en el sistema y automáticamente se recalcula la tabla de posiciones. | El organizador accede a "Registro de partidos", selecciona el partido, ingresa el marcador, goleadores y tarjetas, y confirma. El sistema calcula puntos automáticamente. | Organizador | Partido debe estar programado en el torneo. |
 
-Datos de entrada
+## Datos de entrada
 
 | Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
 |--------|-------------|----------------|-------------------|-------------|
@@ -332,7 +330,7 @@ Datos de entrada
 | Tarjetas amarillas | Jugadores con tarjeta amarilla | Nombre + minuto | Formato: "Nombre (minuto)" | No |
 | Tarjetas rojas | Jugadores expulsados | Nombre + minuto | Formato: "Nombre (minuto)" | No |
 
-Datos de salida
+## Datos de salida
 
 | Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
 |--------|-------------|----------------|-------------------|-------------|
@@ -340,7 +338,7 @@ Datos de salida
 | Tabla actualizada | Tabla con nueva información | Tabla | Calculada automáticamente | Sí |
 | Mensaje de confirmación | Confirmación de registro | Texto | Mensaje de éxito | Sí |
 
-Flujo básico
+## Flujo básico
 
 | Paso | Actor | Descripción | Excepciones |
 |------|-------|-------------|-------------|
@@ -357,7 +355,7 @@ Flujo básico
 
 RF-007: Calcular Tabla de Posiciones y Generar Llaves Eliminatorias
 
-Funcionalidad
+## Funcionalidad
 
 | Código | Nombre |
 |--------|--------|
@@ -367,14 +365,14 @@ Funcionalidad
 |-------------|-----------------|-----------------|-----------------|
 | El sistema calcula automáticamente la tabla de posiciones en tiempo real según resultados ingresados. Muestra partidos jugados, ganados, empatados, perdidos, goles a favor, goles en contra, diferencia de gol y puntos. Después de la fase de grupos, el sistema genera automáticamente las llaves eliminatorias (cuartos de final, semifinal, final) de manera aleatoria. | Después de cada resultado ingresado, el sistema recalcula. Al finalizar fase de grupos, genera llaves automáticamente según la tabla. | Sistema/Organizador (para validar) | Deben haber resultados registrados. Fase de grupos debe estar finalizada para generar llaves. |
 
-Datos de entrada
+## Datos de entrada
 
 | Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
 |--------|-------------|----------------|-------------------|-------------|
 | Resultados de partidos | Información de todos los partidos | Tabla | Datos de RF-006 | Sí |
 | Criterio de generación de llaves | Método de emparejamiento | Selección | Aleatorio, Por posición en tabla | Sí |
 
-Datos de salida
+## Datos de salida
 
 | Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
 |--------|-------------|----------------|-------------------|-------------|
@@ -389,7 +387,7 @@ Datos de salida
 | Puntos | Puntos totales (3 por victoria, 1 por empate) | Número | Calculado automáticamente | Sí |
 | Llaves eliminatorias | Estructura de cuartos, semis y final | Árbol visual | Generado automáticamente | Sí |
 
-Flujo básico
+## Flujo básico
 
 | Paso | Actor | Descripción | Excepciones |
 |------|-------|-------------|-------------|
@@ -404,7 +402,7 @@ Flujo básico
 | 9 | Sistema | Asigna fechas y horarios a cada llave | - |
 | 10 | Sistema | Publica llaves en la plataforma | - |
 
-Flujo alterno
+## Flujo alterno
 
 | Paso | Actor | Descripción | Excepciones |
 |------|-------|-------------|-------------|
@@ -415,7 +413,7 @@ Flujo alterno
 
 RF-008: Consultar Información del Torneo (Calendario, resultados, estadísticas, alineaciones)
 
-Funcionalidad
+## Funcionalidad
 
 | Código | Nombre |
 |--------|--------|
@@ -425,7 +423,7 @@ Funcionalidad
 |-------------|-----------------|-----------------|-----------------|
 | Todos los usuarios pueden consultar: calendario de partidos, resultados registrados, tabla de posiciones, llaves eliminatorias, estadísticas (máximos goleadores, historial de partidos por equipo), alineaciones de los equipos (titulares y reservas), información de árbitros (fecha, hora, cancha, equipos de su partido). | Los usuarios acceden a diferentes secciones: "Calendario", "Resultados", "Tabla", "Estadísticas", "Mis partidos" (árbitros), "Alineaciones". | Cualquier usuario autenticado | Usuario autenticado. Torneo activo o en progreso. |
 
-Datos de entrada
+## Datos de entrada
 
 | Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
 |--------|-------------|----------------|-------------------|-------------|
@@ -433,7 +431,7 @@ Datos de entrada
 | Filtro por equipo (opcional) | Para resultados o alineaciones | Selección | Listado de equipos | No |
 | Filtro por fecha (opcional) | Para calendario o resultados | Rango de fechas | Formato YYYY-MM-DD | No |
 
-Datos de salida
+## Datos de salida
 
 | Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
 |--------|-------------|----------------|-------------------|-------------|
@@ -446,7 +444,7 @@ Datos de salida
 | Alineación del equipo | Titulares y reservas | Tabla | Nombre, posición, dorsal | Sí |
 | Información árbitro | Sus partidos asignados | Tabla | Fecha, hora, cancha, equipos | Sí |
 
-Flujo básico
+## Flujo básico
 
 | Paso | Actor | Descripción | Excepciones |
 |------|-------|-------------|-------------|
@@ -460,7 +458,7 @@ Flujo básico
 | 8 | Usuario | Accede a "Máximos goleadores" | - |
 | 9 | Sistema | Muestra ranking de goleadores | - |
 
-Flujo alterno (Árbitro)
+## Flujo alterno (Árbitro)
 
 | Paso | Actor | Descripción | Excepciones |
 |------|-------|-------------|-------------|
@@ -468,7 +466,7 @@ Flujo alterno (Árbitro)
 | 2 | Sistema | Muestra partidos asignados al árbitro (fecha, hora, cancha, equipos) | - |
 | 3 | Árbitro | Puede consultar información de las alineaciones | - |
 
-Flujo alterno (Capitán - Alineaciones)
+## Flujo alterno (Capitán - Alineaciones)
 
 | Paso | Actor | Descripción | Excepciones |
 |------|-------|-------------|-------------|
@@ -480,16 +478,16 @@ Flujo alterno (Capitán - Alineaciones)
 
 
 
-Anexos
+## Anexos
 
 Diagramas de Casos de Uso:
 ![alt text](../images/Diagrama-Casos-De-Uso.png)
 
-Mockup:
+## Mockup:
 
 
 
-Reglas de Negocio
+## vReglas de Negocio
 
 
 | No. | Descripción |
@@ -508,7 +506,7 @@ Reglas de Negocio
 | RN-012 | Los máximos goleadores se calculan de manera acumulativa durante todo el torneo (fases de grupo y eliminatorias). |
 
 
-Abreviaturas
+## Abreviaturas
 
 | Abreviatura | Significado |
 |-------------|-------------|
