@@ -1,93 +1,117 @@
-# Manual de Identidad Visual y UI - TECHCUP FÚTBOL
+# Manual de Identidad de Marca y UI - TECHCUP FÚTBOL
 
-Este documento establece las directrices visuales, conceptuales y de diseño de interfaz (UI) para el sistema de gestión de torneos "TECHCUP FÚTBOL". Su objetivo principal es asegurar la consistencia visual, la escalabilidad del sistema y proporcionar una referencia clara para el desarrollo frontend.
+## 1. Introducción y Filosofía de Marca
 
-## 1. Identidad Visual y Concepto de Marca
+La construcción de la marca **TECHCUP FÚTBOL** trasciende el ámbito estético; representa un ecosistema diseñado para dignificar y profesionalizar la gestión de torneos deportivos a nivel amateur y semi-profesional. 
 
-La interfaz del sistema TECHCUP FÚTBOL presenta un diseño tipo *dashboard* enfocado en la gestión deportiva, adoptando una estética tecnológica y moderna. Se estructura sobre un tema oscuro (*Dark Mode*) diseñado para optimizar la legibilidad de datos complejos, establecer una jerarquía visual técnica y garantizar un rendimiento ergonómico prolongado.
+Nuestro **elemento central** es la convergencia entre la pasión visceral por el deporte y la frialdad analítica de la tecnología de datos. Actuamos como el puente que transforma la organización caótica de un torneo de fin de semana en una experiencia de alto rendimiento y primer nivel tanto para organizadores como para jugadores.
 
-### 1.1. Valores y Posicionamiento
-La propuesta cromática y estructural, basada en fondos de baja luminosidad con acentos en verde de alta saturación, busca proyectar:
-- **Profesionalismo:** Un entorno corporativo y seguro para la administración deportiva.
-- **Eficiencia Cognitiva:** Presentación clara y estructurada de indicadores y estadísticas.
-- **Dinamismo Competitivo:** Uso estratégico del contraste para evocar la energía inherente al deporte.
-- **Vanguardia Tecnológica:** Una plataforma digital robusta y contemporánea.
+### Valores Fundamentales:
+- **Profesionalismo y Rigurosidad:** Dotamos de credibilidad a la gestión de datos deportivos, ofreciendo herramientas robustas y exactas.
+- **Transparencia Inmediata:** Creemos en la democratización de la información. Resultados, estadísticas y sanciones siempre disponibles y en tiempo real.
+- **Dinamismo Competitivo:** Reflejamos la energía del campo de juego en cada interacción de la plataforma, manteniendo vivo el espíritu competitivo sano.
+- **Vanguardia Práctica:** La innovación tecnológica tiene sentido únicamente cuando resuelve problemas reales. Nuestra tecnología no es un adorno, es utilidad pura.
 
-## 2. Tipografía
+## 2. Nombre y Eslogan
 
-El sistema adopta principios de diseño modular y funcional, donde la selección tipográfica es determinante para la legibilidad en interfaces de alta densidad informativa.
+- **Nombre de la Marca:** TECHCUP FÚTBOL
+- **Eslogan Propuesto:** *"Tu torneo, tu estadio, tus reglas."* 
 
-- **Familia Tipográfica Principal:** Fuente sans-serif contemporánea, de proporción geométrica y alta legibilidad en pantalla (Ej. `Inter`, `Roboto` o similar).
-- **Sistema de Pesos:**
-  - **Títulos y Estructura Organizativa (`h1`, `h2`, `h3`):** Grosores *Bold* (700) o *Semi-Bold* (600) para definir jerarquía y separar secciones.
-  - **Cuerpos de Texto, Tablas y Componentes (`p`, `span`, `td`):** Grosores *Regular* (400) y *Light* (300) para facilitar la lectura de datos continuos y tabulares.
+Logo: 
+![alt text](image.png)
 
-## 3. Sistema de Color
+Isilogo (Logo sin texto): 
+![alt text](image-2.png)
 
-La arquitectura de color se fundamenta en tonos oscuros desaturados para minimizar la fatiga visual, empleando un verde vibrante como color de acción primario. Este verde actúa como *call-to-action* (CTA) y refuerza la conexión semántica con el campo de juego.
+Isilogo Horizontal: 
+![alt text](image-3.png)
 
-### 3.1. Tonos Primarios de Marca y Acción
-Definen la identidad interactiva y focalizan la atención en elementos críticos.
-- **Verde Principal (Acento):** `#00B37E`
-  - **Aplicación:** Logotipo (textos de resalte), botones de acción afirmativa (CTA), indicadores de valores numéricos positivos, elementos de navegación seleccionados y estados de retroalimentación de éxito.
-- **Verde Secundario (Fondos Activos):** `#0A2B27`
-  - **Aplicación:** Uso restringido a fondos semi-transparentes o tenues para denotar estados interactivos (*hover*, *active* o *selected*) sin saturar la composición visual.
+Isologo Monocromático: 
+![alt text](image-5.png)
 
-### 3.2. Tonos Neutros y Estructura de Superficies
-Constituyen la base del tema oscuro, generando profundidad mediante la superposición de capas.
-- **Fondo Base (App Background):** `#0B111A`
-- **Superficies y Contenedores (Cards/Modals):** `#121926` y `#1C2434`
-  - **Aplicación:** Elevación visual de paneles informativos, tablas de datos y módulos superpuestos.
-- **Textos Primarios:** `#FFFFFF` o `#F8FAFC`
-  - **Aplicación:** Legibilidad máxima sobre fondos oscuros.
-- **Textos Secundarios y Metadatos:** `#94A3B8`
-  - **Aplicación:** Etiquetas descriptivas, encabezados de columnas, información auxiliar, menús inactivos y *placeholders*.
+Isologo Simbolo en contorno: 
+![alt text](image-6.png)
 
-### 3.3. Paleta Semántica
-Colores funcionales para la comunicación de estados del sistema.
-- **Éxito (Success):** `#00B37E` (Acciones completadas, operaciones en línea).
-- **Peligro / Error / Alertas Críticas (Danger):** `#EF4444` o `#D32F2F` (Errores de validación, acciones destructivas, sanciones disciplinarias).
-- **Advertencia (Warning):** `#FBBF24` o `#F59E0B` (Avisos preventivos, estados pendientes, amonestaciones).
-- **Informativo (Info):** `#3B82F6` (Notificaciones del sistema, hipervínculos).
 
-## 4. Arquitectura de la Interfaz
 
-La disposición espacial de los elementos responde a principios ergonómicos, optimizando la navegación y el consumo de información.
+## 3. Público Objetivo
 
-### 4.1. Panel de Navegación Lateral (Sidebar)
-Elemento de anclaje para el enrutamiento principal.
-- **Cabecera Institucional:** Isotipo técnico (e.g., trofeo abstracto) y logotipo denominativo "TECHCUP FÚTBOL".
-- **Estructura de Menú:** Ítems representados mediante iconografía lineal de peso uniforme (Panel de Control, Perfil, Alineación, Pagos, Gestión de Torneos).
-- **Indicador de Estado Activo:** Destacado volumétrico utilizando el Verde Secundario sobre el ítem seleccionado.
-- **Módulo de Identidad de Usuario:** Situado en la sección inferior, presenta un avatar, credenciales y rol en el sistema.
+Nuestra plataforma está diseñada y optimizada para dos perfiles principales:
 
-### 4.2. Superficie Principal de Trabajo
-Área de despliegue del contexto operativo.
-- **Cabecera de Contexto (Header):** Títulos descriptivos unívocos y subtítulos funcionales para contextualización inmediata.
-- **Zona de Utilidad Global:** Ubicación de indicadores de estado en tiempo real, notificaciones globales y botones de acción principal.
+1. **Organizadores de Torneos (Administradores):**
+   - **Perfil:** Personas o entidades dedicadas a gestionar ligas de fútbol 5, fútbol 7, y fútbol 11. Suelen lidiar con hojas de cálculo desactualizadas, problemas de cobros y desorganización de estadísticas.
+   - **Necesidad Básica:** Eficiencia, gestión automatizada, control financiero, y un medio para proyectar profesionalismo hacia los equipos participantes.
 
-### 4.3. Componentes Modulares Informativos (Cards)
-Estrategia de contención para la segmentación de datos estadísticos y operativos.
-- **Tablas de Rendimiento:** Sistemas de grillas estructuradas con bordes divisibles tenues (`#1C2434`). Resalte selectivo (Verde Principal) para métricas de alto valor cognitivo (e.g., puntuación total).
-- **Módulos de Resumen (Widgets):** Tarjetas de alta densidad informativa, diseñadas para consultas rápidas sobre programación y cruces deportivos.
+2. **Jugadores, Capitanes y Aficionados (Usuarios Finales):**
+   - **Perfil:** Deportistas amateur, entusiastas del fútbol que participan activamente en ligas competitivas. Les interesa revisar estadísticas personales (goleadores), consultar posiciones, horarios de partidos e incidencias disciplinarias (tarjetas).
+   - **Necesidad Básica:** Experiencia fluida (preferentemente móvil), acceso inmediato a datos estadísticos de su rendimiento y el de sus rivales, todo desde un entorno visual atractivo que los haga sentir en una liga profesional.
 
-## 5. Diseño de Componentes (Design System Core)
+## 4. Paleta de Colores
 
-### 5.1. Controles Interactivos (Botones)
-- **Acción Primaria (Solid):** Fondo `#00B37E`, tipografía `#FFFFFF`, contornos suavizados para amabilidad visual.
-- **Acción Secundaria (Outline):** Ausencia de relleno (transparente), delineado en borde gris claro o `#00B37E`, utilizado para reducir el peso visual en acciones no críticas.
-- **Indicadores de Estado (Badges/Pills):** Geometría oval, combinando iconos de estado (e.g., conectividad) con tipografía secundaria.
+Nuestra arquitectura de color comunica solidez tecnológica (*Dark Mode*) y vitalidad deportiva (acento vibrante).
 
-### 5.2. Componentes de Entrada de Datos (Formularios)
-- Contenedores de entrada con fondo sutilmente contrastante (`#0B111A` sobre tarjetas) y transiciones visibles en `:focus` (borde `#00B37E`) para asegurar accesibilidad y retroalimentación inmediata durante la interacción.
+- **Verde Principal (Acento y Energía): `#00B37E`**
+  - El núcleo visual de la marca. Evoca el césped del campo de juego fresco y las resoluciones afirmativas del ecosistema digital ("Éxito", "Adelante").
+  - *Uso:* Logotipo principal, botones de acción primarios (CTA), resaltado de estadísticas clave y enlaces activos.
 
-### 5.3. Sistema Iconográfico
-- Estilo vectorial lineal, peso tipográfico equilibrado con la fuente base para evitar interferencias visuales. Simbología estándar de fácil decodificación orientada al entorno deportivo y tecnológico.
+  ![alt text](image-7.png)
 
-## 6. Documentación de Referencia
+- **Verde Secundario (Apoyo Interactivo): `#0A2B27`**
+  - Un tono profundo y sutil.
+  - *Uso:* Fondos de selección, estados activos sutiles y transiciones de elementos enfocados (*hover states*).
 
-La implementación fidedigna debe basarse en los siguientes recursos centralizados:
-- **Prototipo Interactivo (UI/UX):** [Figma - Soccer Tournament Management System](https://www.figma.com/make/qoYhlVEwEVM0H4NcYEmsNe/Soccer-Tournament-Management-System?p=f&fullscreen=1&preview-route=%2Flineup)
-- **Archivos Locales:** Recursos disponibles en la ruta `docs/requirements/img.png`.
+ ![alt text](image-8.png)  
+  
+- **Oscuros y Neutros (Estructura y Base): `#0B111A`, `#121926`, `#1C2434`**
+  - Configuran la profundidad de la aplicación. Inspirados en una noche de estadio y paneles de análisis de datos.
+  - *Uso:* Fondos globales (`#0B111A`), tarjetas/paneles (`#121926`) separadores estructurales y modales contextuales.
 
-*Directriz Técnica: Se requiere que la implementación del Frontend utilice arquitecturas basadas en Design Tokens (e.g., variables CSS globales `:root { --color-primary: #00B37E; }`) para garantizar la mantenibilidad y consistencia del sistema.*
+ ![alt text](image-9.png) ![alt text](image-10.png) ![alt text](image-11.png)
+
+- **Colores de Semántica y Texto (Comunicación de Estados):`#FFFFFF`, `#94A3B8`, `#EF4444`**
+  - Las alertas de disciplina (Tarjetas Rojas, exclusiones) emplean el **Rojo `#EF4444`**.
+  - Los textos principales van en color **Blanco (`#FFFFFF`)**, mientras que las etiquetas descriptivas y metadatos se utilizan en **Gris Azulado (`#94A3B8`)** para definir jerarquías sin saturar la lectura.
+ 
+![alt text](image-12.png) 
+![alt text](image-13.png)
+![alt text](image-14.png)
+
+
+## 5. Tipografía
+
+La voz visual de la marca es limpia, geométrica y sin adornos innecesarios, garantizando legibilidad perfecta en interfaces densas.
+
+- **Familia Tipográfica:** **`Inter`** (o `Roboto` como segunda alternativa).
+  - Es una tipografía de estilo *Neo-Grotesque* sin serifas, diseñada específicamente para pantallas y lectura de datos numéricos (ideal para tablas de posiciones y marcadores temporales).
+- **Estructura de Pesos:**
+  - **Encabezados (Títulos de página, Nombres de Equipos):** Pesos *Bold* (700) para un impacto visual directo y jerarquía clara.
+  - **Puntuaciones y Estadísticas Numéricas:** Uso frecuente de *Semi-Bold* (600) para que las métricas relevantes llamen la atención inmediatamente.
+  - **Descripciones Tabulares y Textos Comunes:** Grosores *Regular* (400) favoreciendo una lectura que evite la fatiga ocular y simplifique visualmente pantallas muy cargadas.
+
+## 6. Imágenes Utilizadas
+
+El uso fotográfico y gráfico en la plataforma se basa en el contraste, reforzando la narrativa de "tecnología + pasión".
+
+- **Dirección de Arte y Fotografía:**
+  - **Fuerza y Dinamismo:** Empleamos imágenes de estadios de noche iluminados, césped nítido o balones en movimiento con enfoques dramáticos o de baja exposición de fondo. Tratamiento y filtros que integran los tonos oscuros de la paleta.
+  - **Carga Emotiva del Jugador:** Imágenes de celebración, concentración, cordones atándose. Trazamos un paralelo con el jugador profesional.
+- **Avatares y Escudos:**
+  - Las imágenes cargadas por los usuarios (escudos de equipo, perfiles) van enmarcadas en geométricos estilizados (polígonos, círculos con bordes de `#1C2434`), con tratamientos que resalten los logos de los equipos y minimicen fondos ruidosos.
+- **Ausencia de Imágenes Genéricas:** Evitamos a toda costa "fotos de stock corporativas" sonrientes. El tono es sudor, cancha, luces de estadio tácticas y pizarras de estrategia.
+
+## 7. Elementos Visuales del Diseño (Guía de Estilo UI)
+
+### 7.1. Botones (Call to Action)
+- **Botón Primario ("El Disparo"):** Fondos enteramente de Verde Principal (`#00B37E`), texto en blanco, bordes con un suavizado moderno (*border-radius* no circular, sino redondeado técnico de aprox `6px - 8px`). Utilizado solo para las acciones más críticas de la pantalla (ej. "Iniciar Sesión", "Crear Torneo").
+- **Botón Secundario ("El Pase"):** Con fondo transparente y borde delineado en plateado o verde claro. Utilizados como acciones suplementarias (Cancelar, Editar Perfil).
+
+### 7.2. Iconografía
+- **Estética Vectorial Lineal:** Iconos limpios, minimalistas, de trazo continuo o "wireframe", del mismo grosor que la tipografía principal para conservar un aspecto quirúrgico y equilibrado (`stroke-width` uniforme).
+- **Semiótica Deportiva Contemporánea:** Íconos tácticos para estrategia, silbatos estilizados para arbitraje y trofeos que huyan de un estilo *cartoony*. Deben lucir tan sofisticados como la interfaz de un videojuego deportivo moderno (Ej. FIFA/EAFC o Football Manager).
+
+### 7.3. Indicadores (Badges / Pills)
+- **Alertas Constantes:** Formas ovaladas compactas con un indicador luminoso (punto de estatus). Utilizados de manera crítica para mostrar "EN CURSO", estados de pago o conexiones activas de la liga.
+- **Alertas Disciplinarias:** Las tarjetas amarillas y rojas se representan literalmente como pequeños rectángulos coloreados, limpios y de borde recto integrados junto a los nombres de los jugadores.
+
+### 7.4. Formularios y Entradas (Inputs)
+- Las cajas de introducción de texto contrastan sensiblemente su fondo (`#0B111A`) sobre la superficie de las tarjetas (`#121926`). Se enfocan (*Focus State*) rodeando el input con un destello en Verde Principal (`#00B37E`), retroalimentando positivamente la interacción del usuario sin margen de error.
