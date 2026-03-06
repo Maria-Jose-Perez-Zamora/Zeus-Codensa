@@ -457,6 +457,11 @@
 ---
 
 # Anexos:
+
+[Diagrama-Casos-De-Uso2.asta](../uml/Diagrama-Casos-De-Uso2.asta)
+
+![Diagrama-Casos-De-Uso.png](../images/Diagrama-Casos-De-Uso.png)
+
 # Prototipos:
 
 ## Reglas de negocio
