@@ -1,502 +1,533 @@
-# Requerimientos del sistema – TECHCUP Fútbol
 
-## Requerimientos funcionales
 
-1. El sistema debe permitir que los usuarios se registren, inicien sesión y puedan completar su perfil como jugador.
+Requerimientos funcionales principales
 
-2. El sistema debe permitir que un capitán cree un equipo, agregue jugadores y administre la información del equipo.
+1. Gestionar torneos: crear, iniciar, finalizar y consultar torneos.
+2. Registrar usuarios y jugadores por rol (estudiante, graduado, profesor, administrativo, familiar, capitán, organizador, árbitro, administrador).
+3. Gestionar equipos: crear equipo, invitar jugadores y validar reglas de conformación (mínimo/máximo de jugadores y sin duplicidad).
+4. Gestionar inscripciones y pagos: cargar comprobante y administrar estados (pendiente, en revisión, aprobado, rechazado).
+5. Configurar torneo: reglamento, fechas clave, cierre de inscripciones, horarios, canchas y sanciones.
+6. Registrar partidos: marcador, goleadores y tarjetas.
+7. Calcular automáticamente tabla de posiciones y generar llaves eliminatorias.
+8. Consultar información del torneo: calendario, resultados, estadísticas e información para árbitros.
 
-3. El sistema debe permitir buscar jugadores disponibles y enviarles invitaciones para unirse a un equipo.
+Requerimientos no funcionales principales
 
-4. El sistema debe permitir al organizador crear y configurar el torneo con su información básica (fechas, número de equipos y costo).
+1. Diseño responsivo: la plataforma debe adaptarse correctamente a pantallas de celular y computador.
+2. Seguridad y acceso: autenticación según tipo de usuario (correo institucional o Gmail) y control de roles/permisos.
+3. Auditoría: registrar acciones relevantes para trazabilidad de cambios y operaciones.
+4. Rendimiento: tiempos de respuesta adecuados en operaciones frecuentes (consulta de tabla, partidos, equipos e inscripciones).
+5. Disponibilidad y confiabilidad: el sistema debe estar estable durante periodos críticos del torneo.
+6. Arquitectura mantenible: backend por capas con API REST, frontend en React + TypeScript y base de datos PostgreSQL.
+7. Integridad de datos: validaciones automáticas de reglas del torneo para evitar inconsistencias.
 
-5. El sistema debe permitir subir comprobantes de pago para la inscripción del equipo y permitir al organizador aprobar o rechazar la inscripción.
 
-6. El sistema debe permitir registrar la información de los partidos como horario, cancha, alineaciones, resultados y sanciones.
+Requerimientos funcionales detallados
+
 
-7. El sistema debe generar automáticamente la tabla de posiciones y las llaves eliminatorias del torneo.
+RF-001: Gestionar Torneos
 
-8. El sistema debe permitir consultar información del torneo como calendario de partidos, resultados y estadísticas.
+Funcionalidad
 
-## Requerimientos no funcionales
+| Código | Nombre |
+|--------|--------|
+| RF-001 | Gestión de Torneos |
+
+| Descripción | Cómo se ejecuta | Actor principal | Precondiciones |
+|-------------|-----------------|-----------------|-----------------|
+| El sistema permite crear, configurar, iniciar y finalizar torneos. Un organizador puede definir la información básica del torneo (fechas, cantidad de equipos, costo) y cambiar su estado entre Borrador, Activo, En progreso y Finalizado. | El organizador accede a la sección de torneos y crea uno nuevo con los datos básicos. Luego puede iniciar el torneo cuando sea el momento. | Organizador | El usuario debe tener rol de organizador. |
 
-1. El sistema debe manejar autenticación de usuarios y control de roles para proteger la información.
+Datos de entrada
 
-2. La plataforma debe ser una aplicación web sencilla y fácil de usar.
+| Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
+|--------|-------------|----------------|-------------------|-------------|
+| Nombre del torneo | Identificador del torneo | Texto | Sin caracteres especiales | Sí |
+| Fecha inicial | Fecha de inicio del torneo | Fecha | Formato YYYY-MM-DD | Sí |
+| Fecha final | Fecha de finalización del torneo | Fecha | Debe ser posterior a la fecha inicial | Sí |
+| Cantidad de equipos | Número de equipos que participarán | Número | Mínimo 4, máximo 32 | Sí |
+| Costo por equipo | Valor a pagar por cada equipo | Dinero | Valor en pesos colombianos | Sí |
 
-3. El sistema debe permitir que varios usuarios puedan usar la plataforma al mismo tiempo.
+Datos de salida
 
-4. La información del torneo debe estar disponible durante todo el tiempo que se realice la competencia.
+| Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
+|--------|-------------|----------------|-------------------|-------------|
+| ID del torneo | Identificador único asignado | Número | Generado automáticamente | Sí |
+| Estado del torneo | Estado actual del torneo | Selección | Borrador, Activo, En progreso, Finalizado | Sí |
+| Mensaje de confirmación | Confirmación de la acción realizada | Texto | Mensaje de éxito o error | Sí |
 
-5. El sistema debe desarrollarse con Spring Boot en el backend, React con TypeScript en el frontend y PostgreSQL como base de datos.
+Flujo básico
 
----
+| Paso | Actor | Descripción | Excepciones |
+|------|-------|-------------|-------------|
+| 1 | Organizador | Accede a la sección "Gestión de torneos" | Organizador no autenticado: redirigir a login |
+| 2 | Organizador | Selecciona "Crear nuevo torneo" | - |
+| 3 | Organizador | Ingresa información básica (nombre, fechas, cantidad de equipos, costo) | Fechas inválidas: mostrar error |
+| 4 | Organizador | Confirma la creación del torneo | - |
+| 5 | Sistema | Valida datos y crea el torneo con estado "Borrador" | Datos incompletos: mostrar error |
+| 6 | Sistema | Genera ID único y confirma creación | - |
 
-# Especificacion de requerimientos
+Flujo alterno
 
-## 1. El sistema debe permitir que los usuarios se registren, inicien sesión y puedan completar su perfil como jugador.
-# Documento de análisis de requerimientos
+| Paso | Actor | Descripción | Excepciones |
+|------|-------|-------------|-------------|
+| 1 | Organizador | Selecciona un torneo existente | Torneo no encontrado: mostrar error |
+| 2 | Organizador | Selecciona "Iniciar torneo" | Torneo no está en estado Borrador: mostrar error |
+| 3 | Sistema | Cambia el estado a "Activo" y activa el período de inscripciones | - |
+| 4 | Organizador | Selecciona "Finalizar torneo" (después de "En progreso") | Torneo no está en estado "En progreso": mostrar error |
+| 5 | Sistema | Cambia estado a "Finalizado" y cierra inscripciones | - |
 
-## Requerimiento funcional
 
-| Campo | Descripción |
-|------|-------------|
-| Identificador | RF1 |
-| Nombre del requerimiento | Registro e inicio de sesión de usuarios |
-| Descripción | El sistema debe permitir que los usuarios se registren, inicien sesión y completen su perfil como jugador dentro de la plataforma. |
-| Actor principal | Usuario |
-| Precondiciones | El usuario debe tener acceso a internet y un correo electrónico válido. |
+RF-002: Registrar Usuarios y Jugadores
 
+Funcionalidad
 
+| Código | Nombre |
+|--------|--------|
+| RF-002 | Registro de Usuarios y Jugadores |
+
+| Descripción | Cómo se ejecuta | Actor principal | Precondiciones |
+|-------------|-----------------|-----------------|-----------------|
+| Cada participante (estudiante, graduado, profesor, administrativo, familiar) se registra en el sistema con su correo (institucional o Gmail según corresponda), crea su perfil deportivo indicando posiciones, dorsal y sube foto. Puede marcarse como disponible para que capitanes lo contacten. | El usuario accede a la plataforma, elige su tipo de rol, se autentica con correo, completa su perfil deportivo y confirma disponibilidad. | Jugador/Estudiante/Graduado/Profesor/Administrativo/Familiar | Ninguna (primer acceso) |
+
+Datos de entrada
+
+| Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
+|--------|-------------|----------------|-------------------|-------------|
+| Correo | Correo para autenticarse | Correo electrónico | Correo institucional o Gmail según rol | Sí |
+| Nombre completo | Nombre del usuario | Texto | Sin caracteres especiales | Sí |
+| Identificación | Número de cédula o pasaporte | Texto | Formato válido sin guiones | Sí |
+| Posiciones | Posiciones de juego (portero, defensa, volante, delantero) | Selección múltiple | Al menos una posición | Sí |
+| Dorsal | Número de camiseta preferido | Número | Entre 1 y 99 | Sí |
+| Foto | Imagen de perfil | Archivo | Formato JPEG/PNG, máximo 5 MB | Sí |
+| Disponibilidad | Disponible para que capitanes lo contacten | Booleano | Sí/No | Sí |
+| Semestre (si estudiante) | Semestre académico | Número | Entre 1 y 12 | No |
+| Género | Género del jugador | Selección | Masculino, Femenino, Otro | Sí |
+| Edad | Edad del jugador | Número | Mayor o igual a 16 | Sí |
+
+Datos de salida
+
+| Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
+|--------|-------------|----------------|-------------------|-------------|
+| ID de usuario | Identificador único | Número | Generado automáticamente | Sí |
+| Perfil completado | Confirmación de registro | Booleano | Sí/No | Sí |
+| Mensaje de confirmación | Confirmación de créación | Texto | Mensaje de éxito | Sí |
+
+Flujo básico
+
+| Paso | Actor | Descripción | Excepciones |
+|------|-------|-------------|-------------|
+| 1 | Jugador | Accede a la plataforma | - |
+| 2 | Jugador | Selecciona su tipo de rol (estudiante, graduado, profesor, etc.) | - |
+| 3 | Jugador | Se autentica con correo institucional o Gmail | Correo no existe: crear cuenta nueva o mostrar error |
+| 4 | Jugador | Completa su perfil (nombre, ID, posiciones, dorsal, sube foto) | Datos faltantes: mostrar campos obligatorios |
+| 5 | Jugador | Indica disponibilidad para que capitanes lo contacten | - |
+| 6 | Sistema | Valida datos y crea el perfil deportivo | - |
+| 7 | Sistema | Confirma registro exitoso | - |
+
+Flujo alterno
+
+| Paso | Actor | Descripción | Excepciones |
+|------|-------|-------------|-------------|
+| 1 | Jugador | Ya tiene cuenta creada y accede a "Editar perfil" | Usuario no autenticado: redirigir a login |
+| 2 | Jugador | Actualiza información (posiciones, dorsal, foto, disponibilidad) | - |
+| 3 | Sistema | Valida cambios y actualiza perfil | - |
+| 4 | Jugador | Puede recibir invitaciones de capitanes | Invitación rechazada: se elimina de la lista de contactos del capitán |
+
+
+RF-003: Gestionar Equipos (Creación, invitaciones, búsqueda de jugadores)
+
+Funcionalidad
+
+| Código | Nombre |
+|--------|--------|
+| RF-003 | Gestión de Equipos |
+
+| Descripción | Cómo se ejecuta | Actor principal | Precondiciones |
+|-------------|-----------------|-----------------|-----------------|
+| Los capitanes crean equipos con nombre, escudo, colores de uniforme. Invitan jugadores a sus equipos respetando las reglas: mínimo 7 jugadores, máximo 12, sin duplicidad de jugador en equipos, más de la mitad de los miembros deben ser de los programas de Ingeniería de Sistemas, IA, Ciberseguridad y Estadística. Los capitanes pueden buscar jugadores disponibles por posición, semestre, edad, género, nombre e identificación. | El capitán accede a su panel, crea el equipo ingresando nombre, carga escudo e indica colores. Luego busca jugadores por criterios y envía invitaciones. Los jugadores aceptan o rechazan iniciativas. | Capitán | El usuario debe tener o cambiar a rol de capitán. Debe existir un torneo activo. |
+
+Datos de entrada (Crear equipo)
+
+| Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
+|--------|-------------|----------------|-------------------|-------------|
+| Nombre del equipo | Nombre del equipo | Texto | Sin caracteres especiales | Sí |
+| Escudo | Logo o imagen del equipo | Archivo | Formato JPEG/PNG, máximo 5 MB | Sí |
+| Color uniforme (primario) | Color principal del uniforme | Color | Código hexadecimal | Sí |
+| Color uniforme (secundario) | Color secundario del uniforme | Color | Código hexadecimal | No |
+
+Datos de entrada (Búsqueda de jugadores)
+
+| Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
+|--------|-------------|----------------|-------------------|-------------|
+| Posición | Filtro por posición de juego | Selección | Portero, Defensa, Volante, Delantero | No |
+| Semestre | Filtro por semestre académico | Número | Aplica solo a estudiantes | No |
+| Edad | Filtro por edad | Número | Rango mínimo y máximo | No |
+| Género | Filtro por género | Selección | Masculino, Femenino, Otro | No |
+| Nombre | Búsqueda por nombre | Texto | Búsqueda parcial permitida | No |
+| Identificación | Búsqueda por ID | Texto | Búsqueda exacta | No |
+
+Datos de salida
+
+| Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
+|--------|-------------|----------------|-------------------|-------------|
+| ID del equipo | Identificador único | Número | Generado automáticamente | Sí |
+| Lista de jugadores disponibles | Resultados de búsqueda | Lista | Jugadores marcados como disponibles | Sí |
+| Estado de invitación | Estado de la invitación enviada | Selección | Pendiente, Aceptada, Rechazada | Sí |
+| Mensaje de confirmación | Confirmación de acción | Texto | Mensaje de éxito o error | Sí |
+
+Flujo básico
+
+| Paso | Actor | Descripción | Excepciones |
+|------|-------|-------------|-------------|
+| 1 | Capitán | Accede a su panel de equipo | Capitán no autenticado: redirigir a login |
+| 2 | Capitán | Selecciona "Crear nuevo equipo" | Torneo no activo: mostrar error |
+| 3 | Capitán | Ingresa nombre del equipo, carga escudo e indica colores | Datos incompletos: mostrar campos obligatorios |
+| 4 | Sistema | Valida nombre único del equipo en el torneo | Nombre duplicado: mostrar error |
+| 5 | Sistema | Crea el equipo y asigna ID único | - |
+| 6 | Capitán | Accede a "Buscar jugadores" | - |
+| 7 | Capitán | Aplica filtros (posición, semestre, edad, género, nombre, ID) | Sin resultados: mostrar mensaje |
+| 8 | Sistema | Muestra lista de jugadores disponibles | - |
+| 9 | Capitán | Selecciona jugadores e invita a su equipo | - |
+| 10 | Sistema | Envía invitación al jugador | - |
+| 11 | Jugador | Recibe invitación y acepta o rechaza | Rechaza: no se suma al equipo |
+| 12 | Sistema | Actualiza lista de miembros del equipo | - |
+
+Flujo alterno
+
+| Paso | Actor | Descripción | Excepciones |
+|------|-------|-------------|-------------|
+| 1 | Capitán | Intenta invitar a jugador que ya pertenece a otro equipo | Sistema previene duplicidad: mostrar error |
+| 2 | Sistema | Valida reglas de conformación (mínimo 7, máximo 12) | Límite alcanzado: no permitir más invitaciones |
+| 3 | Sistema | Valida que más del 50% sean de programas autorizados | Validación fallida: mostrar advertencia |
+| 4 | Jugador | Recibe múltiples invitaciones de equipos | Puede aceptar una sola: rechazar las demás automáticamente |
+
+
+RF-004: Gestionar Inscripciones y Pagos
+
+Funcionalidad
+
+| Código | Nombre |
+|--------|--------|
+| RF-004 | Gestión de Inscripciones y Pagos |
+
+| Descripción | Cómo se ejecuta | Actor principal | Precondiciones |
+|-------------|-----------------|-----------------|-----------------|
+| El capitán realiza el pago por NEQUI o efectivo al coordinador del evento y luego sube el comprobante a la plataforma. El organizador revisa el documento y cambia el estado de la inscripción de Pendiente a En revisión, Aprobado (inscrito) o Rechazado. Solo equipos aprobados pueden participar en el torneo. | El capitán sube el comprobante de pago en la sección de inscripciones. El organizador revisa la imagen y aprueba o rechaza según validación de pago. | Capitán (sube comprobante), Organizador (revisa y aprueba) | Torneo debe estar activo. Equipo debe estar completamente conformado. |
+
+Datos de entrada (Capitán)
+
+| Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
+|--------|-------------|----------------|-------------------|-------------|
+| Comprobante de pago | Imagen o documento de transferencia | Archivo | Formato JPEG/PNG/PDF, máximo 5 MB | Sí |
+| Referencia de pago | Número de referencia de transferencia | Texto | Proporcionado por banco/NEQUI | Sí |
+| Monto pagado | Valor pagado | Dinero | Debe coincidir con costo del torneo | Sí |
+
+Datos de entrada (Organizador)
+
+| Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
+|--------|-------------|----------------|-------------------|-------------|
+| Decisión de revisión | Aprobar o rechazar inscripción | Selección | Aprobado, Rechazado | Sí |
+| Motivo de rechazo (si aplica) | Explicación por la que se rechaza | Texto | Libre | No |
+
+Datos de salida
+
+| Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
+|--------|-------------|----------------|-------------------|-------------|
+| Estado de inscripción | Estado actual del equipo | Selección | Pendiente, En revisión, Aprobado, Rechazado | Sí |
+| Mensaje de confirmación | Confirmación de acción | Texto | Mensaje de éxito o error | Sí |
+| Notificación al capitán | Notificación de aceptación/rechazo | Correo electrónico | Enviado automáticamente | Sí |
+
+Flujo básico
+
+| Paso | Actor | Descripción | Excepciones |
+|------|-------|-------------|-------------|
+| 1 | Capitán | Accede a "Inscripciones" en su panel de equipo | Capitán no autenticado: redirigir a login |
+| 2 | Capitán | Realiza pago del equipo (NEQUI o efectivo) | - |
+| 3 | Capitán | Accede a "Subir comprobante" | Torneo cerrado: mostrar error |
+| 4 | Capitán | Carga imagen del comprobante y referencia de pago | Archivo no válido: mostrar error |
+| 5 | Sistema | Valida formato y tamaño del archivo | - |
+| 6 | Sistema | Cambia estado de inscripción a "En revisión" | - |
+| 7 | Organizador | Accede a panel de revisión de inscripciones | Organizador no autenticado: redirigir a login |
+| 8 | Organizador | Visualiza comprobante y verifica pago | - |
+| 9 | Organizador | Aprueba o rechaza inscripción | - |
+| 10 | Sistema | Cambia estado a "Aprobado" o "Rechazado" | - |
+| 11 | Sistema | Envía notificación al correo del capitán | - |
+
+Flujo alterno
+
+| Paso | Actor | Descripción | Excepciones |
+|------|-------|-------------|-------------|
+| 1 | Organizador | Rechaza inscripción con motivo | Capitán recibe notificación con razón del rechazo |
+| 2 | Capitán | Puede resubir comprobante correcto | Máximo 3 intentos permitidos |
+| 3 | Sistema | Valida nuevo comprobante | - |
+
+
+RF-005: Configurar Torneo (Reglamento, fechas, horarios, canchas, sanciones)
+
+Funcionalidad
+
+| Código | Nombre |
+|--------|--------|
+| RF-005 | Configuración del Torneo |
+
+| Descripción | Cómo se ejecuta | Actor principal | Precondiciones |
+|-------------|-----------------|-----------------|-----------------|
+| Después de crear el torneo, el organizador define el reglamento, fechas importantes (cierre de inscripciones, inicio de fase de grupos), horarios de partidos, canchas disponibles y sanciones. Esta información se publica en la plataforma para que todos los participantes la vean. | El organizador accede a la sección "Configuración" del torneo y completa cada campo. Los cambios se guardan y se publican inmediatamente en la sección de información del torneo. | Organizador | Torneo debe existir y estar en estado "Borrador" o "Activo". |
+
+Datos de entrada
+
+| Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
+|--------|-------------|----------------|-------------------|-------------|
+| Reglamento | Reglas del torneo | Texto largo | Máximo 10000 caracteres | Sí |
+| Fecha cierre inscripciones | Fecha límite para inscribirse | Fecha | Formato YYYY-MM-DD, anterior a fecha de inicio | Sí |
+| Fecha inicio fase de grupos | Fecha de inicio de partidos | Fecha | Posterior a fecha inicial del torneo | Sí |
+| Horarios de partidos | Horas disponibles para partidos | Lista de horas | Formato HH:MM | Sí |
+| Canchas | Listado de canchas disponibles | Texto | Nombre y ubicación de cada cancha | Sí |
+| Sanciones | Definición de tarjetas y expulsiones | Texto largo | Máximo 5000 caracteres | Sí |
+
+Datos de salida
+
+| Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
+|--------|-------------|----------------|-------------------|-------------|
+| Confirmación de configuración | Confirmación de guardado | Booleano | Sí/No | Sí |
+| Mensaje de éxito | Confirmación de cambios guardados | Texto | Mensaje de éxito | Sí |
+
+Flujo básico
+
+| Paso | Actor | Descripción | Excepciones |
+|------|-------|-------------|-------------|
+| 1 | Organizador | Accede a "Configuración del torneo" | Organizador no autenticado: redirigir a login |
+| 2 | Organizador | Completa reglamento | Información incompleta: mostrar campos obligatorios |
+| 3 | Organizador | Define fechas importantes (cierre inscripciones, inicio fase) | Fechas inválidas: mostrar error |
+| 4 | Organizador | Define horarios disponibles para partidos | - |
+| 5 | Organizador | Ingresa canchas con nombres y ubicaciones | - |
+| 6 | Organizador | Define sanciones (tarjetas, expulsiones) | - |
+| 7 | Sistema | Valida información completada | - |
+| 8 | Sistema | Guarda configuración y la publica en la plataforma | - |
+| 9 | Sistema | Confirma cambios al organizador | - |
+
+
+RF-006: Registrar Partidos y Resultados
+
+Funcionalidad
+
+| Código | Nombre |
+|--------|--------|
+| RF-006 | Registro de Partidos y Resultados |
+
+| Descripción | Cómo se ejecuta | Actor principal | Precondiciones |
+|-------------|-----------------|-----------------|-----------------|
+| El organizador registra los resultados de los partidos: marcador final, goleadores (con minuto de gol), tarjetas amarillas y tarjetas rojas. Esta información se actualiza en el sistema y automáticamente se recalcula la tabla de posiciones. | El organizador accede a "Registro de partidos", selecciona el partido, ingresa el marcador, goleadores y tarjetas, y confirma. El sistema calcula puntos automáticamente. | Organizador | Partido debe estar programado en el torneo. |
+
+Datos de entrada
+
+| Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
+|--------|-------------|----------------|-------------------|-------------|
+| ID del partido | Identificador del partido | Número | Generado automáticamente | Sí |
+| Equipo 1 | Equipo local | Selección | Listado de equipos del torneo | Sí |
+| Equipo 2 | Equipo visitante | Selección | Listado de equipos del torneo | Sí |
+| Goles Equipo 1 | Cantidad de goles marcados | Número | Mínimo 0 | Sí |
+| Goles Equipo 2 | Cantidad de goles marcados | Número | Mínimo 0 | Sí |
+| Goleadores | Lista de goleadores | Nombre + minuto | Formato: "Nombre (minuto)" | No |
+| Tarjetas amarillas | Jugadores con tarjeta amarilla | Nombre + minuto | Formato: "Nombre (minuto)" | No |
+| Tarjetas rojas | Jugadores expulsados | Nombre + minuto | Formato: "Nombre (minuto)" | No |
+
+Datos de salida
+
+| Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
+|--------|-------------|----------------|-------------------|-------------|
+| ID del partido registrado | Confirmación de registro | Número | Identificador único | Sí |
+| Tabla actualizada | Tabla con nueva información | Tabla | Calculada automáticamente | Sí |
+| Mensaje de confirmación | Confirmación de registro | Texto | Mensaje de éxito | Sí |
+
+Flujo básico
+
+| Paso | Actor | Descripción | Excepciones |
+|------|-------|-------------|-------------|
+| 1 | Organizador | Accede a "Registro de partidos" | Organizador no autenticado: redirigir a login |
+| 2 | Organizador | Selecciona el partido a registrar | Partido no encontrado: mostrar error |
+| 3 | Organizador | Ingresa goles de ambos equipos | Goles incorrectos: mostrar error |
+| 4 | Organizador | Ingresa goleadores (nombre y minuto) | Sin goleadores si resultado 0-0: permitir sin goleadores |
+| 5 | Organizador | Registra tarjetas amarillas | - |
+| 6 | Organizador | Registra tarjetas rojas | - |
+| 7 | Sistema | Valida datos y guarda resultado | - |
+| 8 | Sistema | Recalcula automáticamente tabla de posiciones | - |
+| 9 | Sistema | Publica resultado en la plataforma | - |
+
+
+RF-007: Calcular Tabla de Posiciones y Generar Llaves Eliminatorias
+
+Funcionalidad
+
+| Código | Nombre |
+|--------|--------|
+| RF-007 | Tabla de Posiciones y Llaves Eliminatorias |
+
+| Descripción | Cómo se ejecuta | Actor principal | Precondiciones |
+|-------------|-----------------|-----------------|-----------------|
+| El sistema calcula automáticamente la tabla de posiciones en tiempo real según resultados ingresados. Muestra partidos jugados, ganados, empatados, perdidos, goles a favor, goles en contra, diferencia de gol y puntos. Después de la fase de grupos, el sistema genera automáticamente las llaves eliminatorias (cuartos de final, semifinal, final) de manera aleatoria. | Después de cada resultado ingresado, el sistema recalcula. Al finalizar fase de grupos, genera llaves automáticamente según la tabla. | Sistema/Organizador (para validar) | Deben haber resultados registrados. Fase de grupos debe estar finalizada para generar llaves. |
+
+Datos de entrada
+
+| Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
+|--------|-------------|----------------|-------------------|-------------|
+| Resultados de partidos | Información de todos los partidos | Tabla | Datos de RF-006 | Sí |
+| Criterio de generación de llaves | Método de emparejamiento | Selección | Aleatorio, Por posición en tabla | Sí |
+
+Datos de salida
+
+| Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
+|--------|-------------|----------------|-------------------|-------------|
+| Tabla de posiciones | Tabla ordenada por puntos | Tabla | Ordenada por puntos, diferencia gol, goles a favor | Sí |
+| Partidos jugados | Cantidad de partidos | Número | Calculado automáticamente | Sí |
+| Partidos ganados | Cantidad de partidos ganados | Número | Calculado automáticamente | Sí |
+| Partidos empatados | Cantidad de partidos empatados | Número | Calculado automáticamente | Sí |
+| Partidos perdidos | Cantidad de partidos perdidos | Número | Calculado automáticamente | Sí |
+| Goles a favor | Cantidad de goles marcados | Número | Calculado automáticamente | Sí |
+| Goles en contra | Cantidad de goles recibidos | Número | Calculado automáticamente | Sí |
+| Diferencia de gol | GF - GC | Número | Calculado automáticamente | Sí |
+| Puntos | Puntos totales (3 por victoria, 1 por empate) | Número | Calculado automáticamente | Sí |
+| Llaves eliminatorias | Estructura de cuartos, semis y final | Árbol visual | Generado automáticamente | Sí |
+
+Flujo básico
+
+| Paso | Actor | Descripción | Excepciones |
+|------|-------|-------------|-------------|
+| 1 | Sistema | Recibe registro de nuevo resultado | Resultado no válido: no actualizar |
+| 2 | Sistema | Recalcula puntos del equipo ganador (+3 puntos) | - |
+| 3 | Sistema | Recalcula puntos de equipos empatados (+1 punto cada) | - |
+| 4 | Sistema | Recalcula goles a favor y goles en contra | - |
+| 5 | Sistema | Ordena tabla por puntos (descendente), luego por diferencia gol | - |
+| 6 | Sistema | Publica tabla actualizada en para consulta de todos | - |
+| 7 | Sistema | Valida si fase de grupos terminó | Fase aún activa: guardar para luego |
+| 8 | Sistema | Genera llaves eliminatorias de manera aleatoria entre los 8/16 mejores | Número de equipos insuficiente: mostrar error |
+| 9 | Sistema | Asigna fechas y horarios a cada llave | - |
+| 10 | Sistema | Publica llaves en la plataforma | - |
+
+Flujo alterno
+
+| Paso | Actor | Descripción | Excepciones |
+|------|-------|-------------|-------------|
+| 1 | Sistema | Si hay empate en puntos, diferencia gol desempata | - |
+| 2 | Sistema | Si aún hay empate, goles a favor desempata | - |
+| 3 | Organizador | Puede revisar y validar llaves generadas | - |
+
+
+RF-008: Consultar Información del Torneo (Calendario, resultados, estadísticas, alineaciones)
+
+Funcionalidad
+
+| Código | Nombre |
+|--------|--------|
+| RF-008 | Consulta de Información del Torneo |
+
+| Descripción | Cómo se ejecuta | Actor principal | Precondiciones |
+|-------------|-----------------|-----------------|-----------------|
+| Todos los usuarios pueden consultar: calendario de partidos, resultados registrados, tabla de posiciones, llaves eliminatorias, estadísticas (máximos goleadores, historial de partidos por equipo), alineaciones de los equipos (titulares y reservas), información de árbitros (fecha, hora, cancha, equipos de su partido). | Los usuarios acceden a diferentes secciones: "Calendario", "Resultados", "Tabla", "Estadísticas", "Mis partidos" (árbitros), "Alineaciones". | Cualquier usuario autenticado | Usuario autenticado. Torneo activo o en progreso. |
+
+Datos de entrada
+
+| Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
+|--------|-------------|----------------|-------------------|-------------|
+| ID del torneo | Torneo a consultar | Número | Selección automática si hay uno activo | Sí |
+| Filtro por equipo (opcional) | Para resultados o alineaciones | Selección | Listado de equipos | No |
+| Filtro por fecha (opcional) | Para calendario o resultados | Rango de fechas | Formato YYYY-MM-DD | No |
+
+Datos de salida
+
+| Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
+|--------|-------------|----------------|-------------------|-------------|
+| Calendario de partidos | Lista de partidos programados | Tabla | Fecha, hora, cancha, equipos | Sí |
+| Resultados | Marcador final de partidos | Tabla | Equipos, goles, goleadores | Sí |
+| Tabla de posiciones | Información clasificatoria | Tabla | Posición, equipo, PJ, PG, PE, PP, GF, GC, DG, Pts | Sí |
+| Llaves eliminatorias | Estructura del playoff | Árbol visual | Cuartos, semis, final | Sí |
+| Máximos goleadores | Ranking de goleadores | Tabla | Nombre, equipo, goles | Sí |
+| Historial por equipo | Partidos de un equipo específico | Tabla | Fecha, rival, resultado | Sí |
+| Alineación del equipo | Titulares y reservas | Tabla | Nombre, posición, dorsal | Sí |
+| Información árbitro | Sus partidos asignados | Tabla | Fecha, hora, cancha, equipos | Sí |
+
+Flujo básico
+
+| Paso | Actor | Descripción | Excepciones |
+|------|-------|-------------|-------------|
+| 1 | Usuario | Accede a la plataforma | Usuario no autenticado: redirigir a login |
+| 2 | Usuario | Accede a "Calendario" | Torneo no activo: mostrar mensaje |
+| 3 | Sistema | Muestra lista de partidos programados (fecha, hora, cancha, equipos) | No hay partidos: mostrar mensaje |
+| 4 | Usuario | Accede a "Resultados" | - |
+| 5 | Sistema | Muestra partidos disputados con marcador y goleadores | No hay resultados: mostrar mensaje |
+| 6 | Usuario | Accede a "Tabla de posiciones" | - |
+| 7 | Sistema | Muestra tabla ordenada por puntos | - |
+| 8 | Usuario | Accede a "Máximos goleadores" | - |
+| 9 | Sistema | Muestra ranking de goleadores | - |
+
+Flujo alterno (Árbitro)
+
+| Paso | Actor | Descripción | Excepciones |
+|------|-------|-------------|-------------|
+| 1 | Árbitro | Accede a "Mis partidos" | Árbitro sin asignaciones: mostrar mensaje |
+| 2 | Sistema | Muestra partidos asignados al árbitro (fecha, hora, cancha, equipos) | - |
+| 3 | Árbitro | Puede consultar información de las alineaciones | - |
+
+Flujo alterno (Capitán - Alineaciones)
+
+| Paso | Actor | Descripción | Excepciones |
+|------|-------|-------------|-------------|
+| 1 | Capitán | Accede a "Alineaciones" de su equipo | Capitán no autenticado: redirigir a login |
+| 2 | Capitán | Ve opción de cargar alineación antes del partido | Partido ya inició: no permitir cambios |
+| 3 | Sistema | Permite al capitán seleccionar titulares (máximo 7) y reservas | - |
+| 4 | Sistema | Guarda alineación | Menos de 7 titulares: mostrar error |
+| 5 | Capitán | Puede ver alineación del rival también | - |
+
+
+
+Anexos
+
+Diagramas de Casos de Uso:
+![alt text](../images/Diagrama-Casos-De-Uso.png)
+
+Mockup:
+
+
+
+Reglas de Negocio
 
-## Datos de entrada
-
-| Nombre | Descripción | Tipo de campo | Reglas / Aplicación | Obligatorio |
-|------|-------------|--------------|---------------------|-------------|
-| nombre | Nombre del usuario | texto | Solo letras | Sí |
-| correo | Correo electrónico del usuario | email | Debe tener formato válido | Sí |
-| contraseña | Contraseña para acceder al sistema | texto | Mínimo 6 caracteres | Sí |
-| posición | Posición de juego | texto | Debe seleccionar una posición válida | No |
-| número_dorsal | Número del jugador | número | Debe estar entre 1 y 99 | No |
-| foto | Foto de perfil | imagen | Formato jpg o png | No |
-
-
-
-## Datos de salida
-
-| Nombre | Descripción | Tipo | Reglas / Aplicación | Obligatorio |
-|------|-------------|------|---------------------|-------------|
-| mensaje_confirmación | Mensaje que indica que el registro o inicio de sesión fue exitoso | texto | Se muestra al finalizar el proceso | Sí |
-| perfil_usuario | Información del usuario guardada en el sistema | objeto | Contiene los datos del perfil del jugador | Sí |
-
-
-
-## Flujo básico
-
-| Paso | Descripción | Excepciones |
-|----|-------------|-------------|
-| 1 | El usuario accede a la opción de registro en la plataforma. | Si la página no carga correctamente, el sistema muestra un mensaje de error. |
-| 2 | El usuario ingresa los datos solicitados para el registro. | Si algún campo obligatorio está vacío, el sistema solicita completar la información. |
-| 3 | El sistema valida el formato de los datos ingresados. | Si el correo no tiene formato válido o la contraseña no cumple las reglas, el sistema muestra un mensaje de error. |
-| 4 | El sistema verifica que el correo no esté registrado previamente. | Si el correo ya existe, el sistema informa al usuario que debe usar otro correo. |
-| 5 | El sistema guarda la información del nuevo usuario. | Si ocurre un error al guardar la información, el sistema muestra un mensaje indicando que el registro no pudo completarse. |
-| 6 | El usuario inicia sesión con su correo y contraseña. | Si los datos de acceso son incorrectos, el sistema muestra un mensaje indicando que el correo o la contraseña no son válidos. |
-| 7 | El usuario completa su perfil como jugador (posición, número dorsal, foto). | Si los datos no cumplen con las reglas definidas, el sistema solicita corregir la información. |
-| 8 | El sistema guarda la información del perfil y muestra un mensaje confirmando que el proceso fue exitoso. | Si ocurre un error al guardar el perfil, el sistema muestra un mensaje indicando que no fue posible guardar los cambios. |
-
----
-
-## 2. El sistema debe permitir que un capitán cree un equipo, agregue jugadores y administre la información del equipo.
-
-# Documento de análisis de requerimientos
-
-## Requerimiento funcional
-
-| Campo | Descripción |
-|------|-------------|
-| Identificador | RF2 |
-| Nombre del requerimiento | Gestión de equipos |
-| Descripción | El sistema debe permitir que un capitán cree un equipo, agregue jugadores y administre la información del equipo. |
-| Actor principal | Capitán |
-| Precondiciones | El usuario debe estar registrado en el sistema, haber iniciado sesión y tener el rol de capitán. |
-
-
-
-## Datos de entrada
-
-| Nombre | Descripción | Tipo de campo | Reglas / Aplicación | Obligatorio |
-|------|-------------|--------------|---------------------|-------------|
-| nombre_equipo | Nombre del equipo | texto | No debe repetirse en el sistema | Sí |
-| escudo | Imagen del escudo del equipo | imagen | Formato jpg o png | No |
-| colores_uniforme | Colores del uniforme | texto | Descripción simple | No |
-| jugadores | Lista de jugadores invitados | lista | Los jugadores deben estar registrados en el sistema | Sí |
-
-
-
-## Datos de salida
-
-| Nombre | Descripción | Tipo | Reglas / Aplicación | Obligatorio |
-|------|-------------|------|---------------------|-------------|
-| mensaje_confirmación | Mensaje que indica que el equipo fue creado correctamente | texto | Se muestra después de guardar el equipo | Sí |
-| información_equipo | Información del equipo guardada en el sistema | objeto | Contiene nombre, escudo, colores y jugadores | Sí |
-
-
-
-## Flujo básico
-
-| Paso | Descripción | Excepciones |
-|----|-------------|-------------|
-| 1 | El capitán accede a la opción de crear equipo. | Si la página no carga correctamente, el sistema muestra un mensaje de error. |
-| 2 | El capitán ingresa la información del equipo (nombre, escudo y colores). | Si el nombre del equipo está vacío, el sistema solicita completar la información. |
-| 3 | El sistema valida que el nombre del equipo no exista previamente. | Si el nombre del equipo ya está registrado, el sistema solicita ingresar otro nombre. |
-| 4 | El capitán busca y selecciona jugadores para agregarlos al equipo. | Si el jugador no está disponible o ya pertenece a otro equipo, el sistema informa que no puede agregarse. |
-| 5 | El sistema valida que el equipo cumpla con las reglas de cantidad de jugadores. | Si el equipo no cumple con el mínimo o excede el máximo permitido, el sistema muestra un mensaje indicando el problema. |
-| 6 | El sistema guarda la información del equipo. | Si ocurre un error al guardar la información, el sistema muestra un mensaje indicando que no se pudo completar el proceso. |
-| 7 | El sistema muestra un mensaje confirmando que el equipo fue creado correctamente. | |
-
----
-
-# 3. El sistema debe permitir buscar jugadores disponibles y enviarles invitaciones para unirse a un equipo.
-# Documento de análisis de requerimientos
-
-## Requerimiento funcional
-
-| Campo | Descripción |
-|------|-------------|
-| Identificador | RF3 |
-| Nombre del requerimiento | Búsqueda de jugadores e invitación a equipos |
-| Descripción | El sistema debe permitir buscar jugadores disponibles y enviarles invitaciones para unirse a un equipo. |
-| Actor principal | Capitán |
-| Precondiciones | El capitán debe estar registrado en el sistema, haber iniciado sesión y tener un equipo creado. |
-
-
-
-## Datos de entrada
-
-| Nombre | Descripción | Tipo de campo | Reglas / Aplicación | Obligatorio |
-|------|-------------|--------------|---------------------|-------------|
-| posición | Posición del jugador | texto | Debe corresponder a una posición válida (portero, defensa, volante, delantero) | No |
-| semestre | Semestre del jugador | número | Debe ser un número válido | No |
-| edad | Edad del jugador | número | Debe ser mayor a 0 | No |
-| género | Género del jugador | texto | Selección de lista | No |
-| nombre | Nombre del jugador | texto | Búsqueda parcial o completa | No |
-| identificación | Número de identificación | número | Debe ser un número válido | No |
-
-
-
-## Datos de salida
-
-| Nombre | Descripción | Tipo | Reglas / Aplicación | Obligatorio |
-|------|-------------|------|---------------------|-------------|
-| lista_jugadores | Lista de jugadores que cumplen con los criterios de búsqueda | lista | Muestra jugadores disponibles | Sí |
-| mensaje_invitación | Confirmación del envío de la invitación | texto | Se muestra después de enviar la invitación | Sí |
-
-
-
-## Flujo básico
-
-| Paso | Descripción | Excepciones |
-|----|-------------|-------------|
-| 1 | El capitán accede a la opción de buscar jugadores. | Si la página no carga correctamente, el sistema muestra un mensaje de error. |
-| 2 | El capitán ingresa uno o varios criterios de búsqueda. | Si los criterios ingresados no son válidos, el sistema solicita corregirlos. |
-| 3 | El sistema realiza la búsqueda de jugadores disponibles. | Si no se encuentran jugadores con esos criterios, el sistema muestra un mensaje indicando que no hay resultados. |
-| 4 | El sistema muestra la lista de jugadores encontrados. | |
-| 5 | El capitán selecciona un jugador de la lista y envía una invitación. | Si el jugador ya pertenece a otro equipo, el sistema indica que no puede enviarse la invitación. |
-| 6 | El sistema registra la invitación enviada al jugador. | Si ocurre un error al guardar la invitación, el sistema muestra un mensaje de error. |
-| 7 | El sistema muestra un mensaje confirmando que la invitación fue enviada. | |
-
----
-
-# 4. El sistema debe permitir al organizador crear y configurar el torneo con su información básica (fechas, número de equipos y costo).
-# Documento de análisis de requerimientos
-
-## Requerimiento funcional
-
-| Campo | Descripción |
-|------|-------------|
-| Identificador | RF4 |
-| Nombre del requerimiento | Creación y configuración del torneo |
-| Descripción | El sistema debe permitir al organizador crear y configurar el torneo con información básica como fechas, número de equipos y costo de inscripción. |
-| Actor principal | Organizador |
-| Precondiciones | El organizador debe estar registrado en el sistema y haber iniciado sesión. |
-
-
-
-## Datos de entrada
-
-| Nombre | Descripción | Tipo de campo | Reglas / Aplicación | Obligatorio |
-|------|-------------|--------------|---------------------|-------------|
-| nombre_torneo | Nombre del torneo | texto | No debe repetirse | Sí |
-| fecha_inicio | Fecha de inicio del torneo | fecha | Debe ser una fecha válida | Sí |
-| fecha_fin | Fecha de finalización del torneo | fecha | Debe ser posterior a la fecha de inicio | Sí |
-| número_equipos | Cantidad de equipos participantes | número | Debe ser mayor que 0 | Sí |
-| costo_inscripción | Valor de inscripción por equipo | número | Debe ser mayor o igual a 0 | Sí |
-
-
-
-## Datos de salida
-
-| Nombre | Descripción | Tipo | Reglas / Aplicación | Obligatorio |
-|------|-------------|------|---------------------|-------------|
-| mensaje_confirmación | Mensaje que indica que el torneo fue creado correctamente | texto | Se muestra después de guardar el torneo | Sí |
-| información_torneo | Datos del torneo guardados en el sistema | objeto | Contiene nombre, fechas, número de equipos y costo | Sí |
-
-
-
-## Flujo básico
-
-| Paso | Descripción | Excepciones |
-|----|-------------|-------------|
-| 1 | El organizador accede a la opción de crear torneo. | Si la página no carga correctamente, el sistema muestra un mensaje de error. |
-| 2 | El organizador ingresa la información del torneo (nombre, fechas, número de equipos y costo). | Si algún campo obligatorio está vacío, el sistema solicita completar la información. |
-| 3 | El sistema valida la información ingresada. | Si las fechas no son válidas o la fecha final es menor que la inicial, el sistema muestra un mensaje de error. |
-| 4 | El sistema verifica que el nombre del torneo no esté registrado previamente. | Si el nombre ya existe, el sistema solicita ingresar un nombre diferente. |
-| 5 | El sistema guarda la información del torneo. | Si ocurre un error al guardar la información, el sistema muestra un mensaje indicando que no se pudo completar el proceso. |
-| 6 | El sistema muestra un mensaje confirmando que el torneo fue creado correctamente. | |
-
----
-
-# 5. El sistema debe permitir subir comprobantes de pago para la inscripción del equipo y permitir al organizador aprobar o rechazar la inscripción.
-# Documento de análisis de requerimientos
-
-## Requerimiento funcional
-
-| Campo | Descripción |
-|------|-------------|
-| Identificador | RF5 |
-| Nombre del requerimiento | Inscripción de equipos y validación de pago |
-| Descripción | El sistema debe permitir subir comprobantes de pago para la inscripción del equipo y permitir al organizador aprobar o rechazar la inscripción. |
-| Actor principal | Capitán / Organizador |
-| Precondiciones | El capitán debe tener un equipo creado y el torneo debe estar abierto para inscripciones. |
-
-
-
-## Datos de entrada
-
-| Nombre | Descripción | Tipo de campo | Reglas / Aplicación | Obligatorio |
-|------|-------------|--------------|---------------------|-------------|
-| equipo | Equipo que realiza la inscripción | texto | Debe existir en el sistema | Sí |
-| comprobante_pago | Archivo del comprobante de pago | archivo | Formato jpg, png o pdf | Sí |
-| fecha_pago | Fecha en que se realizó el pago | fecha | Debe ser una fecha válida | Sí |
-| observación | Comentario del organizador sobre la revisión | texto | Uso opcional | No |
-| estado_inscripción | Estado de la inscripción | texto | Puede ser pendiente, aprobado o rechazado | Sí |
-
-
-
-## Datos de salida
-
-| Nombre | Descripción | Tipo | Reglas / Aplicación | Obligatorio |
-|------|-------------|------|---------------------|-------------|
-| mensaje_confirmación | Mensaje que confirma que el comprobante fue cargado correctamente | texto | Se muestra después de subir el archivo | Sí |
-| estado_inscripción | Estado actualizado de la inscripción del equipo | texto | Indica si está pendiente, aprobado o rechazado | Sí |
-
-
-
-## Flujo básico
-
-| Paso | Descripción | Excepciones |
-|----|-------------|-------------|
-| 1 | El capitán accede a la opción de inscripción al torneo. | Si la página no carga correctamente, el sistema muestra un mensaje de error. |
-| 2 | El capitán selecciona su equipo y carga el comprobante de pago. | Si no se carga ningún archivo, el sistema solicita adjuntar el comprobante. |
-| 3 | El sistema valida el formato del archivo cargado. | Si el archivo no tiene un formato permitido, el sistema muestra un mensaje de error. |
-| 4 | El sistema guarda el comprobante y registra la inscripción como pendiente de revisión. | Si ocurre un error al guardar la información, el sistema muestra un mensaje indicando que no se pudo completar el proceso. |
-| 5 | El organizador revisa el comprobante de pago. | Si el comprobante no es claro o es inválido, el organizador puede rechazar la inscripción. |
-| 6 | El organizador aprueba o rechaza la inscripción del equipo. | |
-| 7 | El sistema actualiza el estado de la inscripción y muestra el resultado al capitán. | |
-
----
-
-# 6. El sistema debe permitir registrar la información de los partidos como horario, cancha, alineaciones, resultados y sanciones.
-# Documento de análisis de requerimientos
-
-## Requerimiento funcional
-
-| Campo | Descripción |
-|------|-------------|
-| Identificador | RF6 |
-| Nombre del requerimiento | Registro de información de partidos |
-| Descripción | El sistema debe permitir registrar la información de los partidos como horario, cancha, alineaciones, resultados y sanciones. |
-| Actor principal | Organizador / Árbitro |
-| Precondiciones | El torneo debe estar creado y los equipos participantes deben estar inscritos. |
-
-
-
-## Datos de entrada
-
-| Nombre | Descripción | Tipo de campo | Reglas / Aplicación | Obligatorio |
-|------|-------------|--------------|---------------------|-------------|
-| equipo_local | Equipo que juega como local | texto | Debe ser un equipo inscrito en el torneo | Sí |
-| equipo_visitante | Equipo que juega como visitante | texto | Debe ser un equipo inscrito en el torneo | Sí |
-| fecha_partido | Fecha del partido | fecha | Debe ser una fecha válida | Sí |
-| hora_partido | Hora del partido | hora | Debe ser una hora válida | Sí |
-| cancha | Cancha donde se juega el partido | texto | Debe existir en el sistema | Sí |
-| alineación | Lista de jugadores que participan en el partido | lista | Deben pertenecer al equipo correspondiente | Sí |
-| resultado | Marcador final del partido | texto | Ejemplo: 2-1 | No |
-| sanciones | Tarjetas o sanciones registradas durante el partido | texto | Opcional | No |
-
-
-
-## Datos de salida
-
-| Nombre | Descripción | Tipo | Reglas / Aplicación | Obligatorio |
-|------|-------------|------|---------------------|-------------|
-| información_partido | Información registrada del partido | objeto | Contiene horario, equipos, cancha, alineaciones y resultado | Sí |
-| mensaje_confirmación | Mensaje que indica que la información fue registrada correctamente | texto | Se muestra después de guardar los datos | Sí |
-
-
-
-## Flujo básico
-
-| Paso | Descripción | Excepciones |
-|----|-------------|-------------|
-| 1 | El organizador o árbitro accede a la opción de registrar información del partido. | Si la página no carga correctamente, el sistema muestra un mensaje de error. |
-| 2 | El usuario ingresa los datos del partido (equipos, fecha, hora y cancha). | Si algún campo obligatorio está vacío, el sistema solicita completar la información. |
-| 3 | El sistema valida que los equipos estén inscritos en el torneo. | Si alguno de los equipos no está inscrito, el sistema muestra un mensaje de error. |
-| 4 | El usuario registra las alineaciones de los equipos. | Si un jugador no pertenece al equipo, el sistema solicita corregir la alineación. |
-| 5 | Después del partido, el usuario registra el resultado y las sanciones. | Si el formato del resultado es incorrecto, el sistema solicita corregirlo. |
-| 6 | El sistema guarda la información del partido. | Si ocurre un error al guardar la información, el sistema muestra un mensaje indicando que no se pudo completar el proceso. |
-| 7 | El sistema muestra un mensaje confirmando que la información fue registrada correctamente. | |
-
----
-
-# 7. El sistema debe generar automáticamente la tabla de posiciones y las llaves eliminatorias del torneo.
-
-# RF7 - Generar tabla de posiciones y llaves eliminatorias
-
-## Información del requerimiento
-
-| Campo | Descripción |
-|------|-------------|
-| Identificador | RF7 |
-| Nombre del requerimiento | Generar tabla de posiciones y llaves eliminatorias |
-| Descripción | El sistema calcula automáticamente la tabla de posiciones del torneo y genera las llaves eliminatorias a partir de los resultados registrados de los partidos. |
-| Actor principal | Organizador |
-| Precondiciones | El torneo debe existir en el sistema y los partidos deben tener resultados registrados. |
-
-
-
-## Datos de entrada
-
-| Nombre | Descripción | Tipo de campo | Reglas / Aplicación | Obligatorio |
-|------|-------------|---------------|---------------------|-------------|
-| Torneo | Torneo para el cual se generará la tabla de posiciones | Selección | Debe existir en el sistema | Sí |
-| Resultados de partidos | Resultados registrados de los partidos del torneo | Datos del sistema | Deben existir resultados para poder calcular la tabla | Sí |
-
-
-
-## Datos de salida
-
-| Nombre | Descripción | Tipo | Reglas / Aplicación | Obligatorio |
-|------|-------------|------|---------------------|-------------|
-| Tabla de posiciones | Clasificación de los equipos según resultados | Información | Se calcula con puntos, goles a favor y diferencia de goles | Sí |
-| Llaves eliminatorias | Cruces entre equipos clasificados | Información | Se generan según la posición obtenida en la tabla | Sí |
-
-
-
-## Flujo básico
-
-| Paso | Descripción | Excepciones |
-|----|-------------|-------------|
-| 1 | El organizador accede al módulo del torneo. | |
-| 2 | El organizador selecciona el torneo. | |
-| 3 | El organizador selecciona la opción generar tabla de posiciones. | |
-| 4 | El sistema obtiene los resultados de los partidos registrados. | Si no existen resultados, el sistema informa que no es posible generar la tabla. |
-| 5 | El sistema calcula los puntos y estadísticas de cada equipo. | |
-| 6 | El sistema ordena los equipos según los criterios del torneo. | |
-| 7 | El sistema genera la tabla de posiciones. | |
-| 8 | El sistema genera las llaves eliminatorias según la clasificación. | Si no hay suficientes equipos clasificados, solo se genera la tabla. |
-| 9 | El sistema muestra la información generada al organizador. | |
-
-
-
-## Flujo alterno
-
-| Descripción | Excepciones |
-|-------------|-------------|
-| El sistema detecta que existen partidos sin resultados registrados. | El sistema solicita completar los resultados antes de generar la tabla. |
-| Ocurre un error durante el cálculo de la tabla o generación de llaves. | El sistema muestra un mensaje de error y solicita intentar nuevamente. |
-
----
-
-# 8. El sistema debe permitir consultar información del torneo como calendario de partidos, resultados y estadísticas.
-
-# RF8 - Consultar información del torneo
-
-## Información del requerimiento
-
-| Campo | Descripción |
-|------|-------------|
-| Identificador | RF8 |
-| Nombre del requerimiento | Consultar información del torneo |
-| Descripción | El sistema permite consultar información del torneo como el calendario de partidos, resultados y estadísticas. |
-| Actor principal | Usuario |
-| Precondiciones | El torneo debe existir en el sistema y debe tener información registrada. |
-
-
-
-## Datos de entrada
-
-| Nombre | Descripción | Tipo de campo | Reglas / Aplicación | Obligatorio |
-|------|-------------|---------------|---------------------|-------------|
-| Torneo | Torneo del cual se desea consultar la información | Selección | Debe existir en el sistema | Sí |
-| Tipo de consulta | Tipo de información a consultar (calendario, resultados o estadísticas) | Selección | Debe ser una de las opciones disponibles | Sí |
-
-
-
-## Datos de salida
-
-| Nombre | Descripción | Tipo | Reglas / Aplicación | Obligatorio |
-|------|-------------|------|---------------------|-------------|
-| Calendario de partidos | Lista de partidos programados del torneo | Información | Incluye fecha, hora y equipos | No |
-| Resultados | Resultados de los partidos disputados | Información | Incluye marcador de cada partido | No |
-| Estadísticas | Información estadística del torneo | Información | Puede incluir goles, puntos o posiciones | No |
-
-
-
-## Flujo básico
-
-| Paso | Descripción | Excepciones |
-|----|-------------|-------------|
-| 1 | El usuario accede al módulo de torneos. | |
-| 2 | El usuario selecciona el torneo que desea consultar. | |
-| 3 | El usuario selecciona el tipo de información que desea ver. | |
-| 4 | El sistema busca la información del torneo en la base de datos. | Si el torneo no existe, el sistema muestra un mensaje indicando que no se encontró información. |
-| 5 | El sistema muestra el calendario, resultados o estadísticas del torneo. | |
-| 6 | El usuario consulta la información mostrada en el sistema. | |
-
-
-
-## Flujo alterno
-
-| Descripción | Excepciones |
-|-------------|-------------|
-| El torneo aún no tiene partidos programados. | El sistema informa que no hay calendario disponible. |
-| El torneo no tiene resultados registrados. | El sistema informa que no hay resultados disponibles. |
-| El torneo no tiene estadísticas generadas. | El sistema informa que no hay estadísticas disponibles. |
-
----
-
-# Anexos:
-
-[Diagrama-Casos-De-Uso.asta](..%2Fuml%2FDiagrama-Casos-De-Uso.asta)
-
-![Diagrama-Casos-De-Uso.png](..%2Fimages%2FDiagrama-Casos-De-Uso.png)
-
-# Prototipos:  
-![img.png](img.png)
-https://www.figma.com/make/qoYhlVEwEVM0H4NcYEmsNe/Soccer-Tournament-Management-System?p=f&fullscreen=1&preview-route=%2Flineup
-
-## Reglas de negocio
 
 | No. | Descripción |
-|----|-------------|
-| RN1 | Un usuario debe registrarse e iniciar sesión para poder participar en el sistema. |
-| RN2 | Solo un capitán puede crear y administrar un equipo. |
-| RN3 | Un jugador solo puede pertenecer a un equipo dentro del torneo. |
-| RN4 | Un equipo solo puede participar en el torneo si su inscripción y pago han sido aprobados por el organizador. |
-| RN5 | Los resultados de los partidos deben estar registrados para poder generar la tabla de posiciones. |
-| RN6 | La tabla de posiciones se calcula según puntos obtenidos, goles a favor y diferencia de goles. |
-| RN7 | Las llaves eliminatorias se generan a partir de la clasificación de la tabla de posiciones. |
-| RN8 | Solo el organizador puede crear y configurar torneos. |
+|-----|-------------|
+| RN-001 | Los participantes deben ser estudiantes, graduados, profesores o personal administrativo de los programas autorizados (Ingeniería de Sistemas, IA, Ciberseguridad, Estadística, y Maestrías en Gestión de Información, Informática y Ciencia de Datos). |
+| RN-002 | Familiares solo pueden participar si son patrocinados por un miembro de la comunidad académica registrada en el sistema. |
+| RN-003 | Cada equipo debe tener mínimo 7 jugadores y máximo 12 jugadores. |
+| RN-004 | Un jugador no puede pertenecer a dos equipos simultáneamente durante el mismo torneo. |
+| RN-005 | Más del 50% de los miembros de cada equipo deben ser de los programas autorizados (estudiantes, graduados, profesores, administrativos). |
+| RN-006 | Durante cada partido participan exactamente 7 estudiantes por equipo (de los 12 totales). |
+| RN-007 | Los cambios de equipo no se permitieron una vez conformado el equipo. Los 12 jugadores iniciales deben terminar el torneo con su equipo. |
+| RN-008 | El pago se realiza fuera de la plataforma (NEQUI o efectivo al coordinador). |
+| RN-009 | Solo equipos aprobados (inscripción aceptada) pueden participar en partidos. |
+| RN-010 | El reglamento del torneo prevalece sobre cualquier decisión del sistema. |
+| RN-011 | Las sanciones (tarjetas) son responsabilidad del árbitro en el terreno; el sistema solo registra la información. |
+| RN-012 | Los máximos goleadores se calculan de manera acumulativa durante todo el torneo (fases de grupo y eliminatorias). |
 
 
-
-## Abreviaturas
+Abreviaturas
 
 | Abreviatura | Significado |
 |-------------|-------------|
+| TECHCUP | Torneo de Fútbol del programa de Ingeniería |
+| ECI | Escuela Colombiana de Ingeniería |
 | RF | Requerimiento Funcional |
 | RNF | Requerimiento No Funcional |
-| UI | Interfaz de Usuario |
-| DB | Base de Datos |
+| RN | Regla de Negocio |
 | API | Interfaz de Programación de Aplicaciones |
-
-
-
-## Historial de revisión
-
-| Elaborado por | Aprobado por | Fecha | Descripción y justificación de cambios |
-|---------------|--------------|-------|----------------------------------------|
-| Equipo de desarrollo | Profesor | 22/10/2024 | Creación inicial del documento de análisis de requerimientos |
-| Equipo de desarrollo | Profesor | 23/10/2024 | Ajuste de requerimientos funcionales y reglas de negocio |
-
+| REST | Transferencia de Estado Representacional |
+| NEQUI | Aplicación móvil de pago de dinero |
+| PJ | Partidos Jugados |
+| PG | Partidos Ganados |
+| PE | Partidos Empatados |
+| PP | Partidos Perdidos |
+| GF | Goles a Favor |
+| GC | Goles en Contra |
+| DG | Diferencia de Gol |
+| Pts | Puntos |
+| SQL | Lenguaje de Consulta Estructurado |
+| UX | Experiencia de Usuario |
+| UI | Interfaz de Usuario |
