@@ -478,9 +478,29 @@
 
 
 
-## Anexos
+# Anexos
 
-Diagrama de Casos de Uso:
+## Diagrama de Casos de Uso:
+
+## Actores del Sistema:
+
+- Estudiante: Se registra como jugador y puede ser capitán.
+
+- Graduado: Se registra como jugador y puede ser capitán.
+
+- Profesor: Se registra como jugador y puede ser capitán.
+
+- Personal Administrativo: Se registra como jugador y puede ser capitán.
+
+- Familiares: Se registra como jugador y puede ser capitán.
+
+- Capitán: Crea y administra un equipo.
+
+- Organizador: Administra el torneo.
+
+- Árbitro: Visualiza la información de los partidos a arbitrar.
+
+- Administrador: Control total del sistema.
 
 [Diagrama-Casos-De-Uso3.asta](..%2Fuml%2FDiagrama-Casos-De-Uso3.asta)
 
