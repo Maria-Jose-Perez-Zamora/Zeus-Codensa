@@ -488,7 +488,7 @@ Diagrama de Casos de Uso:
 
 ## Mockup:
 
-
+https://tag-skit-64046987.figma.site/
 
 ## vReglas de Negocio
 
