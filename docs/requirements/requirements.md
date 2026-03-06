@@ -458,9 +458,9 @@
 
 # Anexos:
 
-[Diagrama-Casos-De-Uso2.asta](../uml/Diagrama-Casos-De-Uso2.asta)
+[Diagrama-Casos-De-Uso.asta](..%2Fuml%2FDiagrama-Casos-De-Uso.asta)
 
-![Diagrama-Casos-De-Uso.png](../images/Diagrama-Casos-De-Uso.png)
+![Diagrama-Casos-De-Uso.png](..%2Fimages%2FDiagrama-Casos-De-Uso.png)
 
 # Prototipos:  
 ![img.png](img.png)
