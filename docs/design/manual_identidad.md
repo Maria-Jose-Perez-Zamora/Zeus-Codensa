@@ -136,4 +136,7 @@ La voz visual de la marca es limpia, geométrica y luminosa, garantizando legibi
 ### 6.4. Formularios y Entradas (Inputs)
 - Las cajas de introducción de texto, subida de vouchers (Portal de Pagos) o selección de opciones (Dorsales) basan su contraste en un fondo claro (`#FFFFFF` o `#F8FAFC`). Emplean un borde gris muy tenue que reacciona (*Focus State* o Estado Activo) con un perímetro más sólido o relleno (ej. Cuadros de dorsales seleccionados rellenados en `#84CC16`) para destacar fuertemente la interacción activa del usuario.
 
-![alt text](image-41.png)
+<img width="560" height="569" alt="image" src="https://github.com/user-attachments/assets/087700ff-9936-40e4-a470-2978efd38ae1" />
+
+
+
