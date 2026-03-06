@@ -32,7 +32,6 @@ Enunciado:
 
 4. La información del torneo debe estar disponible durante todo el tiempo que se realice la competencia.
 
-5. El sistema debe desarrollarse con Spring Boot en el backend, React con TypeScript en el frontend y PostgreSQL como base de datos.
 
 ---
 
