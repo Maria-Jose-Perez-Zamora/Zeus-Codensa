@@ -132,7 +132,7 @@ El uso fotográfico y gráfico en la plataforma se basa en el contraste, reforza
 ### 7.1. Botones (Call to Action)
 - **Botón Primario ("El Disparo"):** Fondos enteramente de Verde Principal (`#84CC16`), texto en blanco puro u oscuro dependiendo del contraste, bordes con un esquema fuertemente redondeado tipo píldora (*pill-shape*, `border-radius: 9999px`). Utilizado solo para las acciones más críticas de la pantalla (ej. "Iniciar Sesión", "Enviar Verificación").
 
-![alt text](image-26.png)
+![alt text](image.png)
 
 - **Botón Secundario ("El Pase"):** Con fondo casi transparente o blanco y borde delineado sutil en gris o verde claro. Utilizados como acciones complementarias (Cancelar, Editar Perfil).
 
