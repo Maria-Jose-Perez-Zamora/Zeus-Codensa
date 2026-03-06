@@ -23,7 +23,7 @@
 # Requerimientos funcionales detallados
 
 
-RF-001: Gestionar Torneos
+# RF-001: Gestionar Torneos
 
 ## Funcionalidad
 
@@ -75,7 +75,7 @@ RF-001: Gestionar Torneos
 | 5 | Sistema | Cambia estado a "Finalizado" y cierra inscripciones | - |
 
 
-RF-002: Registrar Usuarios y Jugadores
+# RF-002: Registrar Usuarios y Jugadores
 
 ## Funcionalidad
 
@@ -132,7 +132,7 @@ RF-002: Registrar Usuarios y Jugadores
 | 4 | Jugador | Puede recibir invitaciones de capitanes | Invitación rechazada: se elimina de la lista de contactos del capitán |
 
 
-RF-003: Gestionar Equipos (Creación, invitaciones, búsqueda de jugadores)
+# RF-003: Gestionar Equipos (Creación, invitaciones, búsqueda de jugadores)
 
 ## Funcionalidad
 
@@ -200,7 +200,7 @@ RF-003: Gestionar Equipos (Creación, invitaciones, búsqueda de jugadores)
 | 4 | Jugador | Recibe múltiples invitaciones de equipos | Puede aceptar una sola: rechazar las demás automáticamente |
 
 
-RF-004: Gestionar Inscripciones y Pagos
+# RF-004: Gestionar Inscripciones y Pagos
 
 ## Funcionalidad
 
@@ -260,7 +260,7 @@ RF-004: Gestionar Inscripciones y Pagos
 | 3 | Sistema | Valida nuevo comprobante | - |
 
 
-RF-005: Configurar Torneo (Reglamento, fechas, horarios, canchas, sanciones)
+# RF-005: Configurar Torneo (Reglamento, fechas, horarios, canchas, sanciones)
 
 ## Funcionalidad
 
@@ -305,7 +305,7 @@ RF-005: Configurar Torneo (Reglamento, fechas, horarios, canchas, sanciones)
 | 9 | Sistema | Confirma cambios al organizador | - |
 
 
-RF-006: Registrar Partidos y Resultados
+# RF-006: Registrar Partidos y Resultados
 
 ## Funcionalidad
 
@@ -353,7 +353,7 @@ RF-006: Registrar Partidos y Resultados
 | 9 | Sistema | Publica resultado en la plataforma | - |
 
 
-RF-007: Calcular Tabla de Posiciones y Generar Llaves Eliminatorias
+# RF-007: Calcular Tabla de Posiciones y Generar Llaves Eliminatorias
 
 ## Funcionalidad
 
@@ -411,7 +411,7 @@ RF-007: Calcular Tabla de Posiciones y Generar Llaves Eliminatorias
 | 3 | Organizador | Puede revisar y validar llaves generadas | - |
 
 
-RF-008: Consultar Información del Torneo (Calendario, resultados, estadísticas, alineaciones)
+# RF-008: Consultar Información del Torneo (Calendario, resultados, estadísticas, alineaciones)
 
 ## Funcionalidad
 
@@ -490,7 +490,7 @@ Diagrama de Casos de Uso:
 
 https://tag-skit-64046987.figma.site/
 
-## vReglas de Negocio
+## Reglas de Negocio
 
 
 | No. | Descripción |
