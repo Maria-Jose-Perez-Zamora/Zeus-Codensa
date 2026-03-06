@@ -19,22 +19,36 @@ Nuestro **elemento central** es la convergencia entre la pasión visceral por el
 
 **Logo Principal (Imagotipo):** 
 Uso primario en la aplicación, encabezados, documentos oficiales y material promocional de alto impacto. Debe ser la primera opción siempre que el espacio lo permita.
+
+
 ![Logotipo Principal](image.png)
+
 
 **Isologo (Símbolo sin texto):** 
 Uso destinado para avatares, favicons, iconos de aplicación móvil (App Icon) o en espacios cuadrados reducidos donde la lectura del texto de la marca sea imposible.
+
+
 ![Isologo](image-2.png)
+
 
 **Isologo Horizontal:** 
 Uso óptimo para barras de navegación superiores (*Topbars* o *Sidebars* colapsados) y banners donde el espacio vertical sea extremadamente limitado.
+
+
 ![Isologo Horizontal](image-3.png)
+
 
 **Isologo Monocromático:** 
 Uso restringido para fondos fotográficos complejos, marcas de agua corporativas, material impreso a una tinta o en estados neutros/inactivos de la UI.
+
+
 ![Isologo Monocromático](image-5.png)
+
 
 **Símbolo en Contorno (Wireframe/Outline):** 
 Uso en detalles estéticos de fondo (marcas de agua gigantes opacas deportivas), cargadores (*loaders*), o en aplicaciones de bordado y serigrafía simple.
+
+
 ![Simbolo en contorno](image-6.png)
 
 
@@ -94,10 +108,16 @@ La voz visual de la marca es limpia, geométrica y sin adornos innecesarios, gar
   - **Descripciones Tabulares y Textos Comunes:** Grosores *Regular* (400) favoreciendo una lectura que evite la fatiga ocular y simplifique visualmente pantallas muy cargadas.
 
 *Muestra del espécimen tipográfico principal:*
+
+
 ![Fuente Principal](image-15.png)
 
+
 *Abecedario y variaciones de grosores de la fuente:*
+
+
 ![Abecedario tipográfico](image-16.png)
+
 
 ## 6. Imágenes Utilizadas
 
