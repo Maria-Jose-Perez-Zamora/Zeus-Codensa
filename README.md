@@ -503,3 +503,7 @@ https://tag-skit-64046987.figma.site/
 |---------------|--------------|-------|----------------------------------------|
 | Equipo de desarrollo | Profesor | 22/10/2024 | Creación inicial del documento de análisis de requerimientos |
 | Equipo de desarrollo | Profesor | 23/10/2024 | Ajuste de requerimientos funcionales y reglas de negocio |
+
+
+Jira:
+https://mail-team-q7lj9.atlassian.net/jira/software/projects/ZEUS/list?jql=project%20%3D%20ZEUS%20ORDER%20BY%20created%20DESC 
