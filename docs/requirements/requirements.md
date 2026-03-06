@@ -462,7 +462,9 @@
 
 ![Diagrama-Casos-De-Uso.png](../images/Diagrama-Casos-De-Uso.png)
 
-# Prototipos:
+# Prototipos:  
+![img.png](img.png)
+https://www.figma.com/make/qoYhlVEwEVM0H4NcYEmsNe/Soccer-Tournament-Management-System?p=f&fullscreen=1&preview-route=%2Flineup
 
 ## Reglas de negocio
 
