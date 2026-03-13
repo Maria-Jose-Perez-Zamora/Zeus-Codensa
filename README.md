@@ -517,6 +517,87 @@ Patrones de Diseño Aplicados:
 Inyección de Dependencias (DI): Implementada para desacoplar los controladores de la lógica de negocio en los servicios.
 Singleton: Spring Boot gestiona los servicios y controladores como instancias únicas para optimizar el uso de memoria.
 POJOs / Entities: Clases planas para la representación fiel de los requerimientos del negocio.
+
+# Patrones de Diseño Utilizados
+
+## 🏭 Factory Method
+
+### ¿Por qué lo elegimos?
+
+Elegimos *Factory Method* porque en *TECHCUP FÚTBOL* manejamos diferentes tipos de usuarios que comparten características comunes pero tienen *reglas de creación distintas*:
+
+- *Jugador*
+    - Requiere posición de juego
+    - Número dorsal
+    - Disponibilidad
+
+- *Capitán*
+    - Además de ser jugador
+    - Debe tener un equipo asociado
+    - Tiene permisos especiales
+
+- *Administrador*
+    - Tiene privilegios para configurar el torneo
+
+También aplica para los *partidos según la fase del torneo*:
+
+- Fase de *grupos*
+- *Cuartos de final*
+- *Semifinal*
+- *Final*
+
+Cada fase puede tener *reglas diferentes* como:
+
+- Empate permitido
+- Penales
+- Tiempo extra
+
+Sin este patrón, el código tendría muchos *condicionales if-else, que habría que modificar cada vez que agreguemos un nuevo tipo, **violando el principio Open/Closed*.
+
+---
+
+### ¿Cómo ayuda a resolver el problema del sistema?
+
+- *Desacopla el código cliente* de las clases concretas, permitiendo trabajar con *interfaces*.
+- *Centraliza la lógica de creación y validación* en factories específicas.
+- *Facilita la extensibilidad: para agregar un nuevo rol (por ejemplo **Árbitro), solo se crea su *factory sin modificar el código existente.
+- *Encapsula las reglas de negocio* particulares de cada tipo de objeto.
+- *Mejora la mantenibilidad*, ya que cada tipo de creación se encuentra en su propia clase.
+
+---
+
+## 🧠 Strategy
+
+### ¿Por qué lo elegimos?
+
+Seleccionamos *Strategy* porque en *TECHCUP* necesitamos *algoritmos intercambiables* para varias funcionalidades clave:
+
+- *Cálculo de tabla de posiciones*
+    - Sistema tradicional (*3-1-0*)
+    - Bonificaciones por goleada
+    - Criterios especiales de desempate
+
+- *Generación de llaves eliminatorias*
+    - Eliminación directa
+    - Doble eliminación
+    - Otros formatos de torneo
+
+- *Sistema de puntuación*
+    - El organizador puede configurar las reglas en cada edición del torneo
+
+Sin *Strategy, tendríamos un **método grande con muchos condicionales*, difícil de mantener y extender.  
+Cada vez que el organizador quisiera cambiar las reglas, habría que *modificar el código existente*.
+
+---
+
+### ¿Cómo ayuda a resolver el problema del sistema?
+
+- Permite *cambiar algoritmos en tiempo de ejecución* según la configuración del torneo.
+- *Aísla cada algoritmo en su propia clase*, facilitando pruebas y mantenimiento.
+- Cumple el *principio Open/Closed*, ya que nuevas estrategias se agregan sin modificar el código existente.
+- *Delega la responsabilidad del cálculo* a clases especializadas, manteniendo el servicio principal limpio.
+- Ofrece *flexibilidad al organizador* para personalizar las reglas de cada torneo sin cambios estructurales
+
 # 📋 Requerimientos Funcionales Implementados (Demo Funcional)
 RF1: Registro y Perfil de Jugador
 Se implementó la entidad User que permite capturar la información técnica de los jugadores.
@@ -536,7 +617,17 @@ POST	/api/users/register	Registra un nuevo jugador (JSON Body).
 GET	/api/users/all	Lista todos los jugadores registrados en la sesión actual.
 POST	/api/teams/create	Crea un nuevo equipo de fútbol.
 GET	/api/teams/all	Lista los equipos creados.
-# 🧪 Pruebas y Validación
+
+### Diagrama De Clases
+![diagrama de clases techcup.drawio.png](docs%2Fuml%2Fdiagrama%20de%20clases%20techcup.drawio.png)
+
+### Diagrama ded Componentes General
+![Diagrama de componentes general tf.drawio.png](docs%2Fuml%2FDiagrama%20de%20componentes%20general%20tf.drawio.png)
+
+### Diagrama dde Componenetes Especifico
+![Diagrama de Componentes Especifico.drawio.png](docs%2Fuml%2FDiagrama%20de%20Componentes%20Especifico.drawio.png)
+
+#  Pruebas y Validación
 Para facilitar la revisión y el trabajo del equipo de Frontend, se incluyó un archivo de pruebas rápidas en la raíz:
 
 Archivo: pruebas.http
