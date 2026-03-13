@@ -523,3 +523,54 @@ https://tag-skit-64046987.figma.site/
 Jira:
 https://mail-team-q7lj9.atlassian.net/jira/software/projects/ZEUS/list?jql=project%20%3D%20ZEUS%20ORDER%20BY%20created%20DESC 
 >>>>>>> 9783465610b445212b45d173cce6d62366db09f4
+
+
+# 🏆 Proyecto TechCup Fútbol - Backend (Sprint #1)
+
+Este repositorio contiene la lógica de negocio y la infraestructura del lado del servidor para la plataforma **TechCup**. En este primer sprint, se ha establecido la arquitectura base, los modelos de dominio y la API funcional para la gestión de usuarios y equipos.
+
+---
+
+## 🏗️ Arquitectura y Patrones de Diseño
+El sistema ha sido desarrollado bajo el patrón de arquitectura **MVC (Modelo-Vista-Controlador)** utilizando el framework **Spring Boot**.
+
+### Patrones de Diseño Aplicados:
+* **Inyección de Dependencias (DI):** Implementada para desacoplar los controladores de la lógica de negocio en los servicios.
+* **Singleton:** Spring Boot gestiona los servicios y controladores como instancias únicas para optimizar el uso de memoria.
+* **POJOs / Entities:** Clases planas para la representación fiel de los requerimientos del negocio.
+
+---
+
+## 📋 Requerimientos Funcionales Implementados (Demo Funcional)
+
+### **RF1: Registro y Perfil de Jugador**
+Se implementó la entidad `User` que permite capturar la información técnica de los jugadores.
+* **Atributos:** Nombre, correo, contraseña (hash simulado), posición, número de dorsal y foto.
+* **Validación de Negocio:** El `UserService` garantiza que no existan registros con correos duplicados antes de añadirlos a la memoria.
+
+### **RF2: Gestión de Equipos**
+Se implementó la entidad `Team` para la organización del torneo.
+* **Atributos:** Nombre del equipo, escudo, colores representativos y lista de jugadores asociados.
+* **Relación:** Un equipo puede contener múltiples objetos de tipo `User` (Jugadores).
+
+---
+
+## 🚀 Endpoints de la API (REST)
+
+Para la **Demo Funcional**, el backend expone los siguientes puntos de acceso en `http://localhost:8080`:
+
+| Método | Ruta | Descripción |
+| :--- | :--- | :--- |
+| `POST` | `/api/users/register` | Registra un nuevo jugador (JSON Body). |
+| `GET` | `/api/users/all` | Lista todos los jugadores registrados en la sesión actual. |
+| `POST` | `/api/teams/create` | Crea un nuevo equipo de fútbol. |
+| `GET` | `/api/teams/all` | Lista los equipos creados. |
+
+---
+
+## 🧪 Pruebas y Validación
+Para facilitar la revisión y el trabajo del equipo de Frontend, se incluyó un archivo de pruebas rápidas en la raíz:
+* **Archivo:** `pruebas.http`
+* **Uso:** Ejecutar directamente desde IntelliJ IDEA para validar el flujo **End-to-End** (Controlador -> Servicio -> Memoria).
+
+---
