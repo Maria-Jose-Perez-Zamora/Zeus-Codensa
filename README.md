@@ -1,5 +1,12 @@
+<<<<<<< HEAD
 # Zeus-Codensa
 
+=======
+Nombre del Equipo: Zeus-Codensa
+Nombre Integrantes: Nicolas Sanchez,Maria Jose Perez, Andres Pineda,Diego Andrade,Stiven Pardo
+Titulo:Techup-Futbol
+Enunciado:
+>>>>>>> 9783465610b445212b45d173cce6d62366db09f4
 # Requerimientos del sistema – TECHCUP Fútbol
 
 ## Requerimientos funcionales
@@ -30,7 +37,10 @@
 
 4. La información del torneo debe estar disponible durante todo el tiempo que se realice la competencia.
 
+<<<<<<< HEAD
 5. El sistema debe desarrollarse con Spring Boot en el backend, React con TypeScript en el frontend y PostgreSQL como base de datos.
+=======
+>>>>>>> 9783465610b445212b45d173cce6d62366db09f4
 
 ---
 
@@ -466,8 +476,13 @@
 
 # Prototipos:
 
+<<<<<<< HEAD
 https://www.figma.com/make/qoYhlVEwEVM0H4NcYEmsNe/Soccer-Tournament-Management-System?p=f&t=feStZs7Uk2hRAzLe-0&fullscreen=1
 
+=======
+https://tag-skit-64046987.figma.site/
+![img_1.png](img_1.png)
+>>>>>>> 9783465610b445212b45d173cce6d62366db09f4
 ## Reglas de negocio
 
 | No. | Descripción |
@@ -502,3 +517,9 @@ https://www.figma.com/make/qoYhlVEwEVM0H4NcYEmsNe/Soccer-Tournament-Management-S
 | Equipo de desarrollo | Profesor | 22/10/2024 | Creación inicial del documento de análisis de requerimientos |
 | Equipo de desarrollo | Profesor | 23/10/2024 | Ajuste de requerimientos funcionales y reglas de negocio |
 
+<<<<<<< HEAD
+=======
+
+Jira:
+https://mail-team-q7lj9.atlassian.net/jira/software/projects/ZEUS/list?jql=project%20%3D%20ZEUS%20ORDER%20BY%20created%20DESC 
+>>>>>>> 9783465610b445212b45d173cce6d62366db09f4
