@@ -1,3 +1,7 @@
+Nombre del Equipo: Zeus-Codensa
+Nombre Integrantes: Nicolas Sanchez,Maria Jose Perez, Andres Pineda,Diego Andrade,Stiven Pardo
+Titulo:Techup-Futbol
+Enunciado: 
 # Requerimientos del sistema – TECHCUP Fútbol
 
 ## Requerimientos funcionales
@@ -464,8 +468,8 @@
 
 # Prototipos:  
 
-https://www.figma.com/make/qoYhlVEwEVM0H4NcYEmsNe/Soccer-Tournament-Management-System?p=f&fullscreen=1&preview-route=%2Flineup
-
+https://tag-skit-64046987.figma.site/
+![img_1.png](img_1.png)
 ## Reglas de negocio
 
 | No. | Descripción |
