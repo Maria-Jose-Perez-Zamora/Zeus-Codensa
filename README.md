@@ -507,10 +507,10 @@ https://tag-skit-64046987.figma.site/
 Jira:
 https://mail-team-q7lj9.atlassian.net/jira/software/projects/ZEUS/list?jql=project%20%3D%20ZEUS%20ORDER%20BY%20created%20DESC
 
-## 🏆 Proyecto TechCup Fútbol - Backend (Sprint #1)
+##  Proyecto TechCup Fútbol - Backend (Sprint #1)
 Este repositorio contiene la lógica de negocio y la infraestructura del lado del servidor para la plataforma TechCup. En este primer sprint, se ha establecido la arquitectura base, los modelos de dominio y la API funcional para la gestión de usuarios y equipos.
 
-# 🏗️ Arquitectura y Patrones de Diseño
+#  Arquitectura y Patrones de Diseño
 El sistema ha sido desarrollado bajo el patrón de arquitectura MVC (Modelo-Vista-Controlador) utilizando el framework Spring Boot.
 
 Patrones de Diseño Aplicados:
@@ -520,7 +520,7 @@ POJOs / Entities: Clases planas para la representación fiel de los requerimient
 
 # Patrones de Diseño Utilizados
 
-## 🏭 Factory Method
+##  Factory Method
 
 ### ¿Por qué lo elegimos?
 
@@ -566,7 +566,7 @@ Sin este patrón, el código tendría muchos *condicionales if-else, que habría
 
 ---
 
-## 🧠 Strategy
+##  Strategy
 
 ### ¿Por qué lo elegimos?
 
@@ -598,7 +598,7 @@ Cada vez que el organizador quisiera cambiar las reglas, habría que *modificar 
 - *Delega la responsabilidad del cálculo* a clases especializadas, manteniendo el servicio principal limpio.
 - Ofrece *flexibilidad al organizador* para personalizar las reglas de cada torneo sin cambios estructurales
 
-# 📋 Requerimientos Funcionales Implementados (Demo Funcional)
+#  Requerimientos Funcionales Implementados (Demo Funcional)
 RF1: Registro y Perfil de Jugador
 Se implementó la entidad User que permite capturar la información técnica de los jugadores.
 
@@ -609,7 +609,7 @@ Se implementó la entidad Team para la organización del torneo.
 
 Atributos: Nombre del equipo, escudo, colores representativos y lista de jugadores asociados.
 Relación: Un equipo puede contener múltiples objetos de tipo User (Jugadores).
-# 🚀 Endpoints de la API (REST)
+#  Endpoints de la API (REST)
 Para la Demo Funcional, el backend expone los siguientes puntos de acceso en http://localhost:8080:
 
 Método	Ruta	Descripción
