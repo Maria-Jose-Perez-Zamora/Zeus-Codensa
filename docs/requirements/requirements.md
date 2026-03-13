@@ -1,14 +1,8 @@
-<<<<<<< HEAD
-Nombre del Equipo: Zeus-Codensa
-Nombre Integrantes: Nicolas Sanchez,Maria Jose Perez, Andres Pineda,Diego Andrade,Stiven Pardo
-Titulo:Techup-Futbol
-Enunciado: 
 # Requerimientos del sistema – TECHCUP Fútbol
-=======
-# Requerimientos funcionales principales
->>>>>>> 9783465610b445212b45d173cce6d62366db09f4
+**Nombre del Equipo:** Zeus-Codensa
+**Integrantes:** Nicolas Sanchez, Maria Jose Perez, Andres Pineda, Diego Andrade, Stiven Pardo
 
-1. Gestionar torneos: crear, iniciar, finalizar y consultar torneos.
+## Requerimientos funcionales principales1. Gestionar torneos: crear, iniciar, finalizar y consultar torneos.
 2. Registrar usuarios y jugadores por rol (estudiante, graduado, profesor, administrativo, familiar, capitán, organizador, árbitro, administrador).
 3. Gestionar equipos: crear equipo, invitar jugadores y validar reglas de conformación (mínimo/máximo de jugadores y sin duplicidad).
 4. Gestionar inscripciones y pagos: cargar comprobante y administrar estados (pendiente, en revisión, aprobado, rechazado).
@@ -148,13 +142,14 @@ Enunciado:
 |--------|--------|
 | RF-003 | Gestión de Equipos |
 
-<<<<<<< HEAD
-# Prototipos:  
+## Prototipos e Interfaces Visuales (Mockups)
 
-https://tag-skit-64046987.figma.site/
+🔗 **Link de Figma:** [https://tag-skit-64046987.figma.site/](https://tag-skit-64046987.figma.site/)
+
 ![img_1.png](img_1.png)
-## Reglas de negocio
-=======
+
+## Funcionalidad Restante
+
 | Descripción | Cómo se ejecuta | Actor principal | Precondiciones |
 |-------------|-----------------|-----------------|-----------------|
 | Los capitanes crean equipos con nombre, escudo, colores de uniforme. Invitan jugadores a sus equipos respetando las reglas: mínimo 7 jugadores, máximo 12, sin duplicidad de jugador en equipos, más de la mitad de los miembros deben ser de los programas de Ingeniería de Sistemas, IA, Ciberseguridad y Estadística. Los capitanes pueden buscar jugadores disponibles por posición, semestre, edad, género, nombre e identificación. | El capitán accede a su panel, crea el equipo ingresando nombre, carga escudo e indica colores. Luego busca jugadores por criterios y envía invitaciones. Los jugadores aceptan o rechazan iniciativas. | Capitán | El usuario debe tener o cambiar a rol de capitán. Debe existir un torneo activo. |
@@ -526,8 +521,6 @@ https://tag-skit-64046987.figma.site/
 https://tag-skit-64046987.figma.site/
 
 ## Reglas de Negocio
-
->>>>>>> 9783465610b445212b45d173cce6d62366db09f4
 
 | No. | Descripción |
 |-----|-------------|
