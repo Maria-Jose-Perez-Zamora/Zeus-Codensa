@@ -111,36 +111,20 @@ La voz visual de la marca es limpia, geométrica y luminosa, garantizando legibi
 
 ![alt text](image-36.png)
 
+## 6. Elementos Visuales del Diseño (Guía de Estilo UI)
 
-## 6. Imágenes Utilizadas
-
-El uso fotográfico y gráfico en la plataforma se basa en el contraste, reforzando la narrativa de "tecnología + pasión".
-
-- **Dirección de Arte y Fotografía:**
-  - **Fuerza y Dinamismo:** Empleamos imágenes de estadios de noche iluminados, césped nítido o balones en movimiento con enfoques dramáticos o de baja exposición de fondo. Tratamiento y filtros que integran los tonos oscuros de la paleta.
-  - **Carga Emotiva del Jugador:** Imágenes de celebración, concentración, cordones atándose. Trazamos un paralelo con el jugador profesional.
-- **Avatares y Escudos:**
-  - Las imágenes cargadas por los usuarios (escudos de equipo, perfiles) van enmarcadas en geométricos estilizados (polígonos, círculos con bordes de `#1C2434`), con tratamientos que resalten los logos de los equipos y minimicen fondos ruidosos.
-- **Ausencia de Imágenes Genéricas:** Evitamos a toda costa "fotos de stock corporativas" sonrientes. El tono es sudor, cancha, luces de estadio tácticas y pizarras de estrategia.
-
-*Moodboard referencial:*
-
-![Moodboard fotográfico general](image-17.png)
-
-## 7. Elementos Visuales del Diseño (Guía de Estilo UI)
-
-### 7.1. Botones (Call to Action)
+### 6.1. Botones (Call to Action)
 - **Botón Primario ("El Disparo"):** Fondos enteramente de Verde Principal (`#84CC16`), texto en blanco puro u oscuro dependiendo del contraste, bordes con un esquema fuertemente redondeado tipo píldora (*pill-shape*, `border-radius: 9999px`). Utilizado solo para las acciones más críticas de la pantalla (ej. "Iniciar Sesión", "Enviar Verificación").
 
 ![alt text](image.png)
 
 - **Botón Secundario ("El Pase"):** Con fondo casi transparente o blanco y borde delineado sutil en gris o verde claro. Utilizados como acciones complementarias (Cancelar, Editar Perfil).
 
-### 7.2. Iconografía
+### 6.2. Iconografía
 - **Estética Vectorial Lineal y Amigable:** Iconos limpios, minimalistas, de trazo continuo. Orientados hacia un *Light Mode*, los íconos decorativos en tarjetas de rendimiento (P. ej. *Goles*, *Asistencias*, *Partidos Jugados*) emplean tonos Verde Principal y Secundario para mantener la identidad visual del deporte.
 - **Semiótica Deportiva Contemporánea:** Íconos tácticos para estrategia, cronómetros y trofeos que lucen tan sofisticados e intuitivos como la interfaz de un videojuego deportivo moderno (Ej. EA FC). La iconografía del menú de navegación interactivo parte de un tono gris inactivo hacia un verde vibrante cuando es el módulo activo.
 
-### 7.3. Indicadores (Badges / Pills)
+### 6.3. Indicadores (Badges / Pills)
 - **Alertas Estructurales:** Formas ovaladas compactas (*pill-shape*) con un indicador luminoso (punto de estatus). Emplean un fondo Verde Pastel (`#ECFCCB`) y texto en Verde Oscuro destacando estados como "EN CURSO" o detalles de "Temporada 2026".
 
 ![alt text](image-39.png)
@@ -149,7 +133,10 @@ El uso fotográfico y gráfico en la plataforma se basa en el contraste, reforza
 
 ![alt text](image-40.png)
 
-### 7.4. Formularios y Entradas (Inputs)
+### 6.4. Formularios y Entradas (Inputs)
 - Las cajas de introducción de texto, subida de vouchers (Portal de Pagos) o selección de opciones (Dorsales) basan su contraste en un fondo claro (`#FFFFFF` o `#F8FAFC`). Emplean un borde gris muy tenue que reacciona (*Focus State* o Estado Activo) con un perímetro más sólido o relleno (ej. Cuadros de dorsales seleccionados rellenados en `#84CC16`) para destacar fuertemente la interacción activa del usuario.
 
-![alt text](image-41.png)
+<img width="560" height="569" alt="image" src="https://github.com/user-attachments/assets/087700ff-9936-40e4-a470-2978efd38ae1" />
+
+
+
