@@ -79,3 +79,4 @@ A continuación se definen los escenarios de prueba exigidos para cada funcional
 ### Conditional (Casos Condicionales)
 1. **Llaves automáticas en cierre:** Solo cuando el último partido de la "Fase de Grupos" es marcado como "Finalizado", el sistema dispara la generación aleatoria/ordenada de los enfrentamientos de Cuartos de Final.
 2. **Sin goleadores en empates 0-0:** Si el resultado es `0-0`, el sistema desactiva condicionalmente los campos requeridos para seleccionar anotadores.
+

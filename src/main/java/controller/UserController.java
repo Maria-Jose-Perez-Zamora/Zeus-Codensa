@@ -1,7 +1,9 @@
 package controller;
 
-import model.User;
+import dto.UserRequestDTO;
+import dto.UserResponseDTO;
 import service.UserService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -11,18 +13,24 @@ public class UserController {
 
     private final UserService userService;
 
-    // Inyección por constructor
     public UserController(UserService userService) {
         this.userService = userService;
     }
 
     @PostMapping("/register")
-    public String register(@RequestBody User user) {
-        return userService.registerUser(user);
+    public ResponseEntity<?> register(@RequestBody UserRequestDTO request) {
+        try {
+            UserResponseDTO response = userService.registerUser(request);
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error interno del servidor");
+        }
     }
 
     @GetMapping("/all")
-    public List<User> getAll() {
-        return userService.getAllUsers();
+    public ResponseEntity<List<UserResponseDTO>> getAll() {
+        return ResponseEntity.ok(userService.getAllUsers());
     }
 }

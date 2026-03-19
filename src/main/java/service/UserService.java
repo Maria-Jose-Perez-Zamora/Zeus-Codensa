@@ -1,24 +1,31 @@
 package service;
 
+import dto.UserRequestDTO;
+import dto.UserResponseDTO;
+import factory.UserFactory;
 import model.User;
 import util.DataStorage;
+import validator.UserValidator;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
 
-    public String registerUser(User user) {
-        for (User u : DataStorage.users) {
-            if (u.getCorreo().equals(user.getCorreo())) {
-                return "Error: El correo ya existe.";
-            }
-        }
-        DataStorage.users.add(user);
-        return "Usuario " + user.getNombre() + " registrado exitosamente.";
+    public UserResponseDTO registerUser(UserRequestDTO requestDTO) {
+        UserValidator.validateForRegistration(requestDTO);
+
+        User newUser = UserFactory.createUser(requestDTO);
+
+        DataStorage.users.add(newUser);
+        return new UserResponseDTO(newUser);
     }
 
-    public List<User> getAllUsers() {
-        return DataStorage.users;
+    public List<UserResponseDTO> getAllUsers() {
+        return DataStorage.users.stream()
+                .map(UserResponseDTO::new)
+                .collect(Collectors.toList());
     }
 }
