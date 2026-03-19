@@ -1,0 +1,58 @@
+package service;
+
+import dto.InscripcionRequestDTO;
+import dto.InscripcionResponseDTO;
+import model.Team;
+import model.Torneo;
+import util.DataStorage;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+public class InscripcionServiceTest {
+
+    private InscripcionService inscripcionService;
+
+    @BeforeEach
+    public void setUp() {
+        DataStorage.clearAll();
+        inscripcionService = new InscripcionService();
+    }
+
+    @Test
+    public void testInscribir_Success() {
+        DataStorage.teams.add(new Team("Aguilas"));
+        DataStorage.torneos.add(new Torneo("Nacional"));
+
+        InscripcionRequestDTO req = new InscripcionRequestDTO("Aguilas", "Nacional", "url_pago");
+        InscripcionResponseDTO res = inscripcionService.inscribir(req);
+
+        assertNotNull(res);
+        assertNotNull(res.getId());
+        assertEquals("PENDIENTE", res.getEstado());
+        assertEquals(1, DataStorage.inscripciones.size());
+    }
+
+    @Test
+    public void testActualizarEstado_Success() {
+        DataStorage.teams.add(new Team("Aguilas"));
+        DataStorage.torneos.add(new Torneo("Nacional"));
+
+        InscripcionRequestDTO req = new InscripcionRequestDTO("Aguilas", "Nacional", "url_pago");
+        InscripcionResponseDTO res = inscripcionService.inscribir(req);
+
+        InscripcionResponseDTO updated = inscripcionService.actualizarEstado(res.getId(), "APROBADO");
+        assertEquals("APROBADO", updated.getEstado());
+    }
+
+    @Test
+    public void testActualizarEstado_InvalidState() {
+        DataStorage.teams.add(new Team("Aguilas"));
+        DataStorage.torneos.add(new Torneo("Nacional"));
+
+        InscripcionResponseDTO res = inscripcionService.inscribir(new InscripcionRequestDTO("Aguilas", "Nacional", "url_pago"));
+
+        assertThrows(IllegalArgumentException.class, () -> inscripcionService.actualizarEstado(res.getId(), "MISTERIO"));
+    }
+}

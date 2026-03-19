@@ -619,7 +619,7 @@ POST	/api/teams/create	Crea un nuevo equipo de fútbol.
 GET	/api/teams/all	Lista los equipos creados.
 
 ### Diagrama De Clases
-![alt text](<Diagrama de clases TechCup.png>)
+![alt text](<Diagrama de clases TechCup2-1.png>)
 
 ### Diagrama ded Componentes General
 ![Diagrama de componentes general tf.drawio.png](docs%2Fuml%2FDiagrama%20de%20componentes%20general%20tf.drawio.png)
