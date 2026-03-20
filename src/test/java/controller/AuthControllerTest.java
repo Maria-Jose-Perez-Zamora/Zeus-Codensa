@@ -45,8 +45,7 @@ public class AuthControllerTest {
 
         when(authService.login(any())).thenThrow(new IllegalArgumentException("error"));
 
-        ResponseEntity<?> response = authController.login(req);
-        assertEquals(401, response.getStatusCode().value());
-        assertEquals("error", response.getBody());
+        RuntimeException thrown = assertThrows(RuntimeException.class, () -> authController.login(req));
+        assertEquals("error", thrown.getMessage());
     }
 }

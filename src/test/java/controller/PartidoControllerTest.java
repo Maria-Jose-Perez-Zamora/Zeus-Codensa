@@ -69,8 +69,8 @@ public class PartidoControllerTest {
         body.put("nombreEquipo", "Otro");
         body.put("jugadores", List.of("j@a.com"));
 
-        ResponseEntity<?> response = partidoController.registrarAlineacion("1", body);
-        assertEquals(400, response.getStatusCode().value());
+        RuntimeException thrown = assertThrows(RuntimeException.class, () -> partidoController.registrarAlineacion("1", body));
+        assertEquals("Equipo no participa", thrown.getMessage());
     }
 
     @Test
@@ -91,8 +91,8 @@ public class PartidoControllerTest {
         when(partidoService.registrarTarjetas(any(), any(), any()))
                 .thenThrow(new IllegalArgumentException("Partido no encontrado"));
 
-        ResponseEntity<?> response = partidoController.registrarTarjetas("999", new HashMap<>());
-        assertEquals(400, response.getStatusCode().value());
+        RuntimeException thrown = assertThrows(RuntimeException.class, () -> partidoController.registrarTarjetas("999", new HashMap<>()));
+        assertEquals("Partido no encontrado", thrown.getMessage());
     }
 
     @Test
@@ -110,8 +110,8 @@ public class PartidoControllerTest {
         when(partidoService.asignarArbitro(any(), any()))
                 .thenThrow(new IllegalArgumentException("No es árbitro"));
 
-        ResponseEntity<?> response = partidoController.asignarArbitro("1", Map.of("correoArbitro", "x@a.com"));
-        assertEquals(400, response.getStatusCode().value());
+        RuntimeException thrown = assertThrows(RuntimeException.class, () -> partidoController.asignarArbitro("1", Map.of("correoArbitro", "x@a.com")));
+        assertEquals("No es árbitro", thrown.getMessage());
     }
 
     @Test

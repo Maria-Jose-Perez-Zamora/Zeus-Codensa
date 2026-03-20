@@ -63,7 +63,7 @@ public class PartidoServiceTest {
     @Test
     public void testRegistrarAlineacion_EquipoNoParticipa_Throws() {
         PartidoResponseDTO res = crearPartido();
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(RuntimeException.class,
                 () -> partidoService.registrarAlineacion(res.getId(), "OtroEquipo", Arrays.asList("j@a.com")));
     }
 

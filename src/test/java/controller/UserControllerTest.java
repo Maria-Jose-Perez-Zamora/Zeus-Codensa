@@ -51,10 +51,8 @@ public class UserControllerTest {
         when(userService.registerUser(any(UserRequestDTO.class)))
             .thenThrow(new IllegalArgumentException("Error de validación"));
 
-        ResponseEntity<?> responseEntity = userController.register(request);
-
-        assertEquals(400, responseEntity.getStatusCode().value());
-        assertEquals("Error de validación", responseEntity.getBody());
+        RuntimeException thrown = assertThrows(RuntimeException.class, () -> userController.register(request));
+        assertEquals("Error de validación", thrown.getMessage());
     }
 
     @Test

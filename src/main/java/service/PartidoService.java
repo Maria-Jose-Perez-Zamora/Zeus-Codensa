@@ -2,36 +2,42 @@ package service;
 
 import dto.PartidoRequestDTO;
 import dto.PartidoResponseDTO;
+import exception.ResourceNotFoundException;
+import exception.BusinessRuleException;
+import model.Partido;
 import model.Partido;
 import util.DataStorage;
 import validator.PartidoValidator;
+import mapper.PartidoMapper;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class PartidoService {
 
+    private static final Logger log = LoggerFactory.getLogger(PartidoService.class);
+
     public PartidoResponseDTO registrarPartido(PartidoRequestDTO request) {
+        log.debug("Ejecutando validaciones para creacion de partido");
         PartidoValidator.validateForCreation(request);
 
-        Partido nuevoPartido = new Partido(
-                request.getEquipoLocal(),
-                request.getEquipoVisitante(),
-                request.getFechaPartido(),
-                request.getNombreTorneo()
-        );
+        Partido nuevoPartido = PartidoMapper.toEntity(request);
 
         DataStorage.partidos.add(nuevoPartido);
-        return new PartidoResponseDTO(nuevoPartido);
+        log.info("Partido registrado exitosamente local {} vs {} visitante (Torneo {})", 
+                 request.getEquipoLocal(), request.getEquipoVisitante(), request.getNombreTorneo());
+        return PartidoMapper.toDTO(nuevoPartido);
     }
 
     public PartidoResponseDTO actualizarMarcador(String id, Integer marcadorLocal, Integer marcadorVisitante) {
         if (marcadorLocal == null || marcadorVisitante == null || marcadorLocal < 0 || marcadorVisitante < 0) {
-            throw new IllegalArgumentException("Marcadores invalidos");
+            log.error("Violación funcional: Marcadores negativos o nulos recibidos");
+            throw new BusinessRuleException("Marcadores invalidos");
         }
 
         Partido partido = findOrThrow(id);
@@ -39,30 +45,27 @@ public class PartidoService {
         partido.setMarcadorVisitante(marcadorVisitante);
         partido.setEstado("FINALIZADO");
 
-        return new PartidoResponseDTO(partido);
+        log.info("Marcador actualizado para el ID {} | {} - {}", id, marcadorLocal, marcadorVisitante);
+        return PartidoMapper.toDTO(partido);
     }
 
-    /**
-     * RF-008: Registrar alineación de un equipo para un partido dado.
-     */
     public PartidoResponseDTO registrarAlineacion(String id, String nombreEquipo, List<String> jugadores) {
         if (jugadores == null || jugadores.isEmpty()) {
-            throw new IllegalArgumentException("La alineación no puede estar vacía");
+            throw new BusinessRuleException("La alineación no puede estar vacía");
         }
 
         Partido partido = findOrThrow(id);
 
         if (!partido.getEquipoLocal().equals(nombreEquipo) && !partido.getEquipoVisitante().equals(nombreEquipo)) {
-            throw new IllegalArgumentException("El equipo especificado no participa en este partido");
+            log.warn("El equipo {} no participa en este partido", nombreEquipo);
+            throw new BusinessRuleException("El equipo especificado no participa en este partido");
         }
 
         partido.getAlineaciones().put(nombreEquipo, jugadores);
-        return new PartidoResponseDTO(partido);
+        log.info("Alineación registrada exitosamente de {} jugadores para el equipo {}", jugadores.size(), nombreEquipo);
+        return PartidoMapper.toDTO(partido);
     }
 
-    /**
-     * RF-006: Registrar tarjetas amarillas y rojas
-     */
     public PartidoResponseDTO registrarTarjetas(String id, Map<String, List<String>> amarillas, Map<String, List<String>> rojas) {
         Partido partido = findOrThrow(id);
         if (amarillas != null) {
@@ -71,39 +74,36 @@ public class PartidoService {
         if (rojas != null) {
             partido.setTarjetasRojas(rojas);
         }
-        return new PartidoResponseDTO(partido);
+        log.debug("Tarjetas amarillas/rojas guardadas para el ID {}", id);
+        return PartidoMapper.toDTO(partido);
     }
 
-    /**
-     * RF-008: Retorna los partidos asignados a un árbitro (vista "mis partidos").
-     */
     public List<PartidoResponseDTO> getPartidosPorArbitro(String correoArbitro) {
         return DataStorage.partidos.stream()
                 .filter(p -> correoArbitro.equals(p.getCorreoArbitro()))
-                .map(PartidoResponseDTO::new)
+                .map(PartidoMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Asigna un árbitro a un partido (solo árbitros registrados).
-     */
     public PartidoResponseDTO asignarArbitro(String id, String correoArbitro) {
         boolean esArbitro = DataStorage.users.stream()
                 .anyMatch(u -> u.getCorreo().equals(correoArbitro)
                         && u.getRole() != null
                         && u.getRole().name().equals("ARBITRO"));
         if (!esArbitro) {
-            throw new IllegalArgumentException("El correo especificado no corresponde a un árbitro registrado");
+            log.error("Asignacion fallida: {} carece del rol ARBITRO", correoArbitro);
+            throw new BusinessRuleException("El correo especificado no corresponde a un árbitro registrado");
         }
 
         Partido partido = findOrThrow(id);
         partido.setCorreoArbitro(correoArbitro);
-        return new PartidoResponseDTO(partido);
+        log.info("Arbitro {} asignado exitosamente al Partido ID {}", correoArbitro, id);
+        return PartidoMapper.toDTO(partido);
     }
 
     public List<PartidoResponseDTO> getAll() {
         return DataStorage.partidos.stream()
-                .map(PartidoResponseDTO::new)
+                .map(PartidoMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
@@ -111,6 +111,6 @@ public class PartidoService {
         return DataStorage.partidos.stream()
                 .filter(p -> p.getId().equals(id))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Partido no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Partido no encontrado con su Identificador Base"));
     }
 }

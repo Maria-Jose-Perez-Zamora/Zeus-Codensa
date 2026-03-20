@@ -44,12 +44,12 @@ public class AuthServiceTest {
         DataStorage.users.add(u);
 
         LoginRequestDTO request = new LoginRequestDTO("test@test.com", "wrong");
-        assertThrows(IllegalArgumentException.class, () -> authService.login(request));
+        assertThrows(RuntimeException.class, () -> authService.login(request));
     }
 
     @Test
     public void testLogin_NullFields() {
         LoginRequestDTO request = new LoginRequestDTO(null, "wrong");
-        assertThrows(IllegalArgumentException.class, () -> authService.login(request));
+        assertThrows(RuntimeException.class, () -> authService.login(request));
     }
 }

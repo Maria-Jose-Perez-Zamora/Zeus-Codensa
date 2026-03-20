@@ -57,6 +57,6 @@ public class InscripcionServiceTest {
 
         InscripcionResponseDTO res = inscripcionService.inscribir(new InscripcionRequestDTO("Aguilas", "Nacional", "url_pago"));
 
-        assertThrows(IllegalArgumentException.class, () -> inscripcionService.actualizarEstado(res.getId(), "MISTERIO"));
+        assertThrows(RuntimeException.class, () -> inscripcionService.actualizarEstado(res.getId(), "MISTERIO"));
     }
 }

@@ -61,9 +61,8 @@ public class TorneoControllerTest {
     public void testConfigurarTorneo_Error_Returns400() {
         when(torneoService.configurarTorneo(eq("invalid"), any())).thenThrow(new IllegalArgumentException("Torneo no encontrado"));
 
-        ResponseEntity<?> response = torneoController.configurarTorneo("invalid", new TorneoRequestDTO());
-        assertEquals(400, response.getStatusCode().value());
-        assertEquals("Torneo no encontrado", response.getBody());
+        RuntimeException thrown = assertThrows(RuntimeException.class, () -> torneoController.configurarTorneo("invalid", new TorneoRequestDTO()));
+        assertEquals("Torneo no encontrado", thrown.getMessage());
     }
 
     @Test

@@ -2,10 +2,16 @@ package service;
 
 import dto.InscripcionRequestDTO;
 import dto.InscripcionResponseDTO;
+import exception.ResourceNotFoundException;
+import exception.BusinessRuleException;
+import model.Inscripcion;
 import model.Inscripcion;
 import util.DataStorage;
 import validator.InscripcionValidator;
+import mapper.InscripcionMapper;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,25 +20,27 @@ import java.util.stream.Collectors;
 @Service
 public class InscripcionService {
 
+    private static final Logger log = LoggerFactory.getLogger(InscripcionService.class);
+
     public InscripcionResponseDTO inscribir(InscripcionRequestDTO request) {
+        log.debug("Ejecutando validaciones para inscripción del equipo {}", request.getNombreEquipo());
         InscripcionValidator.validateForInscripcion(request);
 
-        Inscripcion nuevaInscripcion = new Inscripcion(
-                request.getNombreEquipo(),
-                request.getNombreTorneo(),
-                request.getComprobantePagoUrl()
-        );
+        Inscripcion nuevaInscripcion = InscripcionMapper.toEntity(request);
 
         DataStorage.inscripciones.add(nuevaInscripcion);
-        return new InscripcionResponseDTO(nuevaInscripcion);
+        log.info("Inscripción creada con ID: {}, estado {}", nuevaInscripcion.getId(), nuevaInscripcion.getEstado());
+        return InscripcionMapper.toDTO(nuevaInscripcion);
     }
 
     public InscripcionResponseDTO actualizarEstado(String id, String nuevoEstado) {
+        log.debug("Intentando actualizar estado de la inscripción {} a {}", id, nuevoEstado);
         if (!nuevoEstado.equals("PENDIENTE") && 
             !nuevoEstado.equals("EN_REVISION") && 
             !nuevoEstado.equals("APROBADO") && 
             !nuevoEstado.equals("RECHAZADO")) {
-            throw new IllegalArgumentException("Estado no valido para inscripcion");
+            log.error("Violación transaccional: estado '{}' no permitido", nuevoEstado);
+            throw new BusinessRuleException("Estado no valido para inscripcion");
         }
 
         Optional<Inscripcion> inscripcionOpt = DataStorage.inscripciones.stream()
@@ -40,18 +48,20 @@ public class InscripcionService {
                 .findFirst();
 
         if (inscripcionOpt.isEmpty()) {
-            throw new IllegalArgumentException("La inscripcion especificada no existe");
+            log.error("Inscripción no encontrada ID: {}", id);
+            throw new ResourceNotFoundException("La inscripcion especificada no existe");
         }
 
         Inscripcion inscripcion = inscripcionOpt.get();
         inscripcion.setEstado(nuevoEstado);
 
-        return new InscripcionResponseDTO(inscripcion);
+        log.info("Estado de inscripción ID {} actualizado exitosamente a {}", id, nuevoEstado);
+        return InscripcionMapper.toDTO(inscripcion);
     }
 
     public List<InscripcionResponseDTO> getAll() {
         return DataStorage.inscripciones.stream()
-                .map(InscripcionResponseDTO::new)
+                .map(InscripcionMapper::toDTO)
                 .collect(Collectors.toList());
     }
 }

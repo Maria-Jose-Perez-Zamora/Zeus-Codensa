@@ -2,11 +2,13 @@ package service;
 
 import dto.UserRequestDTO;
 import dto.UserResponseDTO;
-import factory.UserFactory;
 import model.User;
 import util.DataStorage;
 import validator.UserValidator;
+import mapper.UserMapper;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,18 +16,22 @@ import java.util.stream.Collectors;
 @Service
 public class UserService {
 
+    private static final Logger log = LoggerFactory.getLogger(UserService.class);
+
     public UserResponseDTO registerUser(UserRequestDTO requestDTO) {
+        log.debug("Validando reglas de creacion para usuario {}", requestDTO.getCorreo());
         UserValidator.validateForRegistration(requestDTO);
 
-        User newUser = UserFactory.createUser(requestDTO);
+        User newUser = UserMapper.toEntity(requestDTO);
 
         DataStorage.users.add(newUser);
-        return new UserResponseDTO(newUser);
+        log.info("Usuario creado exitosamente: {} con rol {}", newUser.getCorreo(), newUser.getRole());
+        return UserMapper.toDTO(newUser);
     }
 
     public List<UserResponseDTO> getAllUsers() {
         return DataStorage.users.stream()
-                .map(UserResponseDTO::new)
+                .map(UserMapper::toDTO)
                 .collect(Collectors.toList());
     }
 }

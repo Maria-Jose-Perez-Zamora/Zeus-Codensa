@@ -54,10 +54,8 @@ public class TeamControllerTest {
         when(teamService.createTeam(any(TeamRequestDTO.class)))
             .thenThrow(new IllegalArgumentException("Error de validacion"));
 
-        ResponseEntity<?> responseEntity = teamController.createTeam(request);
-
-        assertEquals(400, responseEntity.getStatusCode().value());
-        assertEquals("Error de validacion", responseEntity.getBody());
+        RuntimeException thrown = assertThrows(RuntimeException.class, () -> teamController.createTeam(request));
+        assertEquals("Error de validacion", thrown.getMessage());
     }
 
     @Test

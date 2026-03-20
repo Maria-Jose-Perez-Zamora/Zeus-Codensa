@@ -7,12 +7,15 @@ import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import service.AuthService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("/api/auth")
 @Tag(name = "Autenticación", description = "Endpoints para inicio de sesión y validación de usuarios")
 public class AuthController {
 
+    private static final Logger log = LoggerFactory.getLogger(AuthController.class);
     private final AuthService authService;
 
     public AuthController(AuthService authService) {
@@ -20,14 +23,9 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequestDTO request) {
-        try {
-            LoginResponseDTO response = authService.login(request);
-            return ResponseEntity.ok(response);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(401).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Error interno del servidor");
-        }
+    @Operation(summary = "Inicio de Sesion", description = "Produce un Token JWT simple Base64 enlazado al Rol")
+    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO request) {
+        log.info("REST request - intento de login de usuario: {}", request.getCorreo());
+        return ResponseEntity.ok(authService.login(request));
     }
 }

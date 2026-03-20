@@ -4,10 +4,14 @@ import dto.UserResponseDTO;
 import model.Invitacion;
 import dto.InvitacionRequestDTO;
 import dto.InvitacionResponseDTO;
+import exception.BusinessRuleException;
+import exception.ResourceNotFoundException;
 import model.User;
 import model.Jugador;
 import util.DataStorage;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,10 +19,10 @@ import java.util.stream.Collectors;
 @Service
 public class JugadorService {
 
-    /**
-     * RF-003: Busca jugadores disponibles (sin equipo) filtrando por nombre y/o posición.
-     */
+    private static final Logger log = LoggerFactory.getLogger(JugadorService.class);
+
     public List<UserResponseDTO> buscarJugadoresDisponibles(String nombre, String posicion) {
+        log.debug("Procesando la busqueda de jugadores disponibles en el mercado. Filtros -> Nombre: {}, Posicion: {}", nombre, posicion);
         return DataStorage.users.stream()
                 .filter(u -> u instanceof Jugador)
                 .map(u -> (Jugador) u)
@@ -37,25 +41,24 @@ public class JugadorService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * RF-003: Envía una invitación de un capitán a un jugador disponible.
-     */
     public InvitacionResponseDTO enviarInvitacion(InvitacionRequestDTO request) {
         if (request.getCorreoJugador() == null || request.getCorreoJugador().isBlank()) {
-            throw new IllegalArgumentException("El correo del jugador es obligatorio");
+            throw new BusinessRuleException("El correo del jugador es obligatorio");
         }
         if (request.getNombreEquipo() == null || request.getNombreEquipo().isBlank()) {
-            throw new IllegalArgumentException("El nombre del equipo es obligatorio");
+            throw new BusinessRuleException("El nombre del equipo es obligatorio");
         }
 
         boolean jugadorExiste = DataStorage.users.stream()
                 .anyMatch(u -> u instanceof Jugador && u.getCorreo().equals(request.getCorreoJugador()));
         if (!jugadorExiste) {
-            throw new IllegalArgumentException("El jugador con correo " + request.getCorreoJugador() + " no existe en el sistema");
+            log.error("El jugador destino no existe en DataStorage: {}", request.getCorreoJugador());
+            throw new ResourceNotFoundException("El jugador con correo " + request.getCorreoJugador() + " no existe en el sistema");
         }
 
         if (estaEnEquipo(request.getCorreoJugador())) {
-            throw new IllegalArgumentException("El jugador ya pertenece a un equipo, no se puede enviar invitación");
+            log.warn("El jugador {} ya está fichado por otro equipo", request.getCorreoJugador());
+            throw new BusinessRuleException("El jugador ya pertenece a un equipo, no se puede enviar invitación");
         }
 
         boolean yaInvitado = DataStorage.invitaciones.stream()
@@ -63,12 +66,15 @@ public class JugadorService {
                         && i.getNombreEquipo().equals(request.getNombreEquipo())
                         && i.getEstado().equals("ENVIADA"));
         if (yaInvitado) {
-            throw new IllegalArgumentException("Ya existe una invitación pendiente para este jugador en este equipo");
+            log.warn("Invitación duplicada omitida hacia {}", request.getCorreoJugador());
+            throw new BusinessRuleException("Ya existe una invitación pendiente para este jugador en este equipo");
         }
 
         Invitacion invitacion = new Invitacion(request.getCorreoCapitan(), request.getCorreoJugador(), request.getNombreEquipo());
         DataStorage.invitaciones.add(invitacion);
 
+        log.info("Invitación generada exitosamente del capitan {} al jugador {} (Equipo: {})",
+                 request.getCorreoCapitan(), request.getCorreoJugador(), request.getNombreEquipo());
         return new InvitacionResponseDTO(invitacion);
     }
 

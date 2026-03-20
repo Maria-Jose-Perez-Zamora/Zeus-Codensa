@@ -64,7 +64,7 @@ public class TorneoServiceTest {
         TorneoRequestDTO configInfo = new TorneoRequestDTO();
         configInfo.setReglamento("Nuevas reglas");
 
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, 
+        RuntimeException thrown = assertThrows(RuntimeException.class, 
             () -> torneoService.configurarTorneo(t.getId(), configInfo));
         assertTrue(thrown.getMessage().contains("Solo se pueden configurar torneos en estado BORRADOR o ABIERTO"));
     }

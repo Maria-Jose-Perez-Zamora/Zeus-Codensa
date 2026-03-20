@@ -81,7 +81,7 @@ public class JugadorServiceTest {
     @Test
     public void testEnviarInvitacion_JugadorNoExisteThrows() {
         InvitacionRequestDTO req = new InvitacionRequestDTO("cap@test.com", "noexiste@test.com", "FC Alpha");
-        assertThrows(IllegalArgumentException.class, () -> jugadorService.enviarInvitacion(req));
+        assertThrows(RuntimeException.class, () -> jugadorService.enviarInvitacion(req));
     }
 
     @Test
@@ -92,6 +92,6 @@ public class JugadorServiceTest {
         DataStorage.teams.add(t);
 
         InvitacionRequestDTO req = new InvitacionRequestDTO("cap@test.com", "ana@test.com", "FC Alpha");
-        assertThrows(IllegalArgumentException.class, () -> jugadorService.enviarInvitacion(req));
+        assertThrows(RuntimeException.class, () -> jugadorService.enviarInvitacion(req));
     }
 }
