@@ -15,6 +15,8 @@ public class PartidoResponseDTO {
     private String nombreTorneo;
     private String correoArbitro;
     private Map<String, List<String>> alineaciones;
+    private Map<String, List<String>> tarjetasAmarillas;
+    private Map<String, List<String>> tarjetasRojas;
 
     public PartidoResponseDTO() {}
 
@@ -29,6 +31,8 @@ public class PartidoResponseDTO {
         this.nombreTorneo = partido.getNombreTorneo();
         this.correoArbitro = partido.getCorreoArbitro();
         this.alineaciones = partido.getAlineaciones();
+        this.tarjetasAmarillas = partido.getTarjetasAmarillas();
+        this.tarjetasRojas = partido.getTarjetasRojas();
     }
 
     public String getId() { return id; }
@@ -51,4 +55,8 @@ public class PartidoResponseDTO {
     public void setCorreoArbitro(String correoArbitro) { this.correoArbitro = correoArbitro; }
     public Map<String, List<String>> getAlineaciones() { return alineaciones; }
     public void setAlineaciones(Map<String, List<String>> alineaciones) { this.alineaciones = alineaciones; }
+    public Map<String, List<String>> getTarjetasAmarillas() { return tarjetasAmarillas; }
+    public void setTarjetasAmarillas(Map<String, List<String>> tarjetasAmarillas) { this.tarjetasAmarillas = tarjetasAmarillas; }
+    public Map<String, List<String>> getTarjetasRojas() { return tarjetasRojas; }
+    public void setTarjetasRojas(Map<String, List<String>> tarjetasRojas) { this.tarjetasRojas = tarjetasRojas; }
 }

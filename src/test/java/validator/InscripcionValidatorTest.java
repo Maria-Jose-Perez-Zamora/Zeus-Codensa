@@ -16,10 +16,16 @@ public class InscripcionValidatorTest {
         DataStorage.clearAll();
     }
 
+    private void prepareTestEnv() {
+        DataStorage.teams.add(new Team("Tigres"));
+        Torneo t = new Torneo("Liga A");
+        t.setEstado("ABIERTO");
+        DataStorage.torneos.add(t);
+    }
+
     @Test
     public void testValidateForInscripcion_Success() {
-        DataStorage.teams.add(new Team("Tigres"));
-        DataStorage.torneos.add(new Torneo("Liga A"));
+        prepareTestEnv();
 
         InscripcionRequestDTO req = new InscripcionRequestDTO("Tigres", "Liga A", "http://pago.com");
         assertDoesNotThrow(() -> InscripcionValidator.validateForInscripcion(req));
@@ -27,7 +33,9 @@ public class InscripcionValidatorTest {
 
     @Test
     public void testValidateForInscripcion_TeamNotFound() {
-        DataStorage.torneos.add(new Torneo("Liga A"));
+        Torneo t = new Torneo("Liga A");
+        t.setEstado("ABIERTO");
+        DataStorage.torneos.add(t);
 
         InscripcionRequestDTO req = new InscripcionRequestDTO("Falso", "Liga A", "http://pago.com");
         assertThrows(IllegalArgumentException.class, () -> InscripcionValidator.validateForInscripcion(req));

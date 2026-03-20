@@ -74,6 +74,28 @@ public class PartidoControllerTest {
     }
 
     @Test
+    public void testRegistrarTarjetas_Success() {
+        PartidoResponseDTO res = new PartidoResponseDTO();
+        when(partidoService.registrarTarjetas(eq("1"), anyMap(), anyMap())).thenReturn(res);
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("tarjetasAmarillas", new HashMap<>());
+        body.put("tarjetasRojas", new HashMap<>());
+
+        ResponseEntity<?> response = partidoController.registrarTarjetas("1", body);
+        assertEquals(200, response.getStatusCode().value());
+    }
+
+    @Test
+    public void testRegistrarTarjetas_Error_Returns400() {
+        when(partidoService.registrarTarjetas(any(), any(), any()))
+                .thenThrow(new IllegalArgumentException("Partido no encontrado"));
+
+        ResponseEntity<?> response = partidoController.registrarTarjetas("999", new HashMap<>());
+        assertEquals(400, response.getStatusCode().value());
+    }
+
+    @Test
     public void testAsignarArbitro_Success() {
         PartidoResponseDTO res = new PartidoResponseDTO();
         res.setCorreoArbitro("ref@test.com");

@@ -20,10 +20,15 @@ public class Partido {
     private Map<String, List<String>> alineaciones;
     // Goleadores: mapa correoJugador -> cantidad de goles anotados
     private Map<String, Integer> goles;
+    // Tarjetas (RF-006): mapa nombreJugador(minuto) -> motivo/cantidad
+    private Map<String, List<String>> tarjetasAmarillas;
+    private Map<String, List<String>> tarjetasRojas;
 
     public Partido() {
         this.alineaciones = new HashMap<>();
         this.goles = new HashMap<>();
+        this.tarjetasAmarillas = new HashMap<>();
+        this.tarjetasRojas = new HashMap<>();
     }
 
     public Partido(String equipoLocal, String equipoVisitante, String fechaPartido, String nombreTorneo) {
@@ -37,6 +42,8 @@ public class Partido {
         this.marcadorVisitante = 0;
         this.alineaciones = new HashMap<>();
         this.goles = new HashMap<>();
+        this.tarjetasAmarillas = new HashMap<>();
+        this.tarjetasRojas = new HashMap<>();
     }
 
     public String getId() { return id; }
@@ -61,4 +68,8 @@ public class Partido {
     public void setAlineaciones(Map<String, List<String>> alineaciones) { this.alineaciones = alineaciones; }
     public Map<String, Integer> getGoles() { return goles; }
     public void setGoles(Map<String, Integer> goles) { this.goles = goles; }
+    public Map<String, List<String>> getTarjetasAmarillas() { return tarjetasAmarillas; }
+    public void setTarjetasAmarillas(Map<String, List<String>> tarjetasAmarillas) { this.tarjetasAmarillas = tarjetasAmarillas; }
+    public Map<String, List<String>> getTarjetasRojas() { return tarjetasRojas; }
+    public void setTarjetasRojas(Map<String, List<String>> tarjetasRojas) { this.tarjetasRojas = tarjetasRojas; }
 }

@@ -61,6 +61,20 @@ public class PartidoService {
     }
 
     /**
+     * RF-006: Registrar tarjetas amarillas y rojas
+     */
+    public PartidoResponseDTO registrarTarjetas(String id, Map<String, List<String>> amarillas, Map<String, List<String>> rojas) {
+        Partido partido = findOrThrow(id);
+        if (amarillas != null) {
+            partido.setTarjetasAmarillas(amarillas);
+        }
+        if (rojas != null) {
+            partido.setTarjetasRojas(rojas);
+        }
+        return new PartidoResponseDTO(partido);
+    }
+
+    /**
      * RF-008: Retorna los partidos asignados a un árbitro (vista "mis partidos").
      */
     public List<PartidoResponseDTO> getPartidosPorArbitro(String correoArbitro) {

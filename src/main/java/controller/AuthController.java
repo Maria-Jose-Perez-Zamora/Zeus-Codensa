@@ -4,10 +4,13 @@ import dto.LoginRequestDTO;
 import dto.LoginResponseDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import service.AuthService;
 
 @RestController
 @RequestMapping("/api/auth")
+@Tag(name = "Autenticación", description = "Endpoints para inicio de sesión y validación de usuarios")
 public class AuthController {
 
     private final AuthService authService;

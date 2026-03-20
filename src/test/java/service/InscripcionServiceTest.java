@@ -20,10 +20,16 @@ public class InscripcionServiceTest {
         inscripcionService = new InscripcionService();
     }
 
+    private void prepareTestEnv() {
+        DataStorage.teams.add(new Team("Aguilas"));
+        Torneo t = new Torneo("Nacional");
+        t.setEstado("ABIERTO");
+        DataStorage.torneos.add(t);
+    }
+
     @Test
     public void testInscribir_Success() {
-        DataStorage.teams.add(new Team("Aguilas"));
-        DataStorage.torneos.add(new Torneo("Nacional"));
+        prepareTestEnv();
 
         InscripcionRequestDTO req = new InscripcionRequestDTO("Aguilas", "Nacional", "url_pago");
         InscripcionResponseDTO res = inscripcionService.inscribir(req);
@@ -36,8 +42,7 @@ public class InscripcionServiceTest {
 
     @Test
     public void testActualizarEstado_Success() {
-        DataStorage.teams.add(new Team("Aguilas"));
-        DataStorage.torneos.add(new Torneo("Nacional"));
+        prepareTestEnv();
 
         InscripcionRequestDTO req = new InscripcionRequestDTO("Aguilas", "Nacional", "url_pago");
         InscripcionResponseDTO res = inscripcionService.inscribir(req);
@@ -48,8 +53,7 @@ public class InscripcionServiceTest {
 
     @Test
     public void testActualizarEstado_InvalidState() {
-        DataStorage.teams.add(new Team("Aguilas"));
-        DataStorage.torneos.add(new Torneo("Nacional"));
+        prepareTestEnv();
 
         InscripcionResponseDTO res = inscripcionService.inscribir(new InscripcionRequestDTO("Aguilas", "Nacional", "url_pago"));
 

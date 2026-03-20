@@ -68,6 +68,22 @@ public class PartidoServiceTest {
     }
 
     @Test
+    public void testRegistrarTarjetas_Success() {
+        PartidoResponseDTO res = crearPartido();
+        java.util.Map<String, List<String>> amarillas = new java.util.HashMap<>();
+        amarillas.put("A", Arrays.asList("Jugador1 (15')", "Jugador2 (45')"));
+        amarillas.put("B", Arrays.asList("Jugador3 (80')"));
+
+        java.util.Map<String, List<String>> rojas = new java.util.HashMap<>();
+        rojas.put("B", Arrays.asList("Jugador4 (90')"));
+
+        PartidoResponseDTO result = partidoService.registrarTarjetas(res.getId(), amarillas, rojas);
+        assertNotNull(result.getTarjetasAmarillas());
+        assertEquals(2, result.getTarjetasAmarillas().size());
+        assertEquals(1, result.getTarjetasRojas().size());
+    }
+
+    @Test
     public void testAsignarArbitro_Success() {
         PartidoResponseDTO res = crearPartido();
 

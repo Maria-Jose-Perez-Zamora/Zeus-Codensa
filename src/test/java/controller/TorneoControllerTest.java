@@ -42,6 +42,31 @@ public class TorneoControllerTest {
     }
 
     @Test
+    public void testConfigurarTorneo_Success() {
+        TorneoRequestDTO req = new TorneoRequestDTO();
+        req.setReglamento("Rules");
+        
+        TorneoResponseDTO res = new TorneoResponseDTO();
+        res.setReglamento("Rules");
+        res.setNombreTorneo("Liga");
+
+        when(torneoService.configurarTorneo(eq("123"), any())).thenReturn(res);
+
+        ResponseEntity<?> response = torneoController.configurarTorneo("123", req);
+        assertEquals(200, response.getStatusCode().value());
+        assertEquals(res, response.getBody());
+    }
+
+    @Test
+    public void testConfigurarTorneo_Error_Returns400() {
+        when(torneoService.configurarTorneo(eq("invalid"), any())).thenThrow(new IllegalArgumentException("Torneo no encontrado"));
+
+        ResponseEntity<?> response = torneoController.configurarTorneo("invalid", new TorneoRequestDTO());
+        assertEquals(400, response.getStatusCode().value());
+        assertEquals("Torneo no encontrado", response.getBody());
+    }
+
+    @Test
     public void testGetAllTorneos_Success() {
         when(torneoService.getAllTorneos()).thenReturn(Collections.emptyList());
 

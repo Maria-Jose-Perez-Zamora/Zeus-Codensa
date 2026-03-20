@@ -4,6 +4,8 @@ import dto.InscripcionRequestDTO;
 import dto.InscripcionResponseDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import service.InscripcionService;
 
 import java.util.List;
@@ -11,6 +13,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/inscripciones")
+@Tag(name = "Inscripciones", description = "Proceso de abono de tarifa de inscripción al torneo (RF-004)")
 public class InscripcionController {
 
     private final InscripcionService inscripcionService;
@@ -20,6 +23,7 @@ public class InscripcionController {
     }
 
     @PostMapping("/create")
+    @Operation(summary = "Registrar Comprobante", description = "Sube el link/referencia del comprobante de pago NEQUI o efectivo")
     public ResponseEntity<?> createInscripcion(@RequestBody InscripcionRequestDTO request) {
         try {
             InscripcionResponseDTO response = inscripcionService.inscribir(request);
@@ -32,6 +36,7 @@ public class InscripcionController {
     }
 
     @PutMapping("/{id}/estado")
+    @Operation(summary = "Evaluar pago", description = "El organizador evalúa el comproabante para APROBAR o RECHAZAR la inscripción")
     public ResponseEntity<?> actualizarEstado(@PathVariable String id, @RequestBody Map<String, String> body) {
         try {
             String nuevoEstado = body.get("estado");
@@ -47,6 +52,7 @@ public class InscripcionController {
     }
 
     @GetMapping("/all")
+    @Operation(summary = "Listar procesos", description = "Lista comprobantes pendientes y aprobados")
     public ResponseEntity<List<InscripcionResponseDTO>> getAll() {
         return ResponseEntity.ok(inscripcionService.getAll());
     }
