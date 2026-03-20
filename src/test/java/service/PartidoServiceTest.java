@@ -109,4 +109,28 @@ public class PartidoServiceTest {
         List<PartidoResponseDTO> misPartidos = partidoService.getPartidosPorArbitro("ref@test.com");
         assertEquals(1, misPartidos.size());
     }
+
+    @Test
+    public void testActualizarMarcador_NegativeScores_Throws() {
+        assertThrows(RuntimeException.class, () -> partidoService.actualizarMarcador("Cualquiera", -1, 2));
+    }
+
+    @Test
+    public void testActualizarMarcador_NullScores_Throws() {
+        assertThrows(RuntimeException.class, () -> partidoService.actualizarMarcador("Cualquiera", null, 2));
+    }
+
+    @Test
+    public void testRegistrarAlineacion_EmptyPlayers_Throws() {
+        assertThrows(RuntimeException.class, () -> partidoService.registrarAlineacion("Cualquiera", "A", java.util.Collections.emptyList()));
+    }
+
+    @Test
+    public void testAsignarArbitro_NotArbitro_Throws() {
+        model.Jugador u = new model.Jugador();
+        u.setCorreo("falso@test.com");
+        u.setRole(Role.JUGADOR);
+        DataStorage.users.add(u);
+        assertThrows(RuntimeException.class, () -> partidoService.asignarArbitro("1", "falso@test.com"));
+    }
 }

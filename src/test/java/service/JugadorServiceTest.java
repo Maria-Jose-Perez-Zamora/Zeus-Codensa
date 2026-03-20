@@ -94,4 +94,21 @@ public class JugadorServiceTest {
         InvitacionRequestDTO req = new InvitacionRequestDTO("cap@test.com", "ana@test.com", "FC Alpha");
         assertThrows(RuntimeException.class, () -> jugadorService.enviarInvitacion(req));
     }
+
+    @Test
+    public void testEnviarInvitacion_NullCorreo_Throws() {
+        assertThrows(RuntimeException.class, () -> jugadorService.enviarInvitacion(new InvitacionRequestDTO("cap@test.com", null, "FC Alpha")));
+    }
+
+    @Test
+    public void testEnviarInvitacion_NullEquipo_Throws() {
+        assertThrows(RuntimeException.class, () -> jugadorService.enviarInvitacion(new InvitacionRequestDTO("cap@test.com", "ana@test.com", null)));
+    }
+
+    @Test
+    public void testEnviarInvitacion_YaInvitado_Throws() {
+        DataStorage.invitaciones.add(new model.Invitacion("cap@test.com", "ana@test.com", "FC Alpha"));
+        InvitacionRequestDTO req = new InvitacionRequestDTO("cap@test.com", "ana@test.com", "FC Alpha");
+        assertThrows(RuntimeException.class, () -> jugadorService.enviarInvitacion(req));
+    }
 }

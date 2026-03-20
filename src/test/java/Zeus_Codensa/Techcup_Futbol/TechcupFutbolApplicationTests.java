@@ -10,4 +10,10 @@ class TechcupFutbolApplicationTests {
 	void contextLoads() {
 	}
 
+    @Test
+    void applicationStarts() {
+        org.junit.jupiter.api.Assertions.assertDoesNotThrow(() -> {
+            TechcupFutbolApplication.main(new String[]{"--server.port=0"});
+        });
+    }
 }

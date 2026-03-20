@@ -59,4 +59,9 @@ public class InscripcionServiceTest {
 
         assertThrows(RuntimeException.class, () -> inscripcionService.actualizarEstado(res.getId(), "MISTERIO"));
     }
+
+    @Test
+    public void testActualizarEstado_IdNotFound_Throws() {
+        assertThrows(RuntimeException.class, () -> inscripcionService.actualizarEstado("Inventado-123", "APROBADO"));
+    }
 }
