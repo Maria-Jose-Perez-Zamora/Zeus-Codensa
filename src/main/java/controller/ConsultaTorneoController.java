@@ -33,6 +33,15 @@ public class ConsultaTorneoController {
         this.estadisticasService = estadisticasService;
     }
 
+    @GetMapping("")
+    @Operation(summary = "Indice de Consultas", description = "Endpoint base que valida conexion")
+    public ResponseEntity<Map<String, String>> index() {
+        return ResponseEntity.ok(Map.of(
+            "status", "Consulta API is running",
+            "message", "Usa /{torneo}/tabla, /{torneo}/llaves/{fase}, /{torneo}/calendario, /{torneo}/estadisticas, /{torneo}/goleadores"
+        ));
+    }
+
     @GetMapping("/{torneo}/tabla")
     @Operation(summary = "Tabla de posiciones", description = "Genera la tabla general a partir del torneo activo sumando victorias y empates")
     public ResponseEntity<List<TablaPosicion>> getTabla(@PathVariable String torneo) {

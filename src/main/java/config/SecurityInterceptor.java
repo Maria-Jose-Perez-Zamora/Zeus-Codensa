@@ -14,8 +14,14 @@ public class SecurityInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String uri = request.getRequestURI();
         
-        // Rutas publicas
-        if (uri.startsWith("/api/auth/login") || uri.startsWith("/api/users/register") || uri.startsWith("/api/torneos/consulta")) {
+        // Rutas publicas (sin token)
+        if (uri.startsWith("/api/auth/login")
+            || uri.startsWith("/api/users/register")
+            || uri.startsWith("/api/torneos/consulta")
+            || uri.startsWith("/swagger-ui")
+            || uri.startsWith("/v3/api-docs")
+            || uri.startsWith("/swagger-resources")
+            || uri.startsWith("/webjars")) {
             return true;
         }
 
