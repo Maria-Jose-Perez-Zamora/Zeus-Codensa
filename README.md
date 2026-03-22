@@ -110,19 +110,14 @@ Para la Demo Funcional, el backend expone los siguientes puntos de acceso en htt
 
 
 ### Diagrama De Clases
-![alt text](<Diagrama de clases TechCup2-1.png>)
 
+![alt text](docs/images/DiagramaDeClases.jpg)
 
 ### Diagrama ded Componentes General
-![Diagrama de componentes general tf.drawio.png](docs%2Fuml%2FDiagrama%20de%20componentes%20general%20tf.drawio.png)
+
+![alt text](docs/images/ComponentesGeneral.png)
 
 
-### Diagrama dde Componenetes Especifico
-![Diagrama de Componentes Especifico.drawio.png](docs%2Fuml%2FDiagrama%20de%20Componentes%20Especifico.drawio.png)
-
-
-#  Pruebas y Validación
-Para facilitar la revisión y el trabajo del equipo de Frontend, se incluyó un archivo de pruebas rápidas en la raíz:
 
 
 
@@ -134,65 +129,84 @@ Para documentar el comportamiento del backend, se incluyen las 15 funcionalidade
 
 ### 1. Inicio de sesión (Login)
 Descripción: permite que un usuario ingrese al sistema usando correo y contraseña. El servicio verifica que las credenciales existan y coincidan con un usuario registrado; si son correctas, devuelve un token junto con su rol para controlar permisos en las demás operaciones.
+
 Diagrama de secuencia:
+![alt text](docs/images/InicioDeSesion.jpg)
+
 
 ### 2. Registro de usuario
 Descripción: registra nuevos usuarios del sistema (por ejemplo, organizadores o administradores) validando campos obligatorios y reglas del dominio. Si la información es válida, el usuario se transforma a entidad, se almacena en memoria y se retorna su representación de respuesta.
+
 Diagrama de secuencia:
+![alt text](docs/images/RegistroDeUsuario.jpg)
+
+
 
 ### 3. Consulta de usuarios
 Descripción: obtiene el listado completo de usuarios creados en la aplicación para tareas de administración y seguimiento. La consulta toma los datos almacenados, los transforma a DTO y los entrega en un formato seguro para el cliente.
+
 Diagrama de secuencia:
+![alt text](docs/images/ConsultaDeUsuarios.jpg)
+
 
 ### 4. Creación de equipo
 Descripción: permite crear un equipo del torneo con su información principal (nombre, escudo y colores) y asociar jugadores existentes usando sus correos. Durante el proceso se valida la solicitud y se construye el equipo con su plantilla inicial.
 Diagrama de secuencia:
 
+![alt text](docs/images/CreaciónDeEquipo.jpg)
+
 ### 5. Consulta de equipos
 Descripción: retorna todos los equipos registrados para facilitar la visualización de participantes del torneo. La respuesta incluye los datos relevantes del equipo y su estado actual dentro de la información disponible en memoria.
 Diagrama de secuencia:
+
+![alt text](docs/images/5.jpg)
+
+
 
 ### 6. Creación de torneo
 Descripción: inicia un nuevo torneo con su configuración base y lo deja en estado BORRADOR para que pueda ser completado posteriormente. Esta funcionalidad centraliza la creación inicial de la competencia antes de abrir inscripciones o programar partidos.
 Diagrama de secuencia:
 
+![alt text](docs/images/6.jpg)
+
+
 ### 7. Configuración de torneo
 Descripción: actualiza la información operativa de un torneo existente, como reglamento, fechas, horarios, canchas y sanciones. Solo permite cambios cuando el torneo se encuentra en estados válidos, evitando modificaciones fuera del flujo definido por negocio.
 Diagrama de secuencia:
-
+![alt text](docs/images/7.jpg)
 ### 8. Consulta de torneos
 Descripción: consulta todos los torneos creados en el sistema para mostrar su información general y estado. Sirve como base para paneles de administración, seguimiento de competencia y selección de torneo en otros procesos.
 Diagrama de secuencia:
-
+![alt text](docs/images/8.jpg)
 ### 9. Registro de inscripción
 Descripción: registra la inscripción de un equipo al torneo incluyendo datos del pago o comprobante. El sistema valida la solicitud, crea el registro de inscripción y deja trazabilidad del proceso para su posterior revisión por el organizador.
 Diagrama de secuencia:
-
+![alt text](docs/images/9.jpg)
 ### 10. Actualización de estado de inscripción
 Descripción: permite que el organizador cambie el estado de una inscripción (por ejemplo, en revisión, aprobada o rechazada) de acuerdo con el flujo permitido. También valida que el nuevo estado sea correcto y que la inscripción exista antes de aplicar el cambio.
 Diagrama de secuencia:
-
+![alt text](docs/images/10.jpg)
 ### 11. Consulta de inscripciones
 Descripción: muestra todas las inscripciones registradas junto con su estado actual para facilitar control administrativo y toma de decisiones. Esta vista permite identificar rápidamente qué equipos están pendientes, aprobados o rechazados.
 Diagrama de secuencia:
-
+![alt text](docs/images/11.jpg)
 ### 12. Registro de partido
 Descripción: crea un partido entre dos equipos dentro del contexto de un torneo, guardando la información inicial necesaria para su gestión. Incluye validaciones de consistencia para asegurar que el encuentro quede correctamente preparado para etapas posteriores.
 Diagrama de secuencia:
-
+![alt text](docs/images/12.jpg)
 ### 13. Actualización de marcador
 Descripción: actualiza los goles o puntos de un partido y consolida el resultado final del encuentro. Además, valida que los marcadores sean válidos y cambia el estado del partido a FINALIZADO cuando corresponde.
 Diagrama de secuencia:
-
+![alt text](docs/images/13.jpg)
 ### 14. Registro de alineación
 Descripción: registra los jugadores que participarán en un partido para un equipo específico (local o visitante). La funcionalidad valida que el equipo pertenezca al encuentro y que la lista de jugadores cumpla condiciones mínimas antes de guardarla.
 Diagrama de secuencia:
-
+![alt text](docs/images/14.jpg)
 ### 15. Registro de tarjetas
 Descripción: permite registrar eventos disciplinarios de un partido, como tarjetas amarillas o rojas asociadas a un jugador. Este control aporta trazabilidad deportiva y soporta posteriores decisiones arbitrales o sancionatorias.
 Diagrama de secuencia:
 
-
+![alt text](docs/images/15.jpg)
 
 
 
