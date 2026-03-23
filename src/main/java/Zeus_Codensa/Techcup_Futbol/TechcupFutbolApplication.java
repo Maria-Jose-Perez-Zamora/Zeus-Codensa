@@ -5,16 +5,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication(scanBasePackages = {
     "Zeus_Codensa.Techcup_Futbol",
-    "controller",
-    "service",
-    "config",
-    "validator",
-    "mapper",
-    "factory",
-    "util",
-    "model",
-    "dto",
-    "exception"
+    "controlador",
+    "core",
+    "dependencias"
 })
 public class TechcupFutbolApplication {
 
