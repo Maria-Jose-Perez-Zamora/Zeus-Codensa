@@ -1,10 +1,10 @@
 package core.service;
 
-import dependencias.dto.TeamRequestDTO;
-import dependencias.dto.TeamResponseDTO;
-import core.model.Jugador;
+import dependencies.dto.TeamRequestDTO;
+import dependencies.dto.TeamResponseDTO;
+import core.model.Player;
 import core.model.Role;
-import dependencias.util.DataStorage;
+import dependencies.util.DataStorage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -25,10 +25,10 @@ public class TeamServiceTest {
         validPlayers = Arrays.asList("1@a.com", "2@a.com", "3@a.com", "4@a.com", "5@a.com", "6@a.com", "7@a.com");
         
         for (String email : validPlayers) {
-            Jugador j = new Jugador();
+            Player j = new Player();
             j.setCorreo(email);
-            j.setNombre("Jugador " + email);
-            j.setRole(Role.JUGADOR);
+            j.setName("Player " + email);
+            j.setRole(Role.PLAYER);
             DataStorage.users.add(j);
         }
     }
@@ -50,7 +50,7 @@ public class TeamServiceTest {
         
         List<String> validPlayersB = Arrays.asList("8@a.com", "9@a.com", "10@a.com", "11@a.com", "12@a.com", "13@a.com", "14@a.com");
         for (String email : validPlayersB) {
-            Jugador j = new Jugador(); j.setCorreo(email); DataStorage.users.add(j);
+            Player j = new Player(); j.setCorreo(email); DataStorage.users.add(j);
         }
         TeamRequestDTO request2 = new TeamRequestDTO("Equipo B", null, null, validPlayersB);
         

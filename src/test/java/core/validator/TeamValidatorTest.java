@@ -1,9 +1,9 @@
 package core.validator;
 
-import dependencias.dto.TeamRequestDTO;
+import dependencies.dto.TeamRequestDTO;
 import core.model.Team;
-import core.model.Jugador;
-import dependencias.util.DataStorage;
+import core.model.Player;
+import dependencies.util.DataStorage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.util.Arrays;
@@ -66,7 +66,7 @@ public class TeamValidatorTest {
     @Test
     public void testJugadorYaEnEquipo() {
         Team t = new Team("EqB");
-        Jugador j = new Jugador(); j.setCorreo("1");
+        Player j = new Player(); j.setCorreo("1");
         t.getJugadores().add(j);
         DataStorage.teams.add(t);
         assertThrows(IllegalArgumentException.class, () -> TeamValidator.validateForCreation(validReq()));

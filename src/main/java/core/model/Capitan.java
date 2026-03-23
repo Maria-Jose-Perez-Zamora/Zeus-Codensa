@@ -1,5 +1,5 @@
 package core.model;
 
-public class Capitan extends Jugador {
+public class Capitan extends Player {
     public Capitan() {}
 }

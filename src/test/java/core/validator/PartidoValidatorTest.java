@@ -1,9 +1,9 @@
 package core.validator;
 
-import dependencias.dto.PartidoRequestDTO;
-import dependencias.util.DataStorage;
-import core.model.Torneo;
-import core.model.Inscripcion;
+import dependencies.dto.MatchRequestDTO;
+import dependencies.util.DataStorage;
+import core.model.Tournament;
+import core.model.Registration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -17,82 +17,82 @@ public class PartidoValidatorTest {
         DataStorage.clearAll();
     }
 
-    private PartidoRequestDTO validReq() {
-        return new PartidoRequestDTO("EqA", "EqB", "2026", "T1");
+    private MatchRequestDTO validReq() {
+        return new MatchRequestDTO("EqA", "EqB", "2026", "T1");
     }
 
     private void setupValidEnv() {
-        DataStorage.torneos.add(new Torneo("T1"));
-        Inscripcion i1 = new Inscripcion("EqA", "T1", "url"); i1.setEstado("APROBADO");
-        Inscripcion i2 = new Inscripcion("EqB", "T1", "url"); i2.setEstado("APROBADO");
-        DataStorage.inscripciones.add(i1);
-        DataStorage.inscripciones.add(i2);
+        DataStorage.tournaments.add(new Tournament("T1"));
+        Registration i1 = new Registration("EqA", "T1", "url"); i1.setStatus("APROBADO");
+        Registration i2 = new Registration("EqB", "T1", "url"); i2.setStatus("APROBADO");
+        DataStorage.registrations.add(i1);
+        DataStorage.registrations.add(i2);
     }
 
     @Test
     public void testValid() {
         setupValidEnv();
-        assertDoesNotThrow(() -> PartidoValidator.validateForCreation(validReq()));
+        assertDoesNotThrow(() -> MatchValidator.validateForCreation(validReq()));
     }
 
     @Test
     public void testLocalNull() {
-        PartidoRequestDTO req = validReq(); req.setEquipoLocal(null);
-        assertThrows(IllegalArgumentException.class, () -> PartidoValidator.validateForCreation(req));
+        MatchRequestDTO req = validReq(); req.setHomeTeam(null);
+        assertThrows(IllegalArgumentException.class, () -> MatchValidator.validateForCreation(req));
     }
 
     @Test
     public void testVisitanteNull() {
-        PartidoRequestDTO req = validReq(); req.setEquipoVisitante(null);
-        assertThrows(IllegalArgumentException.class, () -> PartidoValidator.validateForCreation(req));
+        MatchRequestDTO req = validReq(); req.setAwayTeam(null);
+        assertThrows(IllegalArgumentException.class, () -> MatchValidator.validateForCreation(req));
     }
 
     @Test
     public void testMismoEquipo() {
-        PartidoRequestDTO req = validReq(); req.setEquipoLocal("EqA"); req.setEquipoVisitante("EqA");
-        assertThrows(IllegalArgumentException.class, () -> PartidoValidator.validateForCreation(req));
+        MatchRequestDTO req = validReq(); req.setHomeTeam("EqA"); req.setAwayTeam("EqA");
+        assertThrows(IllegalArgumentException.class, () -> MatchValidator.validateForCreation(req));
     }
 
     @Test
     public void testTorneoNull() {
-        PartidoRequestDTO req = validReq(); req.setNombreTorneo(null);
-        assertThrows(IllegalArgumentException.class, () -> PartidoValidator.validateForCreation(req));
+        MatchRequestDTO req = validReq(); req.setTournamentName(null);
+        assertThrows(IllegalArgumentException.class, () -> MatchValidator.validateForCreation(req));
     }
 
     @Test
     public void testFechaNull() {
-        PartidoRequestDTO req = validReq(); req.setFechaPartido(null);
-        assertThrows(IllegalArgumentException.class, () -> PartidoValidator.validateForCreation(req));
+        MatchRequestDTO req = validReq(); req.setMatchDate(null);
+        assertThrows(IllegalArgumentException.class, () -> MatchValidator.validateForCreation(req));
     }
 
     @Test
     public void testTorneoNoExiste() {
-        assertThrows(IllegalArgumentException.class, () -> PartidoValidator.validateForCreation(validReq()));
+        assertThrows(IllegalArgumentException.class, () -> MatchValidator.validateForCreation(validReq()));
     }
 
     @Test
     public void testVisitanteNoInscrito() {
-        DataStorage.torneos.add(new Torneo("T1"));
-        Inscripcion i1 = new Inscripcion("EqA", "T1", "url"); i1.setEstado("APROBADO");
-        DataStorage.inscripciones.add(i1);
-        assertThrows(IllegalArgumentException.class, () -> PartidoValidator.validateForCreation(validReq()));
+        DataStorage.tournaments.add(new Tournament("T1"));
+        Registration i1 = new Registration("EqA", "T1", "url"); i1.setStatus("APROBADO");
+        DataStorage.registrations.add(i1);
+        assertThrows(IllegalArgumentException.class, () -> MatchValidator.validateForCreation(validReq()));
     }
 
     @Test
     public void testLocalNoInscrito() {
-        DataStorage.torneos.add(new Torneo("T1"));
-        Inscripcion i2 = new Inscripcion("EqB", "T1", "url"); i2.setEstado("APROBADO");
-        DataStorage.inscripciones.add(i2);
-        assertThrows(IllegalArgumentException.class, () -> PartidoValidator.validateForCreation(validReq()));
+        DataStorage.tournaments.add(new Tournament("T1"));
+        Registration i2 = new Registration("EqB", "T1", "url"); i2.setStatus("APROBADO");
+        DataStorage.registrations.add(i2);
+        assertThrows(IllegalArgumentException.class, () -> MatchValidator.validateForCreation(validReq()));
     }
 
     @Test
     public void testEstadoNoAprobado() {
-        DataStorage.torneos.add(new Torneo("T1"));
-        Inscripcion i1 = new Inscripcion("EqA", "T1", "url"); i1.setEstado("PENDIENTE");
-        Inscripcion i2 = new Inscripcion("EqB", "T1", "url"); i2.setEstado("APROBADO");
-        DataStorage.inscripciones.add(i1);
-        DataStorage.inscripciones.add(i2);
-        assertThrows(IllegalArgumentException.class, () -> PartidoValidator.validateForCreation(validReq()));
+        DataStorage.tournaments.add(new Tournament("T1"));
+        Registration i1 = new Registration("EqA", "T1", "url"); i1.setStatus("PENDIENTE");
+        Registration i2 = new Registration("EqB", "T1", "url"); i2.setStatus("APROBADO");
+        DataStorage.registrations.add(i1);
+        DataStorage.registrations.add(i2);
+        assertThrows(IllegalArgumentException.class, () -> MatchValidator.validateForCreation(validReq()));
     }
 }

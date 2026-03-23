@@ -1,6 +1,6 @@
 package core.exception;
 
-import dependencias.dto.ApiErrorDTO;
+import dependencies.dto.ApiErrorDTO;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.context.request.WebRequest;

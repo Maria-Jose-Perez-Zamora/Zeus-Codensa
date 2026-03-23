@@ -1,10 +1,10 @@
 package core.service;
 
-import dependencias.dto.InscripcionRequestDTO;
-import dependencias.dto.InscripcionResponseDTO;
+import dependencies.dto.RegistrationRequestDTO;
+import dependencies.dto.RegistrationResponseDTO;
 import core.model.Team;
-import core.model.Torneo;
-import dependencias.util.DataStorage;
+import core.model.Tournament;
+import dependencies.util.DataStorage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -12,50 +12,50 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class InscripcionServiceTest {
 
-    private InscripcionService inscripcionService;
+    private RegistrationService inscripcionService;
 
     @BeforeEach
     public void setUp() {
         DataStorage.clearAll();
-        inscripcionService = new InscripcionService();
+        inscripcionService = new RegistrationService();
     }
 
     private void prepareTestEnv() {
         DataStorage.teams.add(new Team("Aguilas"));
-        Torneo t = new Torneo("Nacional");
-        t.setEstado("ABIERTO");
-        DataStorage.torneos.add(t);
+        Tournament t = new Tournament("Nacional");
+        t.setStatus("OPEN");
+        DataStorage.tournaments.add(t);
     }
 
     @Test
     public void testInscribir_Success() {
         prepareTestEnv();
 
-        InscripcionRequestDTO req = new InscripcionRequestDTO("Aguilas", "Nacional", "url_pago");
-        InscripcionResponseDTO res = inscripcionService.inscribir(req);
+        RegistrationRequestDTO req = new RegistrationRequestDTO("Aguilas", "Nacional", "url_pago");
+        RegistrationResponseDTO res = inscripcionService.inscribir(req);
 
         assertNotNull(res);
         assertNotNull(res.getId());
-        assertEquals("PENDIENTE", res.getEstado());
-        assertEquals(1, DataStorage.inscripciones.size());
+        assertEquals("PENDIENTE", res.getStatus());
+        assertEquals(1, DataStorage.registrations.size());
     }
 
     @Test
     public void testActualizarEstado_Success() {
         prepareTestEnv();
 
-        InscripcionRequestDTO req = new InscripcionRequestDTO("Aguilas", "Nacional", "url_pago");
-        InscripcionResponseDTO res = inscripcionService.inscribir(req);
+        RegistrationRequestDTO req = new RegistrationRequestDTO("Aguilas", "Nacional", "url_pago");
+        RegistrationResponseDTO res = inscripcionService.inscribir(req);
 
-        InscripcionResponseDTO updated = inscripcionService.actualizarEstado(res.getId(), "APROBADO");
-        assertEquals("APROBADO", updated.getEstado());
+        RegistrationResponseDTO updated = inscripcionService.actualizarEstado(res.getId(), "APROBADO");
+        assertEquals("APROBADO", updated.getStatus());
     }
 
     @Test
     public void testActualizarEstado_InvalidState() {
         prepareTestEnv();
 
-        InscripcionResponseDTO res = inscripcionService.inscribir(new InscripcionRequestDTO("Aguilas", "Nacional", "url_pago"));
+        RegistrationResponseDTO res = inscripcionService.inscribir(new RegistrationRequestDTO("Aguilas", "Nacional", "url_pago"));
 
         assertThrows(RuntimeException.class, () -> inscripcionService.actualizarEstado(res.getId(), "MISTERIO"));
     }

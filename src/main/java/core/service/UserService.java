@@ -1,11 +1,11 @@
 package core.service;
 
-import dependencias.dto.UserRequestDTO;
-import dependencias.dto.UserResponseDTO;
+import dependencies.dto.UserRequestDTO;
+import dependencies.dto.UserResponseDTO;
 import core.model.User;
-import dependencias.util.DataStorage;
+import dependencies.util.DataStorage;
 import core.validator.UserValidator;
-import dependencias.mapper.UserMapper;
+import dependencies.mapper.UserMapper;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

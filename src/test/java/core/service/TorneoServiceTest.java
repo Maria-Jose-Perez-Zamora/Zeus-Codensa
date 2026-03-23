@@ -1,9 +1,9 @@
 package core.service;
 
-import dependencias.dto.TorneoRequestDTO;
-import dependencias.dto.TorneoResponseDTO;
-import core.model.Torneo;
-import dependencias.util.DataStorage;
+import dependencies.dto.TournamentRequestDTO;
+import dependencies.dto.TournamentResponseDTO;
+import core.model.Tournament;
+import dependencies.util.DataStorage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.util.Arrays;
@@ -13,32 +13,32 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TorneoServiceTest {
 
-    private TorneoService torneoService;
+    private TournamentService torneoService;
 
     @BeforeEach
     public void setUp() {
         DataStorage.clearAll();
-        torneoService = new TorneoService();
+        torneoService = new TournamentService();
     }
 
     @Test
     public void testCreateTorneo() {
-        TorneoRequestDTO req = new TorneoRequestDTO("Liga Verano", "2026-06-01", "2026-08-01", 8, 100.0);
-        TorneoResponseDTO res = torneoService.createTorneo(req);
+        TournamentRequestDTO req = new TournamentRequestDTO("Liga Verano", "2026-06-01", "2026-08-01", 8, 100.0);
+        TournamentResponseDTO res = torneoService.createTorneo(req);
 
         assertNotNull(res);
-        assertEquals("Liga Verano", res.getNombreTorneo());
-        assertEquals("BORRADOR", res.getEstado());  // Default state from updated model
-        assertEquals(1, DataStorage.torneos.size());
+        assertEquals("Liga Verano", res.getTournamentName());
+        assertEquals("DRAFT", res.getStatus());  // Default state from updated model
+        assertEquals(1, DataStorage.tournaments.size());
     }
 
     @Test
     public void testConfigurarTorneo_Success() {
-        // Prepare Borrador status Torneo
-        DataStorage.torneos.add(new Torneo("Liga Invierno"));
-        String currId = DataStorage.torneos.get(0).getId();
+        // Prepare Borrador status Tournament
+        DataStorage.tournaments.add(new Tournament("Liga Invierno"));
+        String currId = DataStorage.tournaments.get(0).getId();
 
-        TorneoRequestDTO configInfo = new TorneoRequestDTO();
+        TournamentRequestDTO configInfo = new TournamentRequestDTO();
         configInfo.setReglamento("Reglas Oficiales");
         configInfo.setFechaCierreInscripciones("2026-05-30");
         configInfo.setFechaInicioFaseGrupos("2026-06-02");
@@ -46,7 +46,7 @@ public class TorneoServiceTest {
         configInfo.setCanchas(Arrays.asList("Cancha 1", "Cancha Central"));
         configInfo.setSanciones("Roja = 2 Fechas");
 
-        TorneoResponseDTO res = torneoService.configurarTorneo(currId, configInfo);
+        TournamentResponseDTO res = torneoService.configurarTorneo(currId, configInfo);
 
         assertNotNull(res);
         assertEquals("Reglas Oficiales", res.getReglamento());
@@ -57,24 +57,24 @@ public class TorneoServiceTest {
 
     @Test
     public void testConfigurarTorneo_InvalidState_Throws() {
-        Torneo t = new Torneo("Liga Bloqueada");
-        t.setEstado("EN_PROGRESO");
-        DataStorage.torneos.add(t);
+        Tournament t = new Tournament("Liga Bloqueada");
+        t.setStatus("EN_PROGRESO");
+        DataStorage.tournaments.add(t);
 
-        TorneoRequestDTO configInfo = new TorneoRequestDTO();
+        TournamentRequestDTO configInfo = new TournamentRequestDTO();
         configInfo.setReglamento("Nuevas reglas");
 
         RuntimeException thrown = assertThrows(RuntimeException.class, 
             () -> torneoService.configurarTorneo(t.getId(), configInfo));
-        assertTrue(thrown.getMessage().contains("Solo se pueden configurar torneos en estado BORRADOR o ABIERTO"));
+        assertTrue(thrown.getMessage().contains("Solo se pueden configurar tournaments en status DRAFT o OPEN"));
     }
 
     @Test
     public void testGetAllTorneos() {
-        DataStorage.torneos.add(new Torneo("Liga 1"));
-        DataStorage.torneos.add(new Torneo("Liga 2"));
+        DataStorage.tournaments.add(new Tournament("Liga 1"));
+        DataStorage.tournaments.add(new Tournament("Liga 2"));
 
-        List<TorneoResponseDTO> res = torneoService.getAllTorneos();
+        List<TournamentResponseDTO> res = torneoService.getAllTorneos();
         assertEquals(2, res.size());
     }
 }

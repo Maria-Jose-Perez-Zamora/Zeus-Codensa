@@ -1,11 +1,11 @@
 package core.service;
 
-import dependencias.dto.LoginRequestDTO;
-import dependencias.dto.LoginResponseDTO;
-import dependencias.dto.UserResponseDTO;
+import dependencies.dto.LoginRequestDTO;
+import dependencies.dto.LoginResponseDTO;
+import dependencies.dto.UserResponseDTO;
 import core.exception.BusinessRuleException;
 import core.model.User;
-import dependencias.util.DataStorage;
+import dependencies.util.DataStorage;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

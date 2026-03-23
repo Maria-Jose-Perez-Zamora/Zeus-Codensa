@@ -32,9 +32,10 @@ build/
 ### VS Code ###
 .vscode/
 
-### Fixer ###
+### .py ###
 fixer.py
 refactor.py
+translator.py
 
 ### Diagrama de Clases ###
 /diagrama_clases.md

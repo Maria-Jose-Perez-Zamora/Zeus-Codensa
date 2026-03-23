@@ -1,10 +1,10 @@
 package core.service;
 
-import dependencias.dto.LoginRequestDTO;
-import dependencias.dto.LoginResponseDTO;
+import dependencies.dto.LoginRequestDTO;
+import dependencies.dto.LoginResponseDTO;
 import core.model.Role;
-import core.model.Jugador;
-import dependencias.util.DataStorage;
+import core.model.Player;
+import dependencies.util.DataStorage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -22,10 +22,10 @@ public class AuthServiceTest {
 
     @Test
     public void testLogin_Success() {
-        Jugador u = new Jugador();
+        Player u = new Player();
         u.setCorreo("test@test.com");
         u.setContrasena("secret");
-        u.setRole(Role.JUGADOR);
+        u.setRole(Role.PLAYER);
         DataStorage.users.add(u);
 
         LoginRequestDTO request = new LoginRequestDTO("test@test.com", "secret");
@@ -38,7 +38,7 @@ public class AuthServiceTest {
 
     @Test
     public void testLogin_InvalidCredentials() {
-        Jugador u = new Jugador();
+        Player u = new Player();
         u.setCorreo("test@test.com");
         u.setContrasena("secret");
         DataStorage.users.add(u);

@@ -1,13 +1,13 @@
 package core.service;
 
-import dependencias.dto.TeamRequestDTO;
-import dependencias.dto.TeamResponseDTO;
+import dependencies.dto.TeamRequestDTO;
+import dependencies.dto.TeamResponseDTO;
 import core.model.Team;
 import core.model.User;
 import core.model.User;
-import dependencias.util.DataStorage;
+import dependencies.util.DataStorage;
 import core.validator.TeamValidator;
-import dependencias.mapper.TeamMapper;
+import dependencies.mapper.TeamMapper;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +22,7 @@ public class TeamService {
     private static final Logger log = LoggerFactory.getLogger(TeamService.class);
 
     public TeamResponseDTO createTeam(TeamRequestDTO requestDTO) {
-        log.debug("Ejecutando validaciones para creacion de equipo: {}", requestDTO.getNombreEquipo());
+        log.debug("Ejecutando validaciones para creacion de team: {}", requestDTO.getNombreEquipo());
         TeamValidator.validateForCreation(requestDTO);
 
         Team newTeam = TeamMapper.toEntity(requestDTO);
@@ -35,7 +35,7 @@ public class TeamService {
                     .findFirst()
                     .ifPresent(foundUsers::add);
             }
-            log.debug("Se asociaron {} jugadores al equipo", foundUsers.size());
+            log.debug("Se asociaron {} players al team", foundUsers.size());
         }
         newTeam.setJugadores(foundUsers);
 

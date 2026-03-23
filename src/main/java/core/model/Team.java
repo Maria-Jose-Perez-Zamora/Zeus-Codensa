@@ -7,15 +7,15 @@ public class Team {
     private String nombreEquipo;
     private String escudo;
     private String coloresUniforme;
-    private List<User> jugadores;
+    private List<User> players;
 
     public Team() {
-        this.jugadores = new ArrayList<>();
+        this.players = new ArrayList<>();
     }
 
     public Team(String nombreEquipo) {
         this.nombreEquipo = nombreEquipo;
-        this.jugadores = new ArrayList<>();
+        this.players = new ArrayList<>();
     }
 
     // Getters y Setters
@@ -25,6 +25,6 @@ public class Team {
     public void setEscudo(String escudo) { this.escudo = escudo; }
     public String getColoresUniforme() { return coloresUniforme; }
     public void setColoresUniforme(String coloresUniforme) { this.coloresUniforme = coloresUniforme; }
-    public List<User> getJugadores() { return jugadores; }
-    public void setJugadores(List<User> jugadores) { this.jugadores = jugadores; }
+    public List<User> getJugadores() { return players; }
+    public void setJugadores(List<User> players) { this.players = players; }
 }

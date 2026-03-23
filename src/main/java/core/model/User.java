@@ -1,7 +1,7 @@
 package core.model;
 
 public abstract class User {
-    private String nombre;
+    private String name;
     private String correo;
     private String contrasena;
     private String foto;
@@ -9,14 +9,14 @@ public abstract class User {
 
     public User() {}
 
-    public User(String nombre, String correo, String contrasena) {
-        this.nombre = nombre;
+    public User(String name, String correo, String contrasena) {
+        this.name = name;
         this.correo = correo;
         this.contrasena = contrasena;
     }
 
-    public String getNombre() { return nombre; }
-    public void setNombre(String nombre) { this.nombre = nombre; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
     public String getCorreo() { return correo; }
     public void setCorreo(String correo) { this.correo = correo; }
     public String getContrasena() { return contrasena; }

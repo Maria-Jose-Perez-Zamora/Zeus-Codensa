@@ -1,6 +1,6 @@
 package core.factory;
 
-import dependencias.dto.UserRequestDTO;
+import dependencies.dto.UserRequestDTO;
 import core.model.*;
 
 public class UserFactory {
@@ -12,13 +12,13 @@ public class UserFactory {
 
         User user;
         switch (request.getRole()) {
-            case JUGADOR:
-                Jugador j = new Jugador();
+            case PLAYER:
+                Player j = new Player();
                 j.setPosicion(request.getPosicion());
                 j.setNumeroDorsal(request.getNumeroDorsal());
                 user = j;
                 break;
-            case CAPITAN:
+            case CAPTAIN:
                 Capitan c = new Capitan();
                 c.setPosicion(request.getPosicion());
                 c.setNumeroDorsal(request.getNumeroDorsal());
@@ -27,17 +27,17 @@ public class UserFactory {
             case ADMINISTRADOR_SISTEMA:
                 user = new AdministradorSistema();
                 break;
-            case ORGANIZADOR_TORNEO:
-                user = new OrganizadorTorneo();
+            case TOURNAMENT_ORGANIZER:
+                user = new TournamentOrganizer();
                 break;
-            case ARBITRO:
+            case REFEREE:
                 user = new Arbitro();
                 break;
             default:
                 throw new IllegalArgumentException("Rol no reconocido: " + request.getRole());
         }
 
-        user.setNombre(request.getNombre());
+        user.setName(request.getName());
         user.setCorreo(request.getCorreo());
         user.setContrasena(request.getContrasena());
         user.setFoto(request.getFoto());

@@ -1,10 +1,10 @@
 package core.validator;
 
-import dependencias.dto.InscripcionRequestDTO;
+import dependencies.dto.RegistrationRequestDTO;
 import core.model.Team;
-import core.model.Torneo;
-import core.model.Inscripcion;
-import dependencias.util.DataStorage;
+import core.model.Tournament;
+import core.model.Registration;
+import dependencies.util.DataStorage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -18,67 +18,67 @@ public class InscripcionValidatorTest {
         DataStorage.clearAll();
     }
 
-    private InscripcionRequestDTO validReq() {
-        return new InscripcionRequestDTO("EqA", "T1", "url");
+    private RegistrationRequestDTO validReq() {
+        return new RegistrationRequestDTO("EqA", "T1", "url");
     }
 
     private void setupValidEnv() {
         DataStorage.teams.add(new Team("EqA"));
-        Torneo t = new Torneo("T1"); t.setEstado("ABIERTO");
-        DataStorage.torneos.add(t);
+        Tournament t = new Tournament("T1"); t.setStatus("OPEN");
+        DataStorage.tournaments.add(t);
     }
 
     @Test
     public void testValid() {
         setupValidEnv();
-        assertDoesNotThrow(() -> InscripcionValidator.validateForInscripcion(validReq()));
+        assertDoesNotThrow(() -> RegistrationValidator.validateForInscripcion(validReq()));
     }
 
     @Test
     public void testNombreEquipoNullEmpty() {
-        InscripcionRequestDTO req = validReq(); req.setNombreEquipo(null);
-        assertThrows(IllegalArgumentException.class, () -> InscripcionValidator.validateForInscripcion(req));
+        RegistrationRequestDTO req = validReq(); req.setNombreEquipo(null);
+        assertThrows(IllegalArgumentException.class, () -> RegistrationValidator.validateForInscripcion(req));
         req.setNombreEquipo(" ");
-        assertThrows(IllegalArgumentException.class, () -> InscripcionValidator.validateForInscripcion(req));
+        assertThrows(IllegalArgumentException.class, () -> RegistrationValidator.validateForInscripcion(req));
     }
 
     @Test
     public void testTorneoNullEmpty() {
-        InscripcionRequestDTO req = validReq(); req.setNombreTorneo(null);
-        assertThrows(IllegalArgumentException.class, () -> InscripcionValidator.validateForInscripcion(req));
-        req.setNombreTorneo(" ");
-        assertThrows(IllegalArgumentException.class, () -> InscripcionValidator.validateForInscripcion(req));
+        RegistrationRequestDTO req = validReq(); req.setTournamentName(null);
+        assertThrows(IllegalArgumentException.class, () -> RegistrationValidator.validateForInscripcion(req));
+        req.setTournamentName(" ");
+        assertThrows(IllegalArgumentException.class, () -> RegistrationValidator.validateForInscripcion(req));
     }
 
     @Test
     public void testComprobanteNullEmpty() {
-        InscripcionRequestDTO req = validReq(); req.setComprobantePagoUrl(null);
-        assertThrows(IllegalArgumentException.class, () -> InscripcionValidator.validateForInscripcion(req));
+        RegistrationRequestDTO req = validReq(); req.setComprobantePagoUrl(null);
+        assertThrows(IllegalArgumentException.class, () -> RegistrationValidator.validateForInscripcion(req));
         req.setComprobantePagoUrl("");
-        assertThrows(IllegalArgumentException.class, () -> InscripcionValidator.validateForInscripcion(req));
+        assertThrows(IllegalArgumentException.class, () -> RegistrationValidator.validateForInscripcion(req));
     }
 
     @Test
     public void testEquipoNoExiste() {
-        Torneo t = new Torneo("T1"); t.setEstado("ABIERTO");
-        DataStorage.torneos.add(t);
-        assertThrows(IllegalArgumentException.class, () -> InscripcionValidator.validateForInscripcion(validReq()));
+        Tournament t = new Tournament("T1"); t.setStatus("OPEN");
+        DataStorage.tournaments.add(t);
+        assertThrows(IllegalArgumentException.class, () -> RegistrationValidator.validateForInscripcion(validReq()));
     }
 
     @Test
     public void testTorneoNoExisteOEstadoDifferente() {
         DataStorage.teams.add(new Team("EqA"));
-        assertThrows(IllegalArgumentException.class, () -> InscripcionValidator.validateForInscripcion(validReq()));
+        assertThrows(IllegalArgumentException.class, () -> RegistrationValidator.validateForInscripcion(validReq()));
 
-        Torneo t = new Torneo("T1"); t.setEstado("EN_PROGRESO");
-        DataStorage.torneos.add(t);
-        assertThrows(IllegalArgumentException.class, () -> InscripcionValidator.validateForInscripcion(validReq()));
+        Tournament t = new Tournament("T1"); t.setStatus("EN_PROGRESO");
+        DataStorage.tournaments.add(t);
+        assertThrows(IllegalArgumentException.class, () -> RegistrationValidator.validateForInscripcion(validReq()));
     }
 
     @Test
     public void testYaInscrito() {
         setupValidEnv();
-        DataStorage.inscripciones.add(new Inscripcion("EqA", "T1", "url"));
-        assertThrows(IllegalArgumentException.class, () -> InscripcionValidator.validateForInscripcion(validReq()));
+        DataStorage.registrations.add(new Registration("EqA", "T1", "url"));
+        assertThrows(IllegalArgumentException.class, () -> RegistrationValidator.validateForInscripcion(validReq()));
     }
 }

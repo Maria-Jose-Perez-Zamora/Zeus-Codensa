@@ -1,6 +1,6 @@
 package core.factory;
 
-import dependencias.dto.UserRequestDTO;
+import dependencies.dto.UserRequestDTO;
 import core.model.*;
 import org.junit.jupiter.api.Test;
 
@@ -18,14 +18,14 @@ public class UserFactoryTest {
     @Test
     public void testCapitanCreation() {
         UserRequestDTO req = new UserRequestDTO();
-        req.setRole(Role.CAPITAN);
-        req.setNombre("Carlos");
+        req.setRole(Role.CAPTAIN);
+        req.setName("Carlos");
         req.setPosicion("Medio");
         req.setNumeroDorsal(10);
         
         User user = UserFactory.createUser(req);
         assertTrue(user instanceof Capitan);
-        assertEquals("Carlos", user.getNombre());
+        assertEquals("Carlos", user.getName());
         assertEquals("Medio", ((Capitan) user).getPosicion());
         assertEquals(10, ((Capitan) user).getNumeroDorsal());
     }
@@ -41,15 +41,15 @@ public class UserFactoryTest {
     @Test
     public void testOrganizadorCreation() {
         UserRequestDTO req = new UserRequestDTO();
-        req.setRole(Role.ORGANIZADOR_TORNEO);
+        req.setRole(Role.TOURNAMENT_ORGANIZER);
         User user = UserFactory.createUser(req);
-        assertTrue(user instanceof OrganizadorTorneo);
+        assertTrue(user instanceof TournamentOrganizer);
     }
 
     @Test
     public void testArbitroCreation() {
         UserRequestDTO req = new UserRequestDTO();
-        req.setRole(Role.ARBITRO);
+        req.setRole(Role.REFEREE);
         User user = UserFactory.createUser(req);
         assertTrue(user instanceof Arbitro);
     }

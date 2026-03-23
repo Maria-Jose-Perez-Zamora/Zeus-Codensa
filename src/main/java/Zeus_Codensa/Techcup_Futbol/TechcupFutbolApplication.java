@@ -3,12 +3,7 @@ package Zeus_Codensa.Techcup_Futbol;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication(scanBasePackages = {
-    "Zeus_Codensa.Techcup_Futbol",
-    "controlador",
-    "core",
-    "dependencias"
-})
+@SpringBootApplication(scanBasePackages = {"Zeus_Codensa.Techcup_Futbol", "controller", "core", "dependencies"})
 public class TechcupFutbolApplication {
 
 	public static void main(String[] args) {

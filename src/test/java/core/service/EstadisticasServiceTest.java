@@ -1,7 +1,7 @@
 package core.service;
 
-import core.model.Partido;
-import dependencias.util.DataStorage;
+import core.model.Match;
+import dependencies.util.DataStorage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -12,39 +12,39 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class EstadisticasServiceTest {
 
-    private EstadisticasService estadisticasService;
+    private StatisticsService estadisticasService;
 
     @BeforeEach
     public void setUp() {
         DataStorage.clearAll();
-        estadisticasService = new EstadisticasService();
+        estadisticasService = new StatisticsService();
     }
 
     @Test
     public void testGetMaximosGoleadores_Ordenados() {
-        Partido p1 = new Partido("A", "B", "hoy", "Liga");
-        p1.setEstado("FINALIZADO");
+        Match p1 = new Match("A", "B", "hoy", "Liga");
+        p1.setStatus("FINISHED");
         p1.getGoles().put("jugador1@a.com", 2);
         p1.getGoles().put("jugador2@a.com", 1);
 
-        Partido p2 = new Partido("A", "C", "ayer", "Liga");
-        p2.setEstado("FINALIZADO");
+        Match p2 = new Match("A", "C", "ayer", "Liga");
+        p2.setStatus("FINISHED");
         p2.getGoles().put("jugador1@a.com", 1); // jugador1 acumula 3 en total
 
-        DataStorage.partidos.add(p1);
-        DataStorage.partidos.add(p2);
+        DataStorage.matches.add(p1);
+        DataStorage.matches.add(p2);
 
         List<Map<String, Object>> result = estadisticasService.getMaximosGoleadores("Liga");
         assertEquals(2, result.size());
         assertEquals("jugador1@a.com", result.get(0).get("correoJugador"));
-        assertEquals(3, result.get(0).get("goles"));
+        assertEquals(3, result.get(0).get("goals"));
     }
 
     @Test
     public void testGetMaximosGoleadores_SinPartidosFinalizados_RetornaVacio() {
-        Partido p = new Partido("A", "B", "hoy", "Liga");
-        p.setEstado("PROGRAMADO");
-        DataStorage.partidos.add(p);
+        Match p = new Match("A", "B", "hoy", "Liga");
+        p.setStatus("SCHEDULED");
+        DataStorage.matches.add(p);
 
         List<Map<String, Object>> result = estadisticasService.getMaximosGoleadores("Liga");
         assertTrue(result.isEmpty());
@@ -52,11 +52,11 @@ public class EstadisticasServiceTest {
 
     @Test
     public void testGetHistorialEquipo_MarcaResultado() {
-        Partido p1 = new Partido("Tigres", "Leones", "hoy", "Liga");
-        p1.setEstado("FINALIZADO");
-        p1.setMarcadorLocal(2);
-        p1.setMarcadorVisitante(0);
-        DataStorage.partidos.add(p1);
+        Match p1 = new Match("Tigres", "Leones", "hoy", "Liga");
+        p1.setStatus("FINISHED");
+        p1.setHomeScore(2);
+        p1.setAwayScore(0);
+        DataStorage.matches.add(p1);
 
         List<Map<String, Object>> historial = estadisticasService.getHistorialEquipo("Liga", "Tigres");
         assertEquals(1, historial.size());
@@ -66,11 +66,11 @@ public class EstadisticasServiceTest {
 
     @Test
     public void testGetHistorialEquipo_VisitanteDerrota() {
-        Partido p1 = new Partido("Tigres", "Leones", "hoy", "Liga");
-        p1.setEstado("FINALIZADO");
-        p1.setMarcadorLocal(3);
-        p1.setMarcadorVisitante(1);
-        DataStorage.partidos.add(p1);
+        Match p1 = new Match("Tigres", "Leones", "hoy", "Liga");
+        p1.setStatus("FINISHED");
+        p1.setHomeScore(3);
+        p1.setAwayScore(1);
+        DataStorage.matches.add(p1);
 
         List<Map<String, Object>> historial = estadisticasService.getHistorialEquipo("Liga", "Leones");
         assertEquals("DERROTA", historial.get(0).get("resultado"));
