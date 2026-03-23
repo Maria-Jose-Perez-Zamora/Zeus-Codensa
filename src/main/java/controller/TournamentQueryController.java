@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/tournaments/consulta")
+@RequestMapping("/api/tournaments/query")
 @Tag(name = "Tournament Information and Queries", description = "Visualization of Standings, Statistics, Brackets, and Calendars (RF-007, RF-008)")
 public class TournamentQueryController {
 
@@ -37,29 +37,29 @@ public class TournamentQueryController {
     @Operation(summary = "Query Index", description = "Base endpoint to validate connection")
     public ResponseEntity<Map<String, String>> index() {
         return ResponseEntity.ok(Map.of(
-            "status", "Consulta API is running",
-            "message", "Usa /{tournament}/standingTable, /{tournament}/llaves/{phase}, /{tournament}/calendario, /{tournament}/estadisticas, /{tournament}/goleadores"
+            "status", "Query API is running",
+            "message", "Use /{tournament}/standings, /{tournament}/brackets/{phase}, /{tournament}/calendar, /{tournament}/statistics, /{tournament}/scorers"
         ));
     }
 
-    @GetMapping("/{tournament}/standingTable")
+    @GetMapping("/{tournament}/standings")
     @Operation(summary = "Standings Table", description = "Generates the general standing table from the active tournament summing wins and draws")
     public ResponseEntity<List<Standing>> getTabla(@PathVariable String tournament) {
         log.info("REST request - getTabla de posiciones para tournament: {}", tournament);
         return ResponseEntity.ok(tablaService.calcularTabla(tournament));
     }
 
-    @GetMapping("/{tournament}/llaves/{phase}")
+    @GetMapping("/{tournament}/brackets/{phase}")
     @Operation(summary = "Generate Knockout Brackets", description = "Draws quarterfinals, semifinals, or finals")
-    public ResponseEntity<?> getLlaves(@PathVariable String tournament, @PathVariable String phase) {
-        log.info("REST request - getLlaves eliminatorias para tournament: {}, phase: {}", tournament, phase);
+    public ResponseEntity<?> getBrackets(@PathVariable String tournament, @PathVariable String phase) {
+        log.info("REST request - getBrackets eliminatorias para tournament: {}, phase: {}", tournament, phase);
         return ResponseEntity.ok(llaveService.generarLlaves(tournament, phase));
     }
 
-    @GetMapping("/{tournament}/calendario")
+    @GetMapping("/{tournament}/calendar")
     @Operation(summary = "Match Calendar", description = "Returns scheduled matches")
-    public ResponseEntity<?> getCalendario(@PathVariable String tournament) {
-        log.info("REST request - getCalendario para tournament: {}", tournament);
+    public ResponseEntity<?> getCalendar(@PathVariable String tournament) {
+        log.info("REST request - getCalendar para tournament: {}", tournament);
         List<Map<String, Object>> calendario = DataStorage.matches.stream()
                 .filter(p -> p.getTournamentName().equals(tournament) && "SCHEDULED".equals(p.getStatus()))
                 .map(p -> Map.<String, Object>of(
@@ -72,12 +72,12 @@ public class TournamentQueryController {
                 .collect(Collectors.toList());
 
         if (calendario.isEmpty()) {
-            return ResponseEntity.ok(Map.of("mensaje", "No hay matches programados para este tournament"));
+            return ResponseEntity.ok(Map.of("mensaje", "No scheduled matches for this tournament"));
         }
         return ResponseEntity.ok(calendario);
     }
 
-    @GetMapping("/{tournament}/resultados")
+    @GetMapping("/{tournament}/results")
     @Operation(summary = "Historical Results", description = "All finished matches")
     public ResponseEntity<?> getResultados(@PathVariable String tournament) {
         log.info("REST request - getResultados Historicos para tournament: {}", tournament);
@@ -94,40 +94,40 @@ public class TournamentQueryController {
                 .collect(Collectors.toList());
 
         if (resultados.isEmpty()) {
-            return ResponseEntity.ok(Map.of("mensaje", "No hay resultados disponibles para este tournament"));
+            return ResponseEntity.ok(Map.of("mensaje", "No results available for this tournament"));
         }
         return ResponseEntity.ok(resultados);
     }
 
-    @GetMapping("/{tournament}/estadisticas")
+    @GetMapping("/{tournament}/statistics")
     @Operation(summary = "Global Statistics", description = "Summary of goals for/against per team")
     public ResponseEntity<?> getEstadisticas(@PathVariable String tournament) {
         log.info("REST request - getEstadisticas para tournament: {}", tournament);
         List<Standing> standingTable = tablaService.calcularTabla(tournament);
         if (standingTable.isEmpty()) {
-            return ResponseEntity.ok(Map.of("mensaje", "No hay estadísticas disponibles para este tournament"));
+            return ResponseEntity.ok(Map.of("mensaje", "No statistics available for this tournament"));
         }
         return ResponseEntity.ok(standingTable);
     }
 
-    @GetMapping("/{tournament}/goleadores")
+    @GetMapping("/{tournament}/scorers")
     @Operation(summary = "Top Scorers Table", description = "All top scorers aggregated across matches")
-    public ResponseEntity<?> getGoleadores(@PathVariable String tournament) {
-        log.info("REST request - getGoleadores para tournament: {}", tournament);
-        List<Map<String, Object>> goleadores = estadisticasService.getMaximosGoleadores(tournament);
+    public ResponseEntity<?> getScorers(@PathVariable String tournament) {
+        log.info("REST request - getScorers para tournament: {}", tournament);
+        List<Map<String, Object>> goleadores = estadisticasService.getTopScorers(tournament);
         if (goleadores.isEmpty()) {
-            return ResponseEntity.ok(Map.of("mensaje", "No hay goleadores registrados para este tournament"));
+            return ResponseEntity.ok(Map.of("mensaje", "No scorers registered for this tournament"));
         }
         return ResponseEntity.ok(goleadores);
     }
 
-    @GetMapping("/{tournament}/historial/{team}")
+    @GetMapping("/{tournament}/history/{team}")
     @Operation(summary = "Club History", description = "Chronological performance of a given team")
-    public ResponseEntity<?> getHistorialEquipo(@PathVariable String tournament, @PathVariable String team) {
-        log.info("REST request - getHistorialEquipo para tournament: {}, team: {}", tournament, team);
-        List<Map<String, Object>> historial = estadisticasService.getHistorialEquipo(tournament, team);
+    public ResponseEntity<?> getTeamHistory(@PathVariable String tournament, @PathVariable String team) {
+        log.info("REST request - getTeamHistory para tournament: {}, team: {}", tournament, team);
+        List<Map<String, Object>> historial = estadisticasService.getTeamHistory(tournament, team);
         if (historial.isEmpty()) {
-            return ResponseEntity.ok(Map.of("mensaje", "No hay historial disponible para este team en el tournament"));
+            return ResponseEntity.ok(Map.of("mensaje", "No history available for this team in the tournament"));
         }
         return ResponseEntity.ok(historial);
     }

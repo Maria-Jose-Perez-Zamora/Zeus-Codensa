@@ -33,7 +33,7 @@ public class StandingServiceTest {
         List<Standing> standingTable = tablaService.calcularTabla("Liga");
         
         assertEquals(3, standingTable.size());
-        assertEquals("Tigres", standingTable.get(0).getNombreEquipo()); // Tigres win (3) + draw (1) = 4 pts
+        assertEquals("Tigres", standingTable.get(0).getTeamName()); // Tigres win (3) + draw (1) = 4 pts
         assertEquals(4, standingTable.get(0).getPoints());
         assertEquals(2, standingTable.get(0).getMatchesPlayed());
     }

@@ -21,10 +21,10 @@ public class BracketServiceTest {
 
     @Test
     public void testGenerarLlaves_Success() {
-        Registration i1 = new Registration("Eq1", "Liga", "url"); i1.setStatus("APROBADO");
-        Registration i2 = new Registration("Eq2", "Liga", "url"); i2.setStatus("APROBADO");
-        Registration i3 = new Registration("Eq3", "Liga", "url"); i3.setStatus("APROBADO");
-        Registration i4 = new Registration("Eq4", "Liga", "url"); i4.setStatus("APROBADO");
+        Registration i1 = new Registration("Eq1", "Liga", "url"); i1.setStatus("APPROVED");
+        Registration i2 = new Registration("Eq2", "Liga", "url"); i2.setStatus("APPROVED");
+        Registration i3 = new Registration("Eq3", "Liga", "url"); i3.setStatus("APPROVED");
+        Registration i4 = new Registration("Eq4", "Liga", "url"); i4.setStatus("APPROVED");
         
         DataStorage.registrations.addAll(List.of(i1, i2, i3, i4));
 
@@ -36,7 +36,7 @@ public class BracketServiceTest {
 
     @Test
     public void testGenerarLlaves_OddNumberThrows() {
-        Registration i1 = new Registration("Eq1", "Liga", "url"); i1.setStatus("APROBADO");
+        Registration i1 = new Registration("Eq1", "Liga", "url"); i1.setStatus("APPROVED");
         DataStorage.registrations.add(i1);
 
         assertThrows(IllegalArgumentException.class, () -> llaveService.generarLlaves("Liga", "Cuartos"));

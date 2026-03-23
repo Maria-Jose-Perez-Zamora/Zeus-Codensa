@@ -5,7 +5,6 @@ import dependencies.dto.MatchResponseDTO;
 import core.exception.ResourceNotFoundException;
 import core.exception.BusinessRuleException;
 import core.model.Match;
-import core.model.Match;
 import dependencies.util.DataStorage;
 import core.validator.MatchValidator;
 import dependencies.mapper.MatchMapper;
@@ -23,21 +22,21 @@ public class MatchService {
     private static final Logger log = LoggerFactory.getLogger(MatchService.class);
 
     public MatchResponseDTO registrarPartido(MatchRequestDTO request) {
-        log.debug("Ejecutando validaciones para creacion de match");
+        log.debug("Running validations for match creation");
         MatchValidator.validateForCreation(request);
 
         Match nuevoPartido = MatchMapper.toEntity(request);
 
         DataStorage.matches.add(nuevoPartido);
-        log.info("Match registrado exitosamente local {} vs {} visitante (Tournament {})", 
+        log.info("Match successfully registered: home {} vs away {} (Tournament {})", 
                  request.getHomeTeam(), request.getAwayTeam(), request.getTournamentName());
         return MatchMapper.toDTO(nuevoPartido);
     }
 
     public MatchResponseDTO actualizarMarcador(String id, Integer homeScore, Integer awayScore) {
         if (homeScore == null || awayScore == null || homeScore < 0 || awayScore < 0) {
-            log.error("Violación funcional: Marcadores negativos o nulos recibidos");
-            throw new BusinessRuleException("Marcadores invalidos");
+            log.error("Functional violation: Negative or null scores received");
+            throw new BusinessRuleException("Invalid scores");
         }
 
         Match match = findOrThrow(id);
@@ -45,24 +44,24 @@ public class MatchService {
         match.setAwayScore(awayScore);
         match.setStatus("FINISHED");
 
-        log.info("Marcador actualizado para el ID {} | {} - {}", id, homeScore, awayScore);
+        log.info("Score updated for ID {} | {} - {}", id, homeScore, awayScore);
         return MatchMapper.toDTO(match);
     }
 
-    public MatchResponseDTO registrarAlineacion(String id, String nombreEquipo, List<String> players) {
+    public MatchResponseDTO registrarAlineacion(String id, String teamName, List<String> players) {
         if (players == null || players.isEmpty()) {
-            throw new BusinessRuleException("La alineación no puede estar vacía");
+            throw new BusinessRuleException("The lineup cannot be empty");
         }
 
         Match match = findOrThrow(id);
 
-        if (!match.getHomeTeam().equals(nombreEquipo) && !match.getAwayTeam().equals(nombreEquipo)) {
-            log.warn("El team {} no participa en este match", nombreEquipo);
-            throw new BusinessRuleException("El team especificado no participa en este match");
+        if (!match.getHomeTeam().equals(teamName) && !match.getAwayTeam().equals(teamName)) {
+            log.warn("Team {} does not participate in this match", teamName);
+            throw new BusinessRuleException("The specified team does not participate in this match");
         }
 
-        match.getAlineaciones().put(nombreEquipo, players);
-        log.info("Alineación registrada exitosamente de {} players para el team {}", players.size(), nombreEquipo);
+        match.getAlineaciones().put(teamName, players);
+        log.info("Lineup successfully registered: {} players for team {}", players.size(), teamName);
         return MatchMapper.toDTO(match);
     }
 
@@ -74,30 +73,30 @@ public class MatchService {
         if (rojas != null) {
             match.setRedCards(rojas);
         }
-        log.debug("Tarjetas amarillas/rojas guardadas para el ID {}", id);
+        log.debug("Yellow/red cards saved for ID {}", id);
         return MatchMapper.toDTO(match);
     }
 
-    public List<MatchResponseDTO> getPartidosPorArbitro(String correoArbitro) {
+    public List<MatchResponseDTO> getMatchesByReferee(String refereeEmail) {
         return DataStorage.matches.stream()
-                .filter(p -> correoArbitro.equals(p.getCorreoArbitro()))
+                .filter(p -> refereeEmail.equals(p.getRefereeEmail()))
                 .map(MatchMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
-    public MatchResponseDTO asignarArbitro(String id, String correoArbitro) {
+    public MatchResponseDTO asignarArbitro(String id, String refereeEmail) {
         boolean esArbitro = DataStorage.users.stream()
-                .anyMatch(u -> u.getCorreo().equals(correoArbitro)
+                .anyMatch(u -> u.getEmail().equals(refereeEmail)
                         && u.getRole() != null
                         && u.getRole().name().equals("REFEREE"));
         if (!esArbitro) {
-            log.error("Asignacion fallida: {} carece del rol REFEREE", correoArbitro);
-            throw new BusinessRuleException("El correo especificado no corresponde a un árbitro registrado");
+            log.error("Assignment failed: {} lacks the REFEREE role", refereeEmail);
+            throw new BusinessRuleException("The specified email does not correspond to a registered referee");
         }
 
         Match match = findOrThrow(id);
-        match.setCorreoArbitro(correoArbitro);
-        log.info("Arbitro {} asignado exitosamente al Match ID {}", correoArbitro, id);
+        match.setRefereeEmail(refereeEmail);
+        log.info("Referee {} successfully assigned to Match ID {}", refereeEmail, id);
         return MatchMapper.toDTO(match);
     }
 
@@ -111,6 +110,6 @@ public class MatchService {
         return DataStorage.matches.stream()
                 .filter(p -> p.getId().equals(id))
                 .findFirst()
-                .orElseThrow(() -> new ResourceNotFoundException("Match no encontrado con su Identificador Base"));
+                .orElseThrow(() -> new ResourceNotFoundException("Match not found with its Base Identifier"));
     }
 }

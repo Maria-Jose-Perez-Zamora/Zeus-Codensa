@@ -36,9 +36,9 @@ public class InscripcionValidatorTest {
 
     @Test
     public void testNombreEquipoNullEmpty() {
-        RegistrationRequestDTO req = validReq(); req.setNombreEquipo(null);
+        RegistrationRequestDTO req = validReq(); req.setTeamName(null);
         assertThrows(IllegalArgumentException.class, () -> RegistrationValidator.validateForInscripcion(req));
-        req.setNombreEquipo(" ");
+        req.setTeamName(" ");
         assertThrows(IllegalArgumentException.class, () -> RegistrationValidator.validateForInscripcion(req));
     }
 

@@ -1,18 +1,18 @@
 package core.model;
 
 public class Player extends User {
-    private String posicion;
-    private Integer numeroDorsal;
+    private String position;
+    private Integer jerseyNumber;
 
     public Player() {}
 
-    public Player(String posicion, Integer numeroDorsal) {
-        this.posicion = posicion;
-        this.numeroDorsal = numeroDorsal;
+    public Player(String position, Integer jerseyNumber) {
+        this.position = position;
+        this.jerseyNumber = jerseyNumber;
     }
 
-    public String getPosicion() { return posicion; }
-    public void setPosicion(String posicion) { this.posicion = posicion; }
-    public Integer getNumeroDorsal() { return numeroDorsal; }
-    public void setNumeroDorsal(Integer numeroDorsal) { this.numeroDorsal = numeroDorsal; }
+    public String getPosition() { return position; }
+    public void setPosition(String position) { this.position = position; }
+    public Integer getJerseyNumber() { return jerseyNumber; }
+    public void setJerseyNumber(Integer jerseyNumber) { this.jerseyNumber = jerseyNumber; }
 }

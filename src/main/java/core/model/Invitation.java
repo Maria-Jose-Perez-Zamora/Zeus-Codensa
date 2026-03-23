@@ -4,29 +4,29 @@ import java.util.UUID;
 
 public class Invitation {
     private String id;
-    private String correoCapitan;
-    private String correoJugador;
-    private String nombreEquipo;
+    private String captainEmail;
+    private String playerEmail;
+    private String teamName;
     private String status;
 
     public Invitation() {}
 
-    public Invitation(String correoCapitan, String correoJugador, String nombreEquipo) {
+    public Invitation(String captainEmail, String playerEmail, String teamName) {
         this.id = UUID.randomUUID().toString();
-        this.correoCapitan = correoCapitan;
-        this.correoJugador = correoJugador;
-        this.nombreEquipo = nombreEquipo;
+        this.captainEmail = captainEmail;
+        this.playerEmail = playerEmail;
+        this.teamName = teamName;
         this.status = "PENDING"; // Formerly ENVIADA
     }
 
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
-    public String getCorreoCapitan() { return correoCapitan; }
-    public void setCorreoCapitan(String correoCapitan) { this.correoCapitan = correoCapitan; }
-    public String getCorreoJugador() { return correoJugador; }
-    public void setCorreoJugador(String correoJugador) { this.correoJugador = correoJugador; }
-    public String getNombreEquipo() { return nombreEquipo; }
-    public void setNombreEquipo(String nombreEquipo) { this.nombreEquipo = nombreEquipo; }
+    public String getCaptainEmail() { return captainEmail; }
+    public void setCaptainEmail(String captainEmail) { this.captainEmail = captainEmail; }
+    public String getPlayerEmail() { return playerEmail; }
+    public void setPlayerEmail(String playerEmail) { this.playerEmail = playerEmail; }
+    public String getTeamName() { return teamName; }
+    public void setTeamName(String teamName) { this.teamName = teamName; }
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 }

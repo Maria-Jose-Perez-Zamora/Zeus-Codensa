@@ -30,9 +30,9 @@ public class TeamValidatorTest {
 
     @Test
     public void testNombreNullEmpty() {
-        TeamRequestDTO req = validReq(); req.setNombreEquipo(null);
+        TeamRequestDTO req = validReq(); req.setTeamName(null);
         assertThrows(IllegalArgumentException.class, () -> TeamValidator.validateForCreation(req));
-        req.setNombreEquipo("  ");
+        req.setTeamName("  ");
         assertThrows(IllegalArgumentException.class, () -> TeamValidator.validateForCreation(req));
     }
 
@@ -44,30 +44,30 @@ public class TeamValidatorTest {
 
     @Test
     public void testJugadoresNull() {
-        TeamRequestDTO req = validReq(); req.setJugadorCorreos(null);
+        TeamRequestDTO req = validReq(); req.setPlayerEmails(null);
         assertThrows(IllegalArgumentException.class, () -> TeamValidator.validateForCreation(req));
     }
 
     @Test
     public void testJugadoresCount() {
-        TeamRequestDTO req = validReq(); req.setJugadorCorreos(Arrays.asList("1", "2"));
+        TeamRequestDTO req = validReq(); req.setPlayerEmails(Arrays.asList("1", "2"));
         assertThrows(IllegalArgumentException.class, () -> TeamValidator.validateForCreation(req));
         
-        req.setJugadorCorreos(Collections.nCopies(21, "x"));
+        req.setPlayerEmails(Collections.nCopies(21, "x"));
         assertThrows(IllegalArgumentException.class, () -> TeamValidator.validateForCreation(req));
     }
 
     @Test
     public void testJugadoresDuplicatedList() {
-        TeamRequestDTO req = validReq(); req.setJugadorCorreos(Arrays.asList("1", "1", "3", "4", "5", "6", "7"));
+        TeamRequestDTO req = validReq(); req.setPlayerEmails(Arrays.asList("1", "1", "3", "4", "5", "6", "7"));
         assertThrows(IllegalArgumentException.class, () -> TeamValidator.validateForCreation(req));
     }
 
     @Test
     public void testJugadorYaEnEquipo() {
         Team t = new Team("EqB");
-        Player j = new Player(); j.setCorreo("1");
-        t.getJugadores().add(j);
+        Player j = new Player(); j.setEmail("1");
+        t.getPlayers().add(j);
         DataStorage.teams.add(t);
         assertThrows(IllegalArgumentException.class, () -> TeamValidator.validateForCreation(validReq()));
     }

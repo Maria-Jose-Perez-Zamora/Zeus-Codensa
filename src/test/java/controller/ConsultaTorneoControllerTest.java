@@ -50,15 +50,15 @@ public class ConsultaTorneoControllerTest {
     @Test
     public void testGetLlaves_Success() {
         when(llaveService.generarLlaves("Liga", "Semi")).thenReturn(Collections.emptyList());
-        ResponseEntity<?> res = consultaTorneoController.getLlaves("Liga", "Semi");
+        ResponseEntity<?> res = consultaTorneoController.getBrackets("Liga", "Semi");
         assertEquals(200, res.getStatusCode().value());
     }
 
     @Test
     public void testGetCalendario_SinPartidos_ReturnsMensaje() {
-        ResponseEntity<?> res = consultaTorneoController.getCalendario("LigaX");
+        ResponseEntity<?> res = consultaTorneoController.getCalendar("LigaX");
         assertEquals(200, res.getStatusCode().value());
-        assertTrue(res.getBody().toString().contains("No hay matches programados"));
+        assertTrue(res.getBody().toString().contains("No scheduled matches"));
     }
 
     @Test
@@ -67,7 +67,7 @@ public class ConsultaTorneoControllerTest {
         p.setStatus("SCHEDULED");
         DataStorage.matches.add(p);
 
-        ResponseEntity<?> res = consultaTorneoController.getCalendario("LigaX");
+        ResponseEntity<?> res = consultaTorneoController.getCalendar("LigaX");
         assertEquals(200, res.getStatusCode().value());
         assertInstanceOf(List.class, res.getBody());
     }
@@ -76,7 +76,7 @@ public class ConsultaTorneoControllerTest {
     public void testGetResultados_SinPartidos_ReturnsMensaje() {
         ResponseEntity<?> res = consultaTorneoController.getResultados("LigaX");
         assertEquals(200, res.getStatusCode().value());
-        assertTrue(res.getBody().toString().contains("No hay resultados"));
+        assertTrue(res.getBody().toString().contains("No results"));
     }
 
     @Test
@@ -97,7 +97,7 @@ public class ConsultaTorneoControllerTest {
         when(tablaService.calcularTabla("LigaX")).thenReturn(Collections.emptyList());
         ResponseEntity<?> res = consultaTorneoController.getEstadisticas("LigaX");
         assertEquals(200, res.getStatusCode().value());
-        assertTrue(res.getBody().toString().contains("No hay estadísticas"));
+        assertTrue(res.getBody().toString().contains("No statistics available"));
     }
 
     @Test
@@ -111,32 +111,32 @@ public class ConsultaTorneoControllerTest {
 
     @Test
     public void testGetGoleadores_SinDatos_ReturnsMensaje() {
-        when(estadisticasService.getMaximosGoleadores("LigaX")).thenReturn(Collections.emptyList());
-        ResponseEntity<?> res = consultaTorneoController.getGoleadores("LigaX");
+        when(estadisticasService.getTopScorers("LigaX")).thenReturn(Collections.emptyList());
+        ResponseEntity<?> res = consultaTorneoController.getScorers("LigaX");
         assertEquals(200, res.getStatusCode().value());
-        assertTrue(res.getBody().toString().contains("No hay goleadores"));
+        assertTrue(res.getBody().toString().contains("No scorers registered"));
     }
 
     @Test
     public void testGetGoleadores_ConDatos_ReturnsLista() {
-        when(estadisticasService.getMaximosGoleadores("LigaX")).thenReturn(List.of(Map.of("name", "Juan")));
-        ResponseEntity<?> res = consultaTorneoController.getGoleadores("LigaX");
+        when(estadisticasService.getTopScorers("LigaX")).thenReturn(List.of(Map.of("name", "Juan")));
+        ResponseEntity<?> res = consultaTorneoController.getScorers("LigaX");
         assertEquals(200, res.getStatusCode().value());
         assertInstanceOf(List.class, res.getBody());
     }
 
     @Test
     public void testGetHistorialEquipo_SinDatos_ReturnsMensaje() {
-        when(estadisticasService.getHistorialEquipo("LigaX", "EquipoA")).thenReturn(Collections.emptyList());
-        ResponseEntity<?> res = consultaTorneoController.getHistorialEquipo("LigaX", "EquipoA");
+        when(estadisticasService.getTeamHistory("LigaX", "EquipoA")).thenReturn(Collections.emptyList());
+        ResponseEntity<?> res = consultaTorneoController.getTeamHistory("LigaX", "EquipoA");
         assertEquals(200, res.getStatusCode().value());
-        assertTrue(res.getBody().toString().contains("No hay historial"));
+        assertTrue(res.getBody().toString().contains("No history"));
     }
 
     @Test
     public void testGetHistorialEquipo_ConDatos_ReturnsLista() {
-        when(estadisticasService.getHistorialEquipo("LigaX", "EquipoA")).thenReturn(List.of(Map.of("id", 1)));
-        ResponseEntity<?> res = consultaTorneoController.getHistorialEquipo("LigaX", "EquipoA");
+        when(estadisticasService.getTeamHistory("LigaX", "EquipoA")).thenReturn(List.of(Map.of("id", 1)));
+        ResponseEntity<?> res = consultaTorneoController.getTeamHistory("LigaX", "EquipoA");
         assertEquals(200, res.getStatusCode().value());
         assertInstanceOf(List.class, res.getBody());
     }

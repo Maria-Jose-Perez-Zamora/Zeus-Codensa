@@ -23,7 +23,7 @@ public class RegistrationService {
     private static final Logger log = LoggerFactory.getLogger(RegistrationService.class);
 
     public RegistrationResponseDTO inscribir(RegistrationRequestDTO request) {
-        log.debug("Ejecutando validaciones para inscripción del team {}", request.getNombreEquipo());
+        log.debug("Ejecutando validaciones para inscripción del team {}", request.getTeamName());
         RegistrationValidator.validateForInscripcion(request);
 
         Registration nuevaInscripcion = RegistrationMapper.toEntity(request);

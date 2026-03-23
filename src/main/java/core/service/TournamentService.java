@@ -50,12 +50,12 @@ public class TournamentService {
             throw new BusinessRuleException("Solo se pueden configurar tournaments en status DRAFT o OPEN");
         }
 
-        if (configInfo.getReglamento() != null) t.setReglamento(configInfo.getReglamento());
+        if (configInfo.getRules() != null) t.setRules(configInfo.getRules());
         if (configInfo.getFechaCierreInscripciones() != null) t.setFechaCierreInscripciones(configInfo.getFechaCierreInscripciones());
         if (configInfo.getFechaInicioFaseGrupos() != null) t.setFechaInicioFaseGrupos(configInfo.getFechaInicioFaseGrupos());
         if (configInfo.getHorariosPartidos() != null) t.setHorariosPartidos(configInfo.getHorariosPartidos());
         if (configInfo.getCanchas() != null) t.setCanchas(configInfo.getCanchas());
-        if (configInfo.getSanciones() != null) t.setSanciones(configInfo.getSanciones());
+        if (configInfo.getSanctions() != null) t.setSanctions(configInfo.getSanctions());
 
         log.info("Tournament ID {} configurado exitosamente", id);
         return TournamentMapper.toDTO(t);

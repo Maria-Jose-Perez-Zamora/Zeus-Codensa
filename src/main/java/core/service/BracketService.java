@@ -23,15 +23,15 @@ public class BracketService {
     }
 
     public List<KnockoutBracket> generarLlaves(String tournamentName, String phase) {
-        List<String> equiposAprobados = DataStorage.registrations.stream()
-                .filter(i -> i.getTournamentName().equals(tournamentName) && i.getStatus().equals("APROBADO"))
-                .map(Registration::getNombreEquipo)
+        List<String> approvedTeams = DataStorage.registrations.stream()
+                .filter(i -> i.getTournamentName().equals(tournamentName) && i.getStatus().equals("APPROVED"))
+                .map(Registration::getTeamName)
                 .collect(Collectors.toList());
 
-        if (equiposAprobados.isEmpty() || equiposAprobados.size() % 2 != 0) {
-            throw new IllegalArgumentException("Para generar llaves se requiere una cantidad par de teams aprobados en el tournament.");
+        if (approvedTeams.isEmpty() || approvedTeams.size() % 2 != 0) {
+            throw new IllegalArgumentException("An even number of approved teams is required to generate brackets.");
         }
         
-        return strategy.generarLlaves(equiposAprobados, phase);
+        return strategy.generarLlaves(approvedTeams, phase);
     }
 }

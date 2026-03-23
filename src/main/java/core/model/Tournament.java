@@ -13,12 +13,12 @@ public class Tournament {
     private String status;
     
     // RF-005: Advanced Configuration
-    private String reglamento;
+    private String rules;
     private String fechaCierreInscripciones;
     private String fechaInicioFaseGrupos;
     private List<String> horariosPartidos;
     private List<String> canchas;
-    private String sanciones;
+    private String sanctions;
 
     public Tournament() {}
 
@@ -43,8 +43,8 @@ public class Tournament {
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
     
-    public String getReglamento() { return reglamento; }
-    public void setReglamento(String reglamento) { this.reglamento = reglamento; }
+    public String getRules() { return rules; }
+    public void setRules(String rules) { this.rules = rules; }
     public String getFechaCierreInscripciones() { return fechaCierreInscripciones; }
     public void setFechaCierreInscripciones(String fechaCierreInscripciones) { this.fechaCierreInscripciones = fechaCierreInscripciones; }
     public String getFechaInicioFaseGrupos() { return fechaInicioFaseGrupos; }
@@ -53,6 +53,6 @@ public class Tournament {
     public void setHorariosPartidos(List<String> horariosPartidos) { this.horariosPartidos = horariosPartidos; }
     public List<String> getCanchas() { return canchas; }
     public void setCanchas(List<String> canchas) { this.canchas = canchas; }
-    public String getSanciones() { return sanciones; }
-    public void setSanciones(String sanciones) { this.sanciones = sanciones; }
+    public String getSanctions() { return sanctions; }
+    public void setSanctions(String sanctions) { this.sanctions = sanctions; }
 }

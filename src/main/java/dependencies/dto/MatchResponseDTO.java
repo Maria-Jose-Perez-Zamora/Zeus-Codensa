@@ -13,7 +13,7 @@ public class MatchResponseDTO {
     private Integer awayScore;
     private String status;
     private String tournamentName;
-    private String correoArbitro;
+    private String refereeEmail;
     private Map<String, List<String>> alineaciones;
     private Map<String, List<String>> yellowCards;
     private Map<String, List<String>> redCards;
@@ -29,7 +29,7 @@ public class MatchResponseDTO {
         this.awayScore = match.getAwayScore();
         this.status = match.getStatus();
         this.tournamentName = match.getTournamentName();
-        this.correoArbitro = match.getCorreoArbitro();
+        this.refereeEmail = match.getRefereeEmail();
         this.alineaciones = match.getAlineaciones();
         this.yellowCards = match.getYellowCards();
         this.redCards = match.getRedCards();
@@ -51,8 +51,8 @@ public class MatchResponseDTO {
     public void setStatus(String status) { this.status = status; }
     public String getTournamentName() { return tournamentName; }
     public void setTournamentName(String tournamentName) { this.tournamentName = tournamentName; }
-    public String getCorreoArbitro() { return correoArbitro; }
-    public void setCorreoArbitro(String correoArbitro) { this.correoArbitro = correoArbitro; }
+    public String getRefereeEmail() { return refereeEmail; }
+    public void setRefereeEmail(String refereeEmail) { this.refereeEmail = refereeEmail; }
     public Map<String, List<String>> getAlineaciones() { return alineaciones; }
     public void setAlineaciones(Map<String, List<String>> alineaciones) { this.alineaciones = alineaciones; }
     public Map<String, List<String>> getYellowCards() { return yellowCards; }

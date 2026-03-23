@@ -31,14 +31,14 @@ public class TournamentController {
         return ResponseEntity.ok(torneoService.createTorneo(request));
     }
 
-    @PutMapping("/{id}/configurar")
+    @PutMapping("/{id}/configure")
     @Operation(summary = "Configure Tournament", description = "Adds rules, fields, sanctions, and schedules to an existing tournament")
     public ResponseEntity<TournamentResponseDTO> configurarTorneo(@PathVariable String id, @RequestBody TournamentRequestDTO configInfo) {
         log.info("REST request - configurarTorneo ID: {}", id);
         return ResponseEntity.ok(torneoService.configurarTorneo(id, configInfo));
     }
 
-    @GetMapping("/consulta/all")
+    @GetMapping("/query/all")
     @Operation(summary = "Get All Tournaments", description = "Gets a list of all registered tournaments")
     public ResponseEntity<List<TournamentResponseDTO>> getAllTorneos() {
         log.info("REST request - getAllTorneos");

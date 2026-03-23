@@ -4,7 +4,7 @@ import core.model.Registration;
 
 public class RegistrationResponseDTO {
     private String id;
-    private String nombreEquipo;
+    private String teamName;
     private String tournamentName;
     private String status;
     private String comprobantePagoUrl;
@@ -14,7 +14,7 @@ public class RegistrationResponseDTO {
 
     public RegistrationResponseDTO(Registration registration) {
         this.id = registration.getId();
-        this.nombreEquipo = registration.getNombreEquipo();
+        this.teamName = registration.getTeamName();
         this.tournamentName = registration.getTournamentName();
         this.status = registration.getStatus();
         this.comprobantePagoUrl = registration.getComprobantePagoUrl();
@@ -23,8 +23,8 @@ public class RegistrationResponseDTO {
 
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
-    public String getNombreEquipo() { return nombreEquipo; }
-    public void setNombreEquipo(String nombreEquipo) { this.nombreEquipo = nombreEquipo; }
+    public String getTeamName() { return teamName; }
+    public void setTeamName(String teamName) { this.teamName = teamName; }
     public String getTournamentName() { return tournamentName; }
     public void setTournamentName(String tournamentName) { this.tournamentName = tournamentName; }
     public String getStatus() { return status; }

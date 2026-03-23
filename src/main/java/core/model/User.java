@@ -2,36 +2,36 @@ package core.model;
 
 public abstract class User {
     private String name;
-    private String correo;
-    private String contrasena;
-    private String foto;
+    private String email;
+    private String password;
+    private String photo;
     private Role role;
     private UserType type;
 
     public User() {}
 
-    public User(String name, String correo, String contrasena) {
+    public User(String name, String email, String password) {
         this.name = name;
-        this.correo = correo;
-        this.contrasena = contrasena;
-        this.type = UserType.EXTERNAL; // Default fallback for old tests
+        this.email = email;
+        this.password = password;
+        this.type = UserType.EXTERNAL; // Default fallback for legacy tests
     }
 
-    public User(String name, String correo, String contrasena, UserType type) {
+    public User(String name, String email, String password, UserType type) {
         this.name = name;
-        this.correo = correo;
-        this.contrasena = contrasena;
+        this.email = email;
+        this.password = password;
         this.type = type != null ? type : UserType.EXTERNAL;
     }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
-    public String getCorreo() { return correo; }
-    public void setCorreo(String correo) { this.correo = correo; }
-    public String getContrasena() { return contrasena; }
-    public void setContrasena(String contrasena) { this.contrasena = contrasena; }
-    public String getFoto() { return foto; }
-    public void setFoto(String foto) { this.foto = foto; }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
+    public String getPhoto() { return photo; }
+    public void setPhoto(String photo) { this.photo = photo; }
     public Role getRole() { return role; }
     public void setRole(Role role) { this.role = role; }
     public UserType getType() { return type; }

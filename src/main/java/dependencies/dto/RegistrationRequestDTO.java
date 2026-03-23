@@ -1,29 +1,22 @@
 package dependencies.dto;
 
 public class RegistrationRequestDTO {
-    private String nombreEquipo;
-    private String nombreTorneo;
+    private String teamName;
+    private String tournamentName;
     private String comprobantePagoUrl;
 
     public RegistrationRequestDTO() {}
 
-    public RegistrationRequestDTO(String nombreEquipo, String nombreTorneo, String comprobantePagoUrl) {
-        this.nombreEquipo = nombreEquipo;
-        this.nombreTorneo = nombreTorneo;
+    public RegistrationRequestDTO(String teamName, String tournamentName, String comprobantePagoUrl) {
+        this.teamName = teamName;
+        this.tournamentName = tournamentName;
         this.comprobantePagoUrl = comprobantePagoUrl;
     }
 
-    public String getNombreEquipo() { return nombreEquipo; }
-    public void setNombreEquipo(String nombreEquipo) { this.nombreEquipo = nombreEquipo; }
-    public String getNombreTorneo() { return nombreTorneo; }
-    public void setNombreTorneo(String nombreTorneo) { this.nombreTorneo = nombreTorneo; }
-    
-    // English adapters for partially translated classes
-    public String getTeamName() { return this.nombreEquipo; }
-    public void setTeamName(String teamName) { this.nombreEquipo = teamName; }
-    public String getTournamentName() { return this.nombreTorneo; }
-    public void setTournamentName(String tournamentName) { this.nombreTorneo = tournamentName; }
-    
+    public String getTeamName() { return teamName; }
+    public void setTeamName(String teamName) { this.teamName = teamName; }
+    public String getTournamentName() { return tournamentName; }
+    public void setTournamentName(String tournamentName) { this.tournamentName = tournamentName; }
     public String getComprobantePagoUrl() { return comprobantePagoUrl; }
     public void setComprobantePagoUrl(String comprobantePagoUrl) { this.comprobantePagoUrl = comprobantePagoUrl; }
 }

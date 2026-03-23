@@ -34,9 +34,9 @@ public class EstadisticasServiceTest {
         DataStorage.matches.add(p1);
         DataStorage.matches.add(p2);
 
-        List<Map<String, Object>> result = estadisticasService.getMaximosGoleadores("Liga");
+        List<Map<String, Object>> result = estadisticasService.getTopScorers("Liga");
         assertEquals(2, result.size());
-        assertEquals("jugador1@a.com", result.get(0).get("correoJugador"));
+        assertEquals("jugador1@a.com", result.get(0).get("playerEmail"));
         assertEquals(3, result.get(0).get("goals"));
     }
 
@@ -46,7 +46,7 @@ public class EstadisticasServiceTest {
         p.setStatus("SCHEDULED");
         DataStorage.matches.add(p);
 
-        List<Map<String, Object>> result = estadisticasService.getMaximosGoleadores("Liga");
+        List<Map<String, Object>> result = estadisticasService.getTopScorers("Liga");
         assertTrue(result.isEmpty());
     }
 
@@ -58,10 +58,10 @@ public class EstadisticasServiceTest {
         p1.setAwayScore(0);
         DataStorage.matches.add(p1);
 
-        List<Map<String, Object>> historial = estadisticasService.getHistorialEquipo("Liga", "Tigres");
+        List<Map<String, Object>> historial = estadisticasService.getTeamHistory("Liga", "Tigres");
         assertEquals(1, historial.size());
-        assertEquals("VICTORIA", historial.get(0).get("resultado"));
-        assertEquals("LOCAL", historial.get(0).get("condicion"));
+        assertEquals("WIN", historial.get(0).get("result"));
+        assertEquals("HOME", historial.get(0).get("venue"));
     }
 
     @Test
@@ -72,8 +72,8 @@ public class EstadisticasServiceTest {
         p1.setAwayScore(1);
         DataStorage.matches.add(p1);
 
-        List<Map<String, Object>> historial = estadisticasService.getHistorialEquipo("Liga", "Leones");
-        assertEquals("DERROTA", historial.get(0).get("resultado"));
-        assertEquals("VISITANTE", historial.get(0).get("condicion"));
+        List<Map<String, Object>> historial = estadisticasService.getTeamHistory("Liga", "Leones");
+        assertEquals("LOSS", historial.get(0).get("result"));
+        assertEquals("AWAY", historial.get(0).get("venue"));
     }
 }

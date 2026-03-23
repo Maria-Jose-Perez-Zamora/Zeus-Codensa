@@ -29,7 +29,7 @@ public class UserServiceTest {
         
         assertNotNull(response);
         assertEquals("Ana", response.getName());
-        assertEquals("ana@test.com", response.getCorreo());
+        assertEquals("ana@test.com", response.getEmail());
         assertEquals(Role.PLAYER, response.getRole());
         assertEquals(1, DataStorage.users.size());
     }

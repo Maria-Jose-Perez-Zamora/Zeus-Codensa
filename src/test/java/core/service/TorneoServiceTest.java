@@ -39,17 +39,17 @@ public class TorneoServiceTest {
         String currId = DataStorage.tournaments.get(0).getId();
 
         TournamentRequestDTO configInfo = new TournamentRequestDTO();
-        configInfo.setReglamento("Reglas Oficiales");
+        configInfo.setRules("Reglas Oficiales");
         configInfo.setFechaCierreInscripciones("2026-05-30");
         configInfo.setFechaInicioFaseGrupos("2026-06-02");
         configInfo.setHorariosPartidos(Arrays.asList("18:00", "20:00"));
         configInfo.setCanchas(Arrays.asList("Cancha 1", "Cancha Central"));
-        configInfo.setSanciones("Roja = 2 Fechas");
+        configInfo.setSanctions("Roja = 2 Fechas");
 
         TournamentResponseDTO res = torneoService.configurarTorneo(currId, configInfo);
 
         assertNotNull(res);
-        assertEquals("Reglas Oficiales", res.getReglamento());
+        assertEquals("Reglas Oficiales", res.getRules());
         assertEquals("2026-05-30", res.getFechaCierreInscripciones());
         assertEquals(2, res.getHorariosPartidos().size());
         assertEquals("Cancha Central", res.getCanchas().get(1));
@@ -62,7 +62,7 @@ public class TorneoServiceTest {
         DataStorage.tournaments.add(t);
 
         TournamentRequestDTO configInfo = new TournamentRequestDTO();
-        configInfo.setReglamento("Nuevas reglas");
+        configInfo.setRules("Nuevas reglas");
 
         RuntimeException thrown = assertThrows(RuntimeException.class, 
             () -> torneoService.configurarTorneo(t.getId(), configInfo));

@@ -19,13 +19,13 @@ public class UserService {
     private static final Logger log = LoggerFactory.getLogger(UserService.class);
 
     public UserResponseDTO registerUser(UserRequestDTO requestDTO) {
-        log.debug("Validando reglas de creacion para usuario {}", requestDTO.getCorreo());
+        log.debug("Validating creation rules for user {}", requestDTO.getEmail());
         UserValidator.validateForRegistration(requestDTO);
 
         User newUser = UserMapper.toEntity(requestDTO);
 
         DataStorage.users.add(newUser);
-        log.info("Usuario creado exitosamente: {} con rol {}", newUser.getCorreo(), newUser.getRole());
+        log.info("User created successfully: {} with role {}", newUser.getEmail(), newUser.getRole());
         return UserMapper.toDTO(newUser);
     }
 

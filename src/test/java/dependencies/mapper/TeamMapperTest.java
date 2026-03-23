@@ -15,7 +15,7 @@ public class TeamMapperTest {
     public void testToEntity() {
         TeamRequestDTO req = new TeamRequestDTO("Delta", "escudo.png", "Azul", Arrays.asList("j@a.com"));
         Team t = TeamMapper.toEntity(req);
-        assertEquals("Delta", t.getNombreEquipo());
+        assertEquals("Delta", t.getTeamName());
         assertEquals("escudo.png", t.getEscudo());
         assertEquals("Azul", t.getColoresUniforme());
     }
@@ -25,7 +25,7 @@ public class TeamMapperTest {
         Team t = new Team("Epsilon");
         t.setColoresUniforme("Rojo");
         TeamResponseDTO dto = TeamMapper.toDTO(t);
-        assertEquals("Epsilon", dto.getNombreEquipo());
+        assertEquals("Epsilon", dto.getTeamName());
         assertEquals("Rojo", dto.getColoresUniforme());
     }
 }

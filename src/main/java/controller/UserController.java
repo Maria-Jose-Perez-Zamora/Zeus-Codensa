@@ -27,7 +27,7 @@ public class UserController {
     @PostMapping("/register")
     @Operation(summary = "Register User", description = "Registers a user as an Administrator or Organizer")
     public ResponseEntity<UserResponseDTO> register(@RequestBody UserRequestDTO request) {
-        log.info("REST request - register user: {}", request.getCorreo());
+        log.info("REST request - register user: {}", request.getEmail());
         return ResponseEntity.ok(userService.registerUser(request));
     }
 

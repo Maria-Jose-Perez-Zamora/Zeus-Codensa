@@ -44,10 +44,10 @@ public class TorneoControllerTest {
     @Test
     public void testConfigurarTorneo_Success() {
         TournamentRequestDTO req = new TournamentRequestDTO();
-        req.setReglamento("Rules");
+        req.setRules("Rules");
         
         TournamentResponseDTO res = new TournamentResponseDTO();
-        res.setReglamento("Rules");
+        res.setRules("Rules");
         res.setTournamentName("Liga");
 
         when(torneoService.configurarTorneo(eq("123"), any())).thenReturn(res);

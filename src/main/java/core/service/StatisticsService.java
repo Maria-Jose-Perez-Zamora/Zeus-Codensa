@@ -15,7 +15,7 @@ public class StatisticsService {
      * RF-008: Máximos goleadores del tournament.
      * Retorna lista ordenada de { correoJugador, goals } descendente.
      */
-    public List<Map<String, Object>> getMaximosGoleadores(String tournamentName) {
+    public List<Map<String, Object>> getTopScorers(String tournamentName) {
         Map<String, Integer> totales = new HashMap<>();
 
         DataStorage.matches.stream()
@@ -27,7 +27,7 @@ public class StatisticsService {
                 .sorted((a, b) -> Integer.compare(b.getValue(), a.getValue()))
                 .map(e -> {
                     Map<String, Object> entry = new LinkedHashMap<>();
-                    entry.put("correoJugador", e.getKey());
+                    entry.put("playerEmail", e.getKey());
                     entry.put("goals", e.getValue());
                     return entry;
                 })
@@ -37,27 +37,27 @@ public class StatisticsService {
     /**
      * RF-008: Historial de matches de un team (todos sus matches con resultado).
      */
-    public List<Map<String, Object>> getHistorialEquipo(String tournamentName, String nombreEquipo) {
+    public List<Map<String, Object>> getTeamHistory(String tournamentName, String teamName) {
         return DataStorage.matches.stream()
                 .filter(p -> p.getTournamentName().equals(tournamentName))
-                .filter(p -> p.getHomeTeam().equals(nombreEquipo) || p.getAwayTeam().equals(nombreEquipo))
+                .filter(p -> p.getHomeTeam().equals(teamName) || p.getAwayTeam().equals(teamName))
                 .map(p -> {
                     Map<String, Object> info = new LinkedHashMap<>();
                     info.put("id", p.getId());
-                    info.put("rival", p.getHomeTeam().equals(nombreEquipo) ? p.getAwayTeam() : p.getHomeTeam());
-                    info.put("condicion", p.getHomeTeam().equals(nombreEquipo) ? "LOCAL" : "VISITANTE");
+                    info.put("opponent", p.getHomeTeam().equals(teamName) ? p.getAwayTeam() : p.getHomeTeam());
+                    info.put("venue", p.getHomeTeam().equals(teamName) ? "HOME" : "AWAY");
                     info.put("homeScore", p.getHomeScore());
                     info.put("awayScore", p.getAwayScore());
                     info.put("status", p.getStatus());
-                    info.put("fecha", p.getMatchDate());
+                    info.put("date", p.getMatchDate());
 
-                    String resultado = "PENDIENTE";
+                    String result = "PENDING";
                     if ("FINISHED".equals(p.getStatus())) {
-                        int golesEquipo = p.getHomeTeam().equals(nombreEquipo) ? p.getHomeScore() : p.getAwayScore();
-                        int golesRival = p.getHomeTeam().equals(nombreEquipo) ? p.getAwayScore() : p.getHomeScore();
-                        resultado = golesEquipo > golesRival ? "VICTORIA" : golesEquipo == golesRival ? "EMPATE" : "DERROTA";
+                        int teamGoals = p.getHomeTeam().equals(teamName) ? p.getHomeScore() : p.getAwayScore();
+                        int opponentGoals = p.getHomeTeam().equals(teamName) ? p.getAwayScore() : p.getHomeScore();
+                        result = teamGoals > opponentGoals ? "WIN" : teamGoals == opponentGoals ? "DRAW" : "LOSS";
                     }
-                    info.put("resultado", resultado);
+                    info.put("result", result);
                     return info;
                 })
                 .collect(Collectors.toList());

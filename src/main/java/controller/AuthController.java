@@ -25,7 +25,7 @@ public class AuthController {
     @PostMapping("/login")
     @Operation(summary = "Login", description = "Produces a simple JWT Base64 Token linked to the Role")
     public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO request) {
-        log.info("REST request - intento de login de usuario: {}", request.getCorreo());
+        log.info("REST request - intento de login de usuario: {}", request.getEmail());
         return ResponseEntity.ok(authService.login(request));
     }
 }

@@ -5,7 +5,7 @@ import java.util.UUID;
 
 public class Registration {
     private String id;
-    private String nombreEquipo;
+    private String teamName;
     private String tournamentName;
     private String status;
     private String comprobantePagoUrl;
@@ -13,9 +13,9 @@ public class Registration {
 
     public Registration() {}
 
-    public Registration(String nombreEquipo, String tournamentName, String comprobantePagoUrl) {
+    public Registration(String teamName, String tournamentName, String comprobantePagoUrl) {
         this.id = UUID.randomUUID().toString();
-        this.nombreEquipo = nombreEquipo;
+        this.teamName = teamName;
         this.tournamentName = tournamentName;
         this.status = "PENDIENTE";
         this.comprobantePagoUrl = comprobantePagoUrl;
@@ -24,8 +24,8 @@ public class Registration {
 
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
-    public String getNombreEquipo() { return nombreEquipo; }
-    public void setNombreEquipo(String nombreEquipo) { this.nombreEquipo = nombreEquipo; }
+    public String getTeamName() { return teamName; }
+    public void setTeamName(String teamName) { this.teamName = teamName; }
     public String getTournamentName() { return tournamentName; }
     public void setTournamentName(String tournamentName) { this.tournamentName = tournamentName; }
     public String getStatus() { return status; }

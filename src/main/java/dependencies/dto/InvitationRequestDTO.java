@@ -1,22 +1,22 @@
 package dependencies.dto;
 
 public class InvitationRequestDTO {
-    private String correoCapitan;
-    private String correoJugador;
-    private String nombreEquipo;
+    private String captainEmail;
+    private String playerEmail;
+    private String teamName;
 
     public InvitationRequestDTO() {}
 
-    public InvitationRequestDTO(String correoCapitan, String correoJugador, String nombreEquipo) {
-        this.correoCapitan = correoCapitan;
-        this.correoJugador = correoJugador;
-        this.nombreEquipo = nombreEquipo;
+    public InvitationRequestDTO(String captainEmail, String playerEmail, String teamName) {
+        this.captainEmail = captainEmail;
+        this.playerEmail = playerEmail;
+        this.teamName = teamName;
     }
 
-    public String getCorreoCapitan() { return correoCapitan; }
-    public void setCorreoCapitan(String correoCapitan) { this.correoCapitan = correoCapitan; }
-    public String getCorreoJugador() { return correoJugador; }
-    public void setCorreoJugador(String correoJugador) { this.correoJugador = correoJugador; }
-    public String getNombreEquipo() { return nombreEquipo; }
-    public void setNombreEquipo(String nombreEquipo) { this.nombreEquipo = nombreEquipo; }
+    public String getCaptainEmail() { return captainEmail; }
+    public void setCaptainEmail(String captainEmail) { this.captainEmail = captainEmail; }
+    public String getPlayerEmail() { return playerEmail; }
+    public void setPlayerEmail(String playerEmail) { this.playerEmail = playerEmail; }
+    public String getTeamName() { return teamName; }
+    public void setTeamName(String teamName) { this.teamName = teamName; }
 }

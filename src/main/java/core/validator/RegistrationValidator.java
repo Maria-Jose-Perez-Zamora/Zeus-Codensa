@@ -6,7 +6,7 @@ import dependencies.util.DataStorage;
 public class RegistrationValidator {
 
     public static void validateForInscripcion(RegistrationRequestDTO request) {
-        if (request.getNombreEquipo() == null || request.getNombreEquipo().trim().isEmpty()) {
+        if (request.getTeamName() == null || request.getTeamName().trim().isEmpty()) {
             throw new IllegalArgumentException("Nombre de team es obligatorio");
         }
         if (request.getTournamentName() == null || request.getTournamentName().trim().isEmpty()) {
@@ -17,7 +17,7 @@ public class RegistrationValidator {
         }
 
         boolean equipoExiste = DataStorage.teams.stream()
-                .anyMatch(t -> t.getNombreEquipo().equals(request.getNombreEquipo()));
+                .anyMatch(t -> t.getTeamName().equals(request.getTeamName()));
         if (!equipoExiste) {
             throw new IllegalArgumentException("El team especificado no existe");
         }
@@ -29,7 +29,7 @@ public class RegistrationValidator {
         }
 
         boolean estaInscrito = DataStorage.registrations.stream()
-                .anyMatch(i -> i.getNombreEquipo().equals(request.getNombreEquipo()) && i.getTournamentName().equals(request.getTournamentName()));
+                .anyMatch(i -> i.getTeamName().equals(request.getTeamName()) && i.getTournamentName().equals(request.getTournamentName()));
         if (estaInscrito) {
             throw new IllegalArgumentException("El team ya cuenta con un proceso de registration para este tournament");
         }

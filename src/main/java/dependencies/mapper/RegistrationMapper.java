@@ -8,7 +8,7 @@ public class RegistrationMapper {
 
     public static Registration toEntity(RegistrationRequestDTO dto) {
         return new Registration(
-                dto.getNombreEquipo(),
+                dto.getTeamName(),
                 dto.getTournamentName(),
                 dto.getComprobantePagoUrl()
         );

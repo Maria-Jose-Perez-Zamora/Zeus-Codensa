@@ -23,8 +23,8 @@ public class AuthServiceTest {
     @Test
     public void testLogin_Success() {
         Player u = new Player();
-        u.setCorreo("test@test.com");
-        u.setContrasena("secret");
+        u.setEmail("test@test.com");
+        u.setPassword("secret");
         u.setRole(Role.PLAYER);
         DataStorage.users.add(u);
 
@@ -33,14 +33,14 @@ public class AuthServiceTest {
 
         assertNotNull(response);
         assertNotNull(response.getToken());
-        assertEquals("test@test.com", response.getUser().getCorreo());
+        assertEquals("test@test.com", response.getUser().getEmail());
     }
 
     @Test
     public void testLogin_InvalidCredentials() {
         Player u = new Player();
-        u.setCorreo("test@test.com");
-        u.setContrasena("secret");
+        u.setEmail("test@test.com");
+        u.setPassword("secret");
         DataStorage.users.add(u);
 
         LoginRequestDTO request = new LoginRequestDTO("test@test.com", "wrong");

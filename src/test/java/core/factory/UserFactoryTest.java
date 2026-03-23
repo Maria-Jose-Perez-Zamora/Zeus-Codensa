@@ -20,14 +20,14 @@ public class UserFactoryTest {
         UserRequestDTO req = new UserRequestDTO();
         req.setRole(Role.CAPTAIN);
         req.setName("Carlos");
-        req.setPosicion("Medio");
-        req.setNumeroDorsal(10);
+        req.setPosition("Medio");
+        req.setJerseyNumber(10);
         
         User user = UserFactory.createUser(req);
-        assertTrue(user instanceof Capitan);
+        assertTrue(user instanceof Captain);
         assertEquals("Carlos", user.getName());
-        assertEquals("Medio", ((Capitan) user).getPosicion());
-        assertEquals(10, ((Capitan) user).getNumeroDorsal());
+        assertEquals("Medio", ((Captain) user).getPosition());
+        assertEquals(10, ((Captain) user).getJerseyNumber());
     }
 
     @Test
@@ -51,6 +51,6 @@ public class UserFactoryTest {
         UserRequestDTO req = new UserRequestDTO();
         req.setRole(Role.REFEREE);
         User user = UserFactory.createUser(req);
-        assertTrue(user instanceof Arbitro);
+        assertTrue(user instanceof Referee);
     }
 }

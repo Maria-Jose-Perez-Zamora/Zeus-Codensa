@@ -23,9 +23,9 @@ public class MatchValidator {
         }
 
         boolean localInscrito = DataStorage.registrations.stream()
-                .anyMatch(i -> i.getNombreEquipo().equals(request.getHomeTeam()) && i.getTournamentName().equals(request.getTournamentName()) && i.getStatus().equals("APROBADO"));
+                .anyMatch(i -> i.getTeamName().equals(request.getHomeTeam()) && i.getTournamentName().equals(request.getTournamentName()) && i.getStatus().equals("APROBADO"));
         boolean visitanteInscrito = DataStorage.registrations.stream()
-                .anyMatch(i -> i.getNombreEquipo().equals(request.getAwayTeam()) && i.getTournamentName().equals(request.getTournamentName()) && i.getStatus().equals("APROBADO"));
+                .anyMatch(i -> i.getTeamName().equals(request.getAwayTeam()) && i.getTournamentName().equals(request.getTournamentName()) && i.getStatus().equals("APROBADO"));
 
         if (!localInscrito || !visitanteInscrito) {
             throw new IllegalArgumentException("Los teams deben estar inscritos y APROBADOS en el tournament");

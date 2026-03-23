@@ -27,7 +27,7 @@ public class TeamController {
     @PostMapping("/create")
     @Operation(summary = "Create Team", description = "Registers a team associating colors and crest with a name")
     public ResponseEntity<TeamResponseDTO> createTeam(@RequestBody TeamRequestDTO request) {
-        log.info("REST request - createTeam: {}", request.getNombreEquipo());
+        log.info("REST request - createTeam: {}", request.getTeamName());
         return ResponseEntity.ok(teamService.createTeam(request));
     }
 

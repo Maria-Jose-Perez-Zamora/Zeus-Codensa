@@ -26,28 +26,30 @@ public class MatchController {
     }
 
     @PostMapping("/create")
+    @Operation(summary = "Create Match", description = "Creates a new match in the tournament")
     public ResponseEntity<MatchResponseDTO> registrarPartido(@RequestBody MatchRequestDTO request) {
         log.info("REST request - registrarPartido");
         return ResponseEntity.ok(partidoService.registrarPartido(request));
     }
 
-    @PutMapping("/{id}/marcador")
+    @PutMapping("/{id}/score")
+    @Operation(summary = "Update Score", description = "Updates the home and away score of a match")
     public ResponseEntity<MatchResponseDTO> actualizarMarcador(@PathVariable String id, @RequestBody Map<String, Integer> body) {
         log.info("REST request - actualizarMarcador para el match ID: {}", id);
         return ResponseEntity.ok(partidoService.actualizarMarcador(id, body.get("homeScore"), body.get("awayScore")));
     }
 
-    @PutMapping("/{id}/alineacion")
+    @PutMapping("/{id}/lineup")
     @Operation(summary = "Register Lineup", description = "Registers the players who will play in a team for a specific match")
     public ResponseEntity<MatchResponseDTO> registrarAlineacion(@PathVariable String id, @RequestBody Map<String, Object> body) {
         log.info("REST request - registrarAlineacion para el match ID: {}", id);
-        String nombreEquipo = (String) body.get("nombreEquipo");
+        String teamName = (String) body.get("teamName");
         @SuppressWarnings("unchecked")
         List<String> players = (List<String>) body.get("players");
-        return ResponseEntity.ok(partidoService.registrarAlineacion(id, nombreEquipo, players));
+        return ResponseEntity.ok(partidoService.registrarAlineacion(id, teamName, players));
     }
 
-    @PutMapping("/{id}/tarjetas")
+    @PutMapping("/{id}/cards")
     @Operation(summary = "Register Cards", description = "Adds yellow and red cards to the match per player")
     public ResponseEntity<MatchResponseDTO> registrarTarjetas(@PathVariable String id, @RequestBody Map<String, Object> body) {
         log.info("REST request - registrarTarjetas para el match ID: {}", id);
@@ -58,20 +60,22 @@ public class MatchController {
         return ResponseEntity.ok(partidoService.registrarTarjetas(id, amarillas, rojas));
     }
 
-    @PutMapping("/{id}/arbitro")
+    @PutMapping("/{id}/referee")
+    @Operation(summary = "Assign Referee", description = "Assigns a referee to a match by email")
     public ResponseEntity<MatchResponseDTO> asignarArbitro(@PathVariable String id, @RequestBody Map<String, String> body) {
         log.info("REST request - asignarArbitro para el match ID: {}", id);
         return ResponseEntity.ok(partidoService.asignarArbitro(id, body.get("correoArbitro")));
     }
 
-    @GetMapping("/arbitro/{correoArbitro}")
+    @GetMapping("/referee/{refereeEmail}")
     @Operation(summary = "Get My Matches", description = "Returns all matches assigned to a referee")
-    public ResponseEntity<List<MatchResponseDTO>> getMisPartidos(@PathVariable String correoArbitro) {
-        log.info("REST request - getMisPartidos para el árbitro: {}", correoArbitro);
-        return ResponseEntity.ok(partidoService.getPartidosPorArbitro(correoArbitro));
+    public ResponseEntity<List<MatchResponseDTO>> getMisPartidos(@PathVariable String refereeEmail) {
+        log.info("REST request - getMisPartidos para el árbitro: {}", refereeEmail);
+        return ResponseEntity.ok(partidoService.getMatchesByReferee(refereeEmail));
     }
 
     @GetMapping("/all")
+    @Operation(summary = "Get All Matches", description = "Returns all matches in the system")
     public ResponseEntity<List<MatchResponseDTO>> getAll() {
         log.info("REST request - getAll Partidos");
         return ResponseEntity.ok(partidoService.getAll());

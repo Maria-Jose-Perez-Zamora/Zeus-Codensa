@@ -13,12 +13,12 @@ public class TournamentResponseDTO {
     private String status;
 
     // Advanced Configuration (RF-005)
-    private String reglamento;
+    private String rules;
     private String fechaCierreInscripciones;
     private String fechaInicioFaseGrupos;
     private List<String> horariosPartidos;
     private List<String> canchas;
-    private String sanciones;
+    private String sanctions;
 
     public TournamentResponseDTO() {}
     
@@ -30,12 +30,12 @@ public class TournamentResponseDTO {
         this.numeroEquipos = tournament.getNumeroEquipos();
         this.costoInscripcion = tournament.getCostoInscripcion();
         this.status = tournament.getStatus();
-        this.reglamento = tournament.getReglamento();
+        this.rules = tournament.getRules();
         this.fechaCierreInscripciones = tournament.getFechaCierreInscripciones();
         this.fechaInicioFaseGrupos = tournament.getFechaInicioFaseGrupos();
         this.horariosPartidos = tournament.getHorariosPartidos();
         this.canchas = tournament.getCanchas();
-        this.sanciones = tournament.getSanciones();
+        this.sanctions = tournament.getSanctions();
     }
 
     public String getId() { return id; }
@@ -53,8 +53,8 @@ public class TournamentResponseDTO {
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
     
-    public String getReglamento() { return reglamento; }
-    public void setReglamento(String reglamento) { this.reglamento = reglamento; }
+    public String getRules() { return rules; }
+    public void setRules(String rules) { this.rules = rules; }
     public String getFechaCierreInscripciones() { return fechaCierreInscripciones; }
     public void setFechaCierreInscripciones(String fechaCierreInscripciones) { this.fechaCierreInscripciones = fechaCierreInscripciones; }
     public String getFechaInicioFaseGrupos() { return fechaInicioFaseGrupos; }
@@ -63,6 +63,6 @@ public class TournamentResponseDTO {
     public void setHorariosPartidos(List<String> horariosPartidos) { this.horariosPartidos = horariosPartidos; }
     public List<String> getCanchas() { return canchas; }
     public void setCanchas(List<String> canchas) { this.canchas = canchas; }
-    public String getSanciones() { return sanciones; }
-    public void setSanciones(String sanciones) { this.sanciones = sanciones; }
+    public String getSanctions() { return sanctions; }
+    public void setSanctions(String sanctions) { this.sanctions = sanctions; }
 }

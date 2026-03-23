@@ -13,7 +13,7 @@ public class InscripcionMapperTest {
     public void testToEntity() {
         RegistrationRequestDTO req = new RegistrationRequestDTO("Alpha", "Liga", "url_pago");
         Registration i = RegistrationMapper.toEntity(req);
-        assertEquals("Alpha", i.getNombreEquipo());
+        assertEquals("Alpha", i.getTeamName());
         assertEquals("Liga", i.getTournamentName());
         assertEquals("url_pago", i.getComprobantePagoUrl());
     }
@@ -23,7 +23,7 @@ public class InscripcionMapperTest {
         Registration i = new Registration("Beta", "Liga2", "url2");
         i.setStatus("APROBADO");
         RegistrationResponseDTO dto = RegistrationMapper.toDTO(i);
-        assertEquals("Beta", dto.getNombreEquipo());
+        assertEquals("Beta", dto.getTeamName());
         assertEquals("APROBADO", dto.getStatus());
     }
 }

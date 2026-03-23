@@ -1,7 +1,7 @@
 package core.model;
 
 public class Standing {
-    private String nombreEquipo;
+    private String teamName;
     private int matchesPlayed;
     private int matchesWon;
     private int matchesDrawn;
@@ -11,8 +11,8 @@ public class Standing {
     private int goalDifference;
     private int points;
 
-    public Standing(String nombreEquipo) {
-        this.nombreEquipo = nombreEquipo;
+    public Standing(String teamName) {
+        this.teamName = teamName;
         this.matchesPlayed = 0;
         this.matchesWon = 0;
         this.matchesDrawn = 0;
@@ -40,7 +40,7 @@ public class Standing {
         }
     }
 
-    public String getNombreEquipo() { return nombreEquipo; }
+    public String getTeamName() { return teamName; }
     public int getMatchesPlayed() { return matchesPlayed; }
     public int getMatchesWon() { return matchesWon; }
     public int getMatchesDrawn() { return matchesDrawn; }

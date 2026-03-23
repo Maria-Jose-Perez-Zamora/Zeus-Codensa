@@ -28,7 +28,7 @@ public class RegistrationController {
     @PostMapping("/create")
     @Operation(summary = "Register Receipt", description = "Uploads the link/reference of the payment receipt (NEQUI or cash)")
     public ResponseEntity<RegistrationResponseDTO> createInscripcion(@RequestBody RegistrationRequestDTO request) {
-        log.info("REST request - createInscripcion para el team: {}", request.getNombreEquipo());
+        log.info("REST request - createInscripcion para el team: {}", request.getTeamName());
         return ResponseEntity.ok(inscripcionService.inscribir(request));
     }
 

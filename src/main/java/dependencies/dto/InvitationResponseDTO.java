@@ -4,29 +4,29 @@ import core.model.Invitation;
 
 public class InvitationResponseDTO {
     private String id;
-    private String correoJugador;
-    private String nombreEquipo;
+    private String playerEmail;
+    private String teamName;
     private String status;
-    private String mensaje;
+    private String message;
 
     public InvitationResponseDTO() {}
 
     public InvitationResponseDTO(Invitation inv) {
         this.id = inv.getId();
-        this.correoJugador = inv.getCorreoJugador();
-        this.nombreEquipo = inv.getNombreEquipo();
+        this.playerEmail = inv.getPlayerEmail();
+        this.teamName = inv.getTeamName();
         this.status = inv.getStatus();
-        this.mensaje = "Invitación enviada exitosamente al player " + inv.getCorreoJugador();
+        this.message = "Invitation successfully sent to player " + inv.getPlayerEmail();
     }
 
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
-    public String getCorreoJugador() { return correoJugador; }
-    public void setCorreoJugador(String correoJugador) { this.correoJugador = correoJugador; }
-    public String getNombreEquipo() { return nombreEquipo; }
-    public void setNombreEquipo(String nombreEquipo) { this.nombreEquipo = nombreEquipo; }
+    public String getPlayerEmail() { return playerEmail; }
+    public void setPlayerEmail(String playerEmail) { this.playerEmail = playerEmail; }
+    public String getTeamName() { return teamName; }
+    public void setTeamName(String teamName) { this.teamName = teamName; }
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
-    public String getMensaje() { return mensaje; }
-    public void setMensaje(String mensaje) { this.mensaje = mensaje; }
+    public String getMessage() { return message; }
+    public void setMessage(String message) { this.message = message; }
 }

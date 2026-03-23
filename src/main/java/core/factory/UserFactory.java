@@ -14,14 +14,14 @@ public class UserFactory {
         switch (request.getRole()) {
             case PLAYER:
                 Player j = new Player();
-                j.setPosicion(request.getPosicion());
-                j.setNumeroDorsal(request.getNumeroDorsal());
+                j.setPosition(request.getPosition());
+                j.setJerseyNumber(request.getJerseyNumber());
                 user = j;
                 break;
             case CAPTAIN:
-                Capitan c = new Capitan();
-                c.setPosicion(request.getPosicion());
-                c.setNumeroDorsal(request.getNumeroDorsal());
+                Captain c = new Captain();
+                c.setPosition(request.getPosition());
+                c.setJerseyNumber(request.getJerseyNumber());
                 user = c;
                 break;
             case ADMINISTRADOR_SISTEMA:
@@ -31,16 +31,16 @@ public class UserFactory {
                 user = new TournamentOrganizer();
                 break;
             case REFEREE:
-                user = new Arbitro();
+                user = new Referee();
                 break;
             default:
                 throw new IllegalArgumentException("Rol no reconocido: " + request.getRole());
         }
 
         user.setName(request.getName());
-        user.setCorreo(request.getCorreo());
-        user.setContrasena(request.getContrasena());
-        user.setFoto(request.getFoto());
+        user.setEmail(request.getEmail());
+        user.setPassword(request.getPassword());
+        user.setPhoto(request.getPhoto());
         user.setRole(request.getRole());
         
         if (request.getUserType() != null) {

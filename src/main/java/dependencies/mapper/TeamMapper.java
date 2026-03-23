@@ -7,7 +7,7 @@ import core.model.Team;
 public class TeamMapper {
 
     public static Team toEntity(TeamRequestDTO dto) {
-        Team t = new Team(dto.getNombreEquipo());
+        Team t = new Team(dto.getTeamName());
         t.setEscudo(dto.getEscudo());
         t.setColoresUniforme(dto.getColoresUniforme());
         return t;

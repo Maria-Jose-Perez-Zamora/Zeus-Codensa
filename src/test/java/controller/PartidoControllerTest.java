@@ -98,7 +98,7 @@ public class PartidoControllerTest {
     @Test
     public void testAsignarArbitro_Success() {
         MatchResponseDTO res = new MatchResponseDTO();
-        res.setCorreoArbitro("ref@test.com");
+        res.setRefereeEmail("ref@test.com");
         when(partidoService.asignarArbitro("1", "ref@test.com")).thenReturn(res);
 
         ResponseEntity<?> response = partidoController.asignarArbitro("1", Map.of("correoArbitro", "ref@test.com"));
@@ -116,7 +116,7 @@ public class PartidoControllerTest {
 
     @Test
     public void testGetMisPartidos_Success() {
-        when(partidoService.getPartidosPorArbitro("ref@test.com")).thenReturn(Collections.emptyList());
+        when(partidoService.getMatchesByReferee("ref@test.com")).thenReturn(Collections.emptyList());
         ResponseEntity<List<MatchResponseDTO>> response = partidoController.getMisPartidos("ref@test.com");
         assertEquals(200, response.getStatusCode().value());
     }

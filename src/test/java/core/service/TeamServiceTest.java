@@ -26,7 +26,7 @@ public class TeamServiceTest {
         
         for (String email : validPlayers) {
             Player j = new Player();
-            j.setCorreo(email);
+            j.setEmail(email);
             j.setName("Player " + email);
             j.setRole(Role.PLAYER);
             DataStorage.users.add(j);
@@ -39,8 +39,8 @@ public class TeamServiceTest {
         TeamResponseDTO response = teamService.createTeam(request);
         
         assertNotNull(response);
-        assertEquals(7, response.getJugadores().size());
-        assertEquals("Tigres FC", response.getNombreEquipo());
+        assertEquals(7, response.getPlayers().size());
+        assertEquals("Tigres FC", response.getTeamName());
         assertEquals(1, DataStorage.teams.size());
     }
 
@@ -50,7 +50,7 @@ public class TeamServiceTest {
         
         List<String> validPlayersB = Arrays.asList("8@a.com", "9@a.com", "10@a.com", "11@a.com", "12@a.com", "13@a.com", "14@a.com");
         for (String email : validPlayersB) {
-            Player j = new Player(); j.setCorreo(email); DataStorage.users.add(j);
+            Player j = new Player(); j.setEmail(email); DataStorage.users.add(j);
         }
         TeamRequestDTO request2 = new TeamRequestDTO("Equipo B", null, null, validPlayersB);
         

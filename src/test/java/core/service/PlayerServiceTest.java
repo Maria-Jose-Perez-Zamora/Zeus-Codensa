@@ -25,7 +25,7 @@ public class PlayerServiceTest {
     @Test
     public void testAcceptInvitation_Success() {
         Player player = new Player();
-        player.setCorreo("player@test.com");
+        player.setEmail("player@test.com");
         DataStorage.users.add(player);
 
         Team team = new Team("Dream Team");
@@ -38,8 +38,8 @@ public class PlayerServiceTest {
         playerService.acceptInvitation(inv.getId(), "player@test.com");
 
         assertEquals("ACCEPTED", inv.getStatus());
-        assertEquals(1, team.getJugadores().size());
-        assertEquals("player@test.com", team.getJugadores().get(0).getCorreo());
+        assertEquals(1, team.getPlayers().size());
+        assertEquals("player@test.com", team.getPlayers().get(0).getEmail());
     }
 
     @Test
@@ -62,11 +62,11 @@ public class PlayerServiceTest {
     @Test
     public void testAcceptInvitation_AlreadyInTeam() {
         Player player = new Player();
-        player.setCorreo("player@test.com");
+        player.setEmail("player@test.com");
         DataStorage.users.add(player);
 
         Team team = new Team("Dream Team");
-        team.getJugadores().add(player);
+        team.getPlayers().add(player);
         DataStorage.teams.add(team);
 
         Invitation inv = new Invitation("capitan@test.com", "player@test.com", "Otro Team");

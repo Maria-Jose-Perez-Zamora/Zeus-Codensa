@@ -22,25 +22,25 @@ public class TeamService {
     private static final Logger log = LoggerFactory.getLogger(TeamService.class);
 
     public TeamResponseDTO createTeam(TeamRequestDTO requestDTO) {
-        log.debug("Ejecutando validaciones para creacion de team: {}", requestDTO.getNombreEquipo());
+        log.debug("Ejecutando validaciones para creacion de team: {}", requestDTO.getTeamName());
         TeamValidator.validateForCreation(requestDTO);
 
         Team newTeam = TeamMapper.toEntity(requestDTO);
         
         List<User> foundUsers = new ArrayList<>();
-        if (requestDTO.getJugadorCorreos() != null) {
-            for (String correo : requestDTO.getJugadorCorreos()) {
+        if (requestDTO.getPlayerEmails() != null) {
+            for (String correo : requestDTO.getPlayerEmails()) {
                 DataStorage.users.stream()
-                    .filter(u -> u.getCorreo().equals(correo))
+                    .filter(u -> u.getEmail().equals(correo))
                     .findFirst()
                     .ifPresent(foundUsers::add);
             }
             log.debug("Se asociaron {} players al team", foundUsers.size());
         }
-        newTeam.setJugadores(foundUsers);
+        newTeam.setPlayers(foundUsers);
 
         DataStorage.teams.add(newTeam);
-        log.info("Equipo {} registrado exitosamente en memoria", newTeam.getNombreEquipo());
+        log.info("Equipo {} registrado exitosamente en memoria", newTeam.getTeamName());
         return TeamMapper.toDTO(newTeam);
     }
 

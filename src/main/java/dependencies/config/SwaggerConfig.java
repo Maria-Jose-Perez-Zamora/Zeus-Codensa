@@ -14,9 +14,9 @@ public class SwaggerConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("TechCup API - Sprint 2")
+                        .title("TechCup API - Sprint 3")
                         .version("1.0.0")
-                        .description("Documentación interactiva de la API REST para el backend de TechCup Fútbol.")
+                        .description("Interactive REST API documentation for the TechCup Football backend.")
                         .contact(new Contact().name("TechCup Team"))
                         .license(new License().name("Apache 2.0").url("http://springdoc.org")));
     }

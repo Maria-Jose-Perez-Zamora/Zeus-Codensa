@@ -37,7 +37,7 @@ public class TeamControllerTest {
     public void testCreateTeam_Success() {
         TeamRequestDTO request = new TeamRequestDTO("FC Zeta", "e.png", "Negro", validPlayers);
         TeamResponseDTO responseDto = new TeamResponseDTO();
-        responseDto.setNombreEquipo("FC Zeta");
+        responseDto.setTeamName("FC Zeta");
 
         when(teamService.createTeam(any(TeamRequestDTO.class))).thenReturn(responseDto);
 
@@ -61,13 +61,13 @@ public class TeamControllerTest {
     @Test
     public void testGetAllTeams() {
         TeamResponseDTO t1 = new TeamResponseDTO();
-        t1.setNombreEquipo("Equipo1");
+        t1.setTeamName("Equipo1");
         when(teamService.getAllTeams()).thenReturn(Collections.singletonList(t1));
 
         ResponseEntity<List<TeamResponseDTO>> responseEntity = teamController.getAllTeams();
 
         assertEquals(200, responseEntity.getStatusCode().value());
         assertEquals(1, responseEntity.getBody().size());
-        assertEquals("Equipo1", responseEntity.getBody().get(0).getNombreEquipo());
+        assertEquals("Equipo1", responseEntity.getBody().get(0).getTeamName());
     }
 }
