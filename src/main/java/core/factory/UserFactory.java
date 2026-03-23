@@ -42,6 +42,16 @@ public class UserFactory {
         user.setContrasena(request.getContrasena());
         user.setFoto(request.getFoto());
         user.setRole(request.getRole());
+        
+        if (request.getUserType() != null) {
+            try {
+                user.setType(UserType.valueOf(request.getUserType().toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                user.setType(UserType.EXTERNAL);
+            }
+        } else {
+            user.setType(UserType.EXTERNAL);
+        }
 
         return user;
     }

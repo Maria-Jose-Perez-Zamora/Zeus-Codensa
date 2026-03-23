@@ -14,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/teams")
-@Tag(name = "Equipos", description = "Conformación de teams del tournament deportivo (RF-003)")
+@Tag(name = "Teams", description = "Formation of teams for the sports tournament (RF-003)")
 public class TeamController {
 
     private static final Logger log = LoggerFactory.getLogger(TeamController.class);
@@ -25,14 +25,14 @@ public class TeamController {
     }
 
     @PostMapping("/create")
-    @Operation(summary = "Crear team", description = "Registra un team asociando colores al escudo y name")
+    @Operation(summary = "Create Team", description = "Registers a team associating colors and crest with a name")
     public ResponseEntity<TeamResponseDTO> createTeam(@RequestBody TeamRequestDTO request) {
         log.info("REST request - createTeam: {}", request.getNombreEquipo());
         return ResponseEntity.ok(teamService.createTeam(request));
     }
 
     @GetMapping("/all")
-    @Operation(summary = "Listar teams", description = "Retorna de manera general todos los teams inscritos en memoria")
+    @Operation(summary = "List Teams", description = "Returns all registered teams generally")
     public ResponseEntity<List<TeamResponseDTO>> getAllTeams() {
         log.info("REST request - getAll Teams");
         return ResponseEntity.ok(teamService.getAllTeams());

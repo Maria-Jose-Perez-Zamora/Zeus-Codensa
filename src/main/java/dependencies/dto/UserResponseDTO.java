@@ -3,6 +3,7 @@ package dependencies.dto;
 import core.model.Role;
 import core.model.User;
 import core.model.Player;
+import core.model.UserType;
 
 public class UserResponseDTO {
     private String name;
@@ -11,6 +12,7 @@ public class UserResponseDTO {
     private Integer numeroDorsal;
     private String foto;
     private Role role;
+    private UserType userType;
 
     public UserResponseDTO() {}
 
@@ -19,6 +21,7 @@ public class UserResponseDTO {
         this.correo = user.getCorreo();
         this.foto = user.getFoto();
         this.role = user.getRole();
+        this.userType = user.getType();
         
         if (user instanceof Player) {
             Player j = (Player) user;
@@ -39,4 +42,6 @@ public class UserResponseDTO {
     public void setFoto(String foto) { this.foto = foto; }
     public Role getRole() { return role; }
     public void setRole(Role role) { this.role = role; }
+    public UserType getUserType() { return userType; }
+    public void setUserType(UserType userType) { this.userType = userType; }
 }

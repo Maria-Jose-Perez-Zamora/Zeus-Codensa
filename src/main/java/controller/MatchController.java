@@ -15,7 +15,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/matches")
-@Tag(name = "Partidos", description = "Manejo de matches, resultados, alineaciones, tarjetas y árbitros (RF-006, RF-008)")
+@Tag(name = "Matches", description = "Management of matches, results, lineups, cards, and referees (RF-006, RF-008)")
 public class MatchController {
 
     private static final Logger log = LoggerFactory.getLogger(MatchController.class);
@@ -38,7 +38,7 @@ public class MatchController {
     }
 
     @PutMapping("/{id}/alineacion")
-    @Operation(summary = "Registrar alineación", description = "Registra los players que jugarán en un team en un match específico")
+    @Operation(summary = "Register Lineup", description = "Registers the players who will play in a team for a specific match")
     public ResponseEntity<MatchResponseDTO> registrarAlineacion(@PathVariable String id, @RequestBody Map<String, Object> body) {
         log.info("REST request - registrarAlineacion para el match ID: {}", id);
         String nombreEquipo = (String) body.get("nombreEquipo");
@@ -48,7 +48,7 @@ public class MatchController {
     }
 
     @PutMapping("/{id}/tarjetas")
-    @Operation(summary = "Registrar tarjetas", description = "Añade tarjetas amarillas y rojas al match por player")
+    @Operation(summary = "Register Cards", description = "Adds yellow and red cards to the match per player")
     public ResponseEntity<MatchResponseDTO> registrarTarjetas(@PathVariable String id, @RequestBody Map<String, Object> body) {
         log.info("REST request - registrarTarjetas para el match ID: {}", id);
         @SuppressWarnings("unchecked")
@@ -65,7 +65,7 @@ public class MatchController {
     }
 
     @GetMapping("/arbitro/{correoArbitro}")
-    @Operation(summary = "Obtener mis matches", description = "Retorna todos los matches asignados a un árbitro")
+    @Operation(summary = "Get My Matches", description = "Returns all matches assigned to a referee")
     public ResponseEntity<List<MatchResponseDTO>> getMisPartidos(@PathVariable String correoArbitro) {
         log.info("REST request - getMisPartidos para el árbitro: {}", correoArbitro);
         return ResponseEntity.ok(partidoService.getPartidosPorArbitro(correoArbitro));

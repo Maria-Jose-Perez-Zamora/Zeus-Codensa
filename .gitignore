@@ -36,6 +36,7 @@ build/
 fixer.py
 refactor.py
 translator.py
+translate_swagger.py
 
 ### Diagrama de Clases ###
 /diagrama_clases.md

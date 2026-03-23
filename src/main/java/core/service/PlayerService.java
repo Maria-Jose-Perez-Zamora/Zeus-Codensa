@@ -64,7 +64,7 @@ public class PlayerService {
         boolean yaInvitado = DataStorage.invitations.stream()
                 .anyMatch(i -> i.getCorreoJugador().equals(request.getCorreoJugador())
                         && i.getNombreEquipo().equals(request.getNombreEquipo())
-                        && i.getStatus().equals("ENVIADA"));
+                        && i.getStatus().equals("PENDING"));
         if (yaInvitado) {
             log.warn("Invitación duplicada omitida hacia {}", request.getCorreoJugador());
             throw new BusinessRuleException("Ya existe una invitación pendiente para este player en este team");
@@ -82,5 +82,48 @@ public class PlayerService {
         return DataStorage.teams.stream()
                 .anyMatch(t -> t.getJugadores().stream()
                         .anyMatch(u -> u.getCorreo().equals(correo)));
+    }
+
+    public void acceptInvitation(String invitationId, String playerEmail) {
+        Invitation inv = DataStorage.invitations.stream()
+                .filter(i -> i.getId().equals(invitationId) && i.getCorreoJugador().equals(playerEmail))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Invitación no encontrada"));
+
+        if (!inv.getStatus().equals("PENDING") && !inv.getStatus().equals("ENVIADA")) {
+            throw new BusinessRuleException("La invitación ya fue respondida o no está pendiente.");
+        }
+
+        if (estaEnEquipo(playerEmail)) {
+            throw new BusinessRuleException("El jugador ya pertenece a un equipo.");
+        }
+
+        core.model.Team targetTeam = DataStorage.teams.stream()
+                .filter(t -> t.getNombreEquipo().equals(inv.getNombreEquipo()))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("El equipo " + inv.getNombreEquipo() + " ya no existe."));
+
+        User player = DataStorage.users.stream()
+                .filter(u -> u.getCorreo().equals(playerEmail))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Jugador no encontrado en el sistema"));
+
+        targetTeam.getJugadores().add(player);
+        inv.setStatus("ACCEPTED");
+        log.info("El jugador {} aceptó la invitación al equipo {}", playerEmail, targetTeam.getNombreEquipo());
+    }
+
+    public void declineInvitation(String invitationId, String playerEmail) {
+        Invitation inv = DataStorage.invitations.stream()
+                .filter(i -> i.getId().equals(invitationId) && i.getCorreoJugador().equals(playerEmail))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Invitación no encontrada"));
+
+        if (!inv.getStatus().equals("PENDING") && !inv.getStatus().equals("ENVIADA")) {
+            throw new BusinessRuleException("La invitación ya fue respondida o no está pendiente.");
+        }
+
+        inv.setStatus("DECLINED");
+        log.info("El jugador {} declinó la invitación al equipo {}", playerEmail, inv.getNombreEquipo());
     }
 }

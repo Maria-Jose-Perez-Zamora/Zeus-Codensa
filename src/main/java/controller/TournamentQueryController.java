@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/tournaments/consulta")
-@Tag(name = "Consulta e Información del Tournament", description = "Visualización de Tablas, Estadísticas, Llaves eliminatorias y Calendarios (RF-007, RF-008)")
+@Tag(name = "Tournament Information and Queries", description = "Visualization of Standings, Statistics, Brackets, and Calendars (RF-007, RF-008)")
 public class TournamentQueryController {
 
     private static final Logger log = LoggerFactory.getLogger(TournamentQueryController.class);
@@ -34,7 +34,7 @@ public class TournamentQueryController {
     }
 
     @GetMapping("")
-    @Operation(summary = "Indice de Consultas", description = "Endpoint base que valida conexion")
+    @Operation(summary = "Query Index", description = "Base endpoint to validate connection")
     public ResponseEntity<Map<String, String>> index() {
         return ResponseEntity.ok(Map.of(
             "status", "Consulta API is running",
@@ -43,21 +43,21 @@ public class TournamentQueryController {
     }
 
     @GetMapping("/{tournament}/standingTable")
-    @Operation(summary = "Tabla de posiciones", description = "Genera la standingTable general a partir del tournament activo sumando victorias y empates")
+    @Operation(summary = "Standings Table", description = "Generates the general standing table from the active tournament summing wins and draws")
     public ResponseEntity<List<Standing>> getTabla(@PathVariable String tournament) {
         log.info("REST request - getTabla de posiciones para tournament: {}", tournament);
         return ResponseEntity.ok(tablaService.calcularTabla(tournament));
     }
 
     @GetMapping("/{tournament}/llaves/{phase}")
-    @Operation(summary = "Generación Llaves Eliminatorias", description = "Dibuja cuartos, semifinal o final")
+    @Operation(summary = "Generate Knockout Brackets", description = "Draws quarterfinals, semifinals, or finals")
     public ResponseEntity<?> getLlaves(@PathVariable String tournament, @PathVariable String phase) {
         log.info("REST request - getLlaves eliminatorias para tournament: {}, phase: {}", tournament, phase);
         return ResponseEntity.ok(llaveService.generarLlaves(tournament, phase));
     }
 
     @GetMapping("/{tournament}/calendario")
-    @Operation(summary = "Calendario Partidos", description = "Devuelve los matches programados")
+    @Operation(summary = "Match Calendar", description = "Returns scheduled matches")
     public ResponseEntity<?> getCalendario(@PathVariable String tournament) {
         log.info("REST request - getCalendario para tournament: {}", tournament);
         List<Map<String, Object>> calendario = DataStorage.matches.stream()
@@ -78,7 +78,7 @@ public class TournamentQueryController {
     }
 
     @GetMapping("/{tournament}/resultados")
-    @Operation(summary = "Resultados Historicos", description = "Todos los matches ya finalizados")
+    @Operation(summary = "Historical Results", description = "All finished matches")
     public ResponseEntity<?> getResultados(@PathVariable String tournament) {
         log.info("REST request - getResultados Historicos para tournament: {}", tournament);
         List<Map<String, Object>> resultados = DataStorage.matches.stream()
@@ -100,7 +100,7 @@ public class TournamentQueryController {
     }
 
     @GetMapping("/{tournament}/estadisticas")
-    @Operation(summary = "Estadisticas Globales", description = "Resumen de goals a favor/contra por team")
+    @Operation(summary = "Global Statistics", description = "Summary of goals for/against per team")
     public ResponseEntity<?> getEstadisticas(@PathVariable String tournament) {
         log.info("REST request - getEstadisticas para tournament: {}", tournament);
         List<Standing> standingTable = tablaService.calcularTabla(tournament);
@@ -111,7 +111,7 @@ public class TournamentQueryController {
     }
 
     @GetMapping("/{tournament}/goleadores")
-    @Operation(summary = "Tabla de Goleadores", description = "Todos los máximos Goleadores agregados en matches")
+    @Operation(summary = "Top Scorers Table", description = "All top scorers aggregated across matches")
     public ResponseEntity<?> getGoleadores(@PathVariable String tournament) {
         log.info("REST request - getGoleadores para tournament: {}", tournament);
         List<Map<String, Object>> goleadores = estadisticasService.getMaximosGoleadores(tournament);
@@ -122,7 +122,7 @@ public class TournamentQueryController {
     }
 
     @GetMapping("/{tournament}/historial/{team}")
-    @Operation(summary = "Historial Club", description = "Desempeño cronológico de un team dado")
+    @Operation(summary = "Club History", description = "Chronological performance of a given team")
     public ResponseEntity<?> getHistorialEquipo(@PathVariable String tournament, @PathVariable String team) {
         log.info("REST request - getHistorialEquipo para tournament: {}, team: {}", tournament, team);
         List<Map<String, Object>> historial = estadisticasService.getHistorialEquipo(tournament, team);

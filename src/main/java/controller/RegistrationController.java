@@ -15,7 +15,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/registrations")
-@Tag(name = "Inscripciones", description = "Proceso de abono de tarifa de inscripción al tournament (RF-004)")
+@Tag(name = "Registrations", description = "Payment process for tournament registration fees (RF-004)")
 public class RegistrationController {
 
     private static final Logger log = LoggerFactory.getLogger(RegistrationController.class);
@@ -26,14 +26,14 @@ public class RegistrationController {
     }
 
     @PostMapping("/create")
-    @Operation(summary = "Registrar Comprobante", description = "Sube el link/referencia del comprobante de pago NEQUI o efectivo")
+    @Operation(summary = "Register Receipt", description = "Uploads the link/reference of the payment receipt (NEQUI or cash)")
     public ResponseEntity<RegistrationResponseDTO> createInscripcion(@RequestBody RegistrationRequestDTO request) {
         log.info("REST request - createInscripcion para el team: {}", request.getNombreEquipo());
         return ResponseEntity.ok(inscripcionService.inscribir(request));
     }
 
     @PutMapping("/{id}/status")
-    @Operation(summary = "Evaluar pago", description = "El organizador evalúa el comproabante para APROBAR o RECHAZAR la inscripción")
+    @Operation(summary = "Evaluate Payment", description = "The organizer evaluates the receipt to APPROVE or REJECT the registration")
     public ResponseEntity<RegistrationResponseDTO> actualizarEstado(@PathVariable String id, @RequestBody Map<String, String> body) {
         log.info("REST request - actualizarEstado para inscripción ID: {}", id);
         String nuevoEstado = body.get("status");
@@ -45,7 +45,7 @@ public class RegistrationController {
     }
 
     @GetMapping("/all")
-    @Operation(summary = "Listar procesos", description = "Lista comprobantes pendientes y aprobados")
+    @Operation(summary = "List Registrations", description = "Lists pending and approved receipts")
     public ResponseEntity<List<RegistrationResponseDTO>> getAll() {
         log.info("REST request - getAll Inscripciones");
         return ResponseEntity.ok(inscripcionService.getAll());

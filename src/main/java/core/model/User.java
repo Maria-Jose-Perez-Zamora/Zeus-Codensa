@@ -6,6 +6,7 @@ public abstract class User {
     private String contrasena;
     private String foto;
     private Role role;
+    private UserType type;
 
     public User() {}
 
@@ -13,6 +14,14 @@ public abstract class User {
         this.name = name;
         this.correo = correo;
         this.contrasena = contrasena;
+        this.type = UserType.EXTERNAL; // Default fallback for old tests
+    }
+
+    public User(String name, String correo, String contrasena, UserType type) {
+        this.name = name;
+        this.correo = correo;
+        this.contrasena = contrasena;
+        this.type = type != null ? type : UserType.EXTERNAL;
     }
 
     public String getName() { return name; }
@@ -25,4 +34,6 @@ public abstract class User {
     public void setFoto(String foto) { this.foto = foto; }
     public Role getRole() { return role; }
     public void setRole(Role role) { this.role = role; }
+    public UserType getType() { return type; }
+    public void setType(UserType type) { this.type = type; }
 }

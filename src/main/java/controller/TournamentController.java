@@ -14,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/tournaments")
-@Tag(name = "Torneos", description = "Operaciones relacionadas con la creación y configuración de tournaments (RF-001, RF-005)")
+@Tag(name = "Tournaments", description = "Operations related to tournament creation and configuration (RF-001, RF-005)")
 public class TournamentController {
 
     private static final Logger log = LoggerFactory.getLogger(TournamentController.class);
@@ -25,21 +25,21 @@ public class TournamentController {
     }
 
     @PostMapping("/create")
-    @Operation(summary = "Crear tournament", description = "Crea un tournament en status DRAFT con sus especificaciones iniciales")
+    @Operation(summary = "Create Tournament", description = "Creates a tournament in DRAFT status with initial specifications")
     public ResponseEntity<TournamentResponseDTO> createTorneo(@RequestBody TournamentRequestDTO request) {
         log.info("REST request - createTorneo: {}", request.getTournamentName());
         return ResponseEntity.ok(torneoService.createTorneo(request));
     }
 
     @PutMapping("/{id}/configurar")
-    @Operation(summary = "Configurar tournament", description = "Añade reglas, canchas, sanciones, horarios a un tournament existente")
+    @Operation(summary = "Configure Tournament", description = "Adds rules, fields, sanctions, and schedules to an existing tournament")
     public ResponseEntity<TournamentResponseDTO> configurarTorneo(@PathVariable String id, @RequestBody TournamentRequestDTO configInfo) {
         log.info("REST request - configurarTorneo ID: {}", id);
         return ResponseEntity.ok(torneoService.configurarTorneo(id, configInfo));
     }
 
     @GetMapping("/consulta/all")
-    @Operation(summary = "Consultar todos los tournaments", description = "Obtiene una lista de todos los tournaments registrados")
+    @Operation(summary = "Get All Tournaments", description = "Gets a list of all registered tournaments")
     public ResponseEntity<List<TournamentResponseDTO>> getAllTorneos() {
         log.info("REST request - getAllTorneos");
         return ResponseEntity.ok(torneoService.getAllTorneos());

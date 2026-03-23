@@ -16,7 +16,7 @@ public class Invitation {
         this.correoCapitan = correoCapitan;
         this.correoJugador = correoJugador;
         this.nombreEquipo = nombreEquipo;
-        this.status = "ENVIADA";
+        this.status = "PENDING"; // Formerly ENVIADA
     }
 
     public String getId() { return id; }

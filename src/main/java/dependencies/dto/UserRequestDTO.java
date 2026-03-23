@@ -10,10 +10,11 @@ public class UserRequestDTO {
     private Integer numeroDorsal;
     private String foto;
     private Role role;
+    private String userType;
 
     public UserRequestDTO() {}
 
-    public UserRequestDTO(String name, String correo, String contrasena, String posicion, Integer numeroDorsal, String foto, Role role) {
+    public UserRequestDTO(String name, String correo, String contrasena, String posicion, Integer numeroDorsal, String foto, Role role, String userType) {
         this.name = name;
         this.correo = correo;
         this.contrasena = contrasena;
@@ -21,6 +22,12 @@ public class UserRequestDTO {
         this.numeroDorsal = numeroDorsal;
         this.foto = foto;
         this.role = role;
+        this.userType = userType;
+    }
+
+    // Legacy constructor for backward compatibility with tests
+    public UserRequestDTO(String name, String correo, String contrasena, String posicion, Integer numeroDorsal, String foto, Role role) {
+        this(name, correo, contrasena, posicion, numeroDorsal, foto, role, "EXTERNAL");
     }
 
     public String getName() { return name; }
@@ -37,4 +44,6 @@ public class UserRequestDTO {
     public void setFoto(String foto) { this.foto = foto; }
     public Role getRole() { return role; }
     public void setRole(Role role) { this.role = role; }
+    public String getUserType() { return userType; }
+    public void setUserType(String userType) { this.userType = userType; }
 }

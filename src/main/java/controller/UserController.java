@@ -14,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
-@Tag(name = "Usuarios Generales", description = "Registro de usuarios como Organizador o Administrador (RF-002)")
+@Tag(name = "General Users", description = "User registration for Organizers or Administrators (RF-002)")
 public class UserController {
 
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
@@ -25,14 +25,14 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    @Operation(summary = "Registrar usuario", description = "Registra un usuario como Administrador o Organizador proporcionando base")
+    @Operation(summary = "Register User", description = "Registers a user as an Administrator or Organizer")
     public ResponseEntity<UserResponseDTO> register(@RequestBody UserRequestDTO request) {
         log.info("REST request - register user: {}", request.getCorreo());
         return ResponseEntity.ok(userService.registerUser(request));
     }
 
     @GetMapping("/all")
-    @Operation(summary = "Consultar todos", description = "Lista a todos los usuarios del sistema sin filtrar")
+    @Operation(summary = "Get All Users", description = "Lists all system users without filtering")
     public ResponseEntity<List<UserResponseDTO>> getAll() {
         log.info("REST request - getAll Usuarios");
         return ResponseEntity.ok(userService.getAllUsers());

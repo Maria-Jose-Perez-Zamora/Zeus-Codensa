@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("/api/auth")
-@Tag(name = "Autenticación", description = "Endpoints para inicio de sesión y validación de usuarios")
+@Tag(name = "Authentication", description = "Endpoints for login and user validation")
 public class AuthController {
 
     private static final Logger log = LoggerFactory.getLogger(AuthController.class);
@@ -23,7 +23,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    @Operation(summary = "Inicio de Sesion", description = "Produce un Token JWT simple Base64 enlazado al Rol")
+    @Operation(summary = "Login", description = "Produces a simple JWT Base64 Token linked to the Role")
     public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO request) {
         log.info("REST request - intento de login de usuario: {}", request.getCorreo());
         return ResponseEntity.ok(authService.login(request));
