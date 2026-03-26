@@ -10,13 +10,19 @@ import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Base64;
 import java.util.Optional;
+import dependencies.security.JwtService;
 
 @Service
 public class AuthService {
 
     private static final Logger log = LoggerFactory.getLogger(AuthService.class);
+    
+    private final JwtService jwtService;
+
+    public AuthService(JwtService jwtService) {
+        this.jwtService = jwtService;
+    }
 
     public LoginResponseDTO login(LoginRequestDTO request) {
         log.debug("Authentication request processed for {}", request.getEmail());
@@ -37,8 +43,7 @@ public class AuthService {
         }
 
         User user = userOpt.get();
-        String tokenStr = user.getEmail() + ":" + user.getRole().name();
-        String token = Base64.getEncoder().encodeToString(tokenStr.getBytes());
+        String token = jwtService.generateToken(user.getEmail(), user.getRole().name());
 
         log.info("Autenticacion exitosa: {} (Rol: {})", user.getEmail(), user.getRole().name());
         return new LoginResponseDTO(token, new UserResponseDTO(user));

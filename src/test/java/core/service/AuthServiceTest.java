@@ -5,19 +5,29 @@ import dependencies.dto.LoginResponseDTO;
 import core.model.Role;
 import core.model.Player;
 import dependencies.util.DataStorage;
+import dependencies.security.JwtService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
 public class AuthServiceTest {
 
+    @Mock
+    private JwtService jwtService;
+
+    @InjectMocks
     private AuthService authService;
 
     @BeforeEach
     public void setUp() {
         DataStorage.clearAll();
-        authService = new AuthService();
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
@@ -28,11 +38,13 @@ public class AuthServiceTest {
         u.setRole(Role.PLAYER);
         DataStorage.users.add(u);
 
+        when(jwtService.generateToken(anyString(), anyString())).thenReturn("mockToken");
+
         LoginRequestDTO request = new LoginRequestDTO("test@test.com", "secret");
         LoginResponseDTO response = authService.login(request);
 
         assertNotNull(response);
-        assertNotNull(response.getToken());
+        assertEquals("mockToken", response.getToken());
         assertEquals("test@test.com", response.getUser().getEmail());
     }
 
