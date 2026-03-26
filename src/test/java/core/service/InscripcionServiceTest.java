@@ -36,7 +36,7 @@ public class InscripcionServiceTest {
 
         assertNotNull(res);
         assertNotNull(res.getId());
-        assertEquals("PENDIENTE", res.getStatus());
+        assertEquals("PENDING", res.getStatus());
         assertEquals(1, DataStorage.registrations.size());
     }
 
@@ -47,8 +47,9 @@ public class InscripcionServiceTest {
         RegistrationRequestDTO req = new RegistrationRequestDTO("Aguilas", "Nacional", "url_pago");
         RegistrationResponseDTO res = inscripcionService.inscribir(req);
 
-        RegistrationResponseDTO updated = inscripcionService.actualizarEstado(res.getId(), "APROBADO");
-        assertEquals("APROBADO", updated.getStatus());
+        inscripcionService.actualizarEstado(res.getId(), "IN_REVIEW");
+        RegistrationResponseDTO updated = inscripcionService.actualizarEstado(res.getId(), "APPROVED");
+        assertEquals("APPROVED", updated.getStatus());
     }
 
     @Test
@@ -62,6 +63,6 @@ public class InscripcionServiceTest {
 
     @Test
     public void testActualizarEstado_IdNotFound_Throws() {
-        assertThrows(RuntimeException.class, () -> inscripcionService.actualizarEstado("Inventado-123", "APROBADO"));
+        assertThrows(RuntimeException.class, () -> inscripcionService.actualizarEstado("Inventado-123", "IN_REVIEW"));
     }
 }

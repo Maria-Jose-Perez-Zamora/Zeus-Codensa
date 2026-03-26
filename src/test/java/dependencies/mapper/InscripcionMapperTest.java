@@ -21,9 +21,9 @@ public class InscripcionMapperTest {
     @Test
     public void testToDTO() {
         Registration i = new Registration("Beta", "Liga2", "url2");
-        i.setStatus("APROBADO");
+        i.setStatus("APPROVED");
         RegistrationResponseDTO dto = RegistrationMapper.toDTO(i);
         assertEquals("Beta", dto.getTeamName());
-        assertEquals("APROBADO", dto.getStatus());
+        assertEquals("APPROVED", dto.getStatus());
     }
 }

@@ -58,10 +58,17 @@ public class SecurityInterceptor implements HandlerInterceptor {
                 response.getWriter().write("Prohibido: Se requiere rol REFEREE u TOURNAMENT_ORGANIZER");
                 return false;
             }
-            if (uri.startsWith("/api/registrations") && !"GET".equalsIgnoreCase(request.getMethod()) && roleEnum != Role.CAPTAIN && roleEnum != Role.TOURNAMENT_ORGANIZER) {
-                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                response.getWriter().write("Prohibido: Rol irrelevante para registrations");
-                return false;
+            if (uri.startsWith("/api/registrations")) {
+                if ("POST".equalsIgnoreCase(request.getMethod()) && roleEnum != Role.CAPTAIN && roleEnum != Role.TOURNAMENT_ORGANIZER) {
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.getWriter().write("Prohibido: Solo CAPTAIN u ORGANIZER pueden crear inscripciones");
+                    return false;
+                }
+                if ("PUT".equalsIgnoreCase(request.getMethod()) && roleEnum != Role.ADMINISTRADOR_SISTEMA && roleEnum != Role.TOURNAMENT_ORGANIZER) {
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.getWriter().write("Prohibido: Solo ADMIN u ORGANIZER pueden actualizar el estado de la inscripción");
+                    return false;
+                }
             }
 
             return true;

@@ -32,7 +32,7 @@ public class InscripcionControllerTest {
     public void testCreateInscripcion_Success() {
         RegistrationRequestDTO req = new RegistrationRequestDTO("Eq", "Tor", "url");
         RegistrationResponseDTO res = new RegistrationResponseDTO();
-        res.setStatus("PENDIENTE");
+        res.setStatus("PENDING");
 
         when(inscripcionService.inscribir(any())).thenReturn(res);
 
@@ -43,11 +43,11 @@ public class InscripcionControllerTest {
     @Test
     public void testActualizarEstado_Success() {
         RegistrationResponseDTO res = new RegistrationResponseDTO();
-        res.setStatus("APROBADO");
+        res.setStatus("APPROVED");
 
-        when(inscripcionService.actualizarEstado("1", "APROBADO")).thenReturn(res);
+        when(inscripcionService.actualizarEstado("1", "APPROVED")).thenReturn(res);
 
-        ResponseEntity<?> response = inscripcionController.actualizarEstado("1", Map.of("status", "APROBADO"));
+        ResponseEntity<?> response = inscripcionController.actualizarEstado("1", Map.of("status", "APPROVED"));
         assertEquals(200, response.getStatusCode().value());
     }
 }

@@ -23,8 +23,8 @@ public class PartidoValidatorTest {
 
     private void setupValidEnv() {
         DataStorage.tournaments.add(new Tournament("T1"));
-        Registration i1 = new Registration("EqA", "T1", "url"); i1.setStatus("APROBADO");
-        Registration i2 = new Registration("EqB", "T1", "url"); i2.setStatus("APROBADO");
+        Registration i1 = new Registration("EqA", "T1", "url"); i1.setStatus("APPROVED");
+        Registration i2 = new Registration("EqB", "T1", "url"); i2.setStatus("APPROVED");
         DataStorage.registrations.add(i1);
         DataStorage.registrations.add(i2);
     }
@@ -73,7 +73,7 @@ public class PartidoValidatorTest {
     @Test
     public void testVisitanteNoInscrito() {
         DataStorage.tournaments.add(new Tournament("T1"));
-        Registration i1 = new Registration("EqA", "T1", "url"); i1.setStatus("APROBADO");
+        Registration i1 = new Registration("EqA", "T1", "url"); i1.setStatus("APPROVED");
         DataStorage.registrations.add(i1);
         assertThrows(IllegalArgumentException.class, () -> MatchValidator.validateForCreation(validReq()));
     }
@@ -81,7 +81,7 @@ public class PartidoValidatorTest {
     @Test
     public void testLocalNoInscrito() {
         DataStorage.tournaments.add(new Tournament("T1"));
-        Registration i2 = new Registration("EqB", "T1", "url"); i2.setStatus("APROBADO");
+        Registration i2 = new Registration("EqB", "T1", "url"); i2.setStatus("APPROVED");
         DataStorage.registrations.add(i2);
         assertThrows(IllegalArgumentException.class, () -> MatchValidator.validateForCreation(validReq()));
     }
@@ -89,8 +89,8 @@ public class PartidoValidatorTest {
     @Test
     public void testEstadoNoAprobado() {
         DataStorage.tournaments.add(new Tournament("T1"));
-        Registration i1 = new Registration("EqA", "T1", "url"); i1.setStatus("PENDIENTE");
-        Registration i2 = new Registration("EqB", "T1", "url"); i2.setStatus("APROBADO");
+        Registration i1 = new Registration("EqA", "T1", "url"); i1.setStatus("PENDING");
+        Registration i2 = new Registration("EqB", "T1", "url"); i2.setStatus("APPROVED");
         DataStorage.registrations.add(i1);
         DataStorage.registrations.add(i2);
         assertThrows(IllegalArgumentException.class, () -> MatchValidator.validateForCreation(validReq()));
