@@ -10,3 +10,48 @@ Using generated security password: 1b41638b-51fa-4860-bbed-f93d27b4d61a
 
 This generated password is for development use only. Your security configuration must be updated before running your application in production.
 
+2026-03-26 13:52:17 [main] WARN  o.s.b.a.s.s.UserDetailsServiceAutoConfiguration - 
+
+Using generated security password: e1ec1bb8-fad1-4212-83db-433467ebc4ab
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-03-26 13:52:20 [main] WARN  o.s.b.a.s.s.UserDetailsServiceAutoConfiguration - 
+
+Using generated security password: 4263deee-558d-41da-b416-39c3315d9834
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-03-26 13:52:44 [main] WARN  o.s.b.a.s.s.UserDetailsServiceAutoConfiguration - 
+
+Using generated security password: 3465d1a9-beeb-46b0-b2aa-d2fa8308ba84
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-03-26 13:53:56 [https-jsse-nio-8443-exec-10] INFO  controller.AuthController - REST request - intento de login de usuario: stiven.pardo-g@mail.escuelaing.edu.co
+2026-03-26 13:53:56 [https-jsse-nio-8443-exec-10] ERROR core.service.AuthService - Credenciales invalidas intentadas contra stiven.pardo-g@mail.escuelaing.edu.co
+2026-03-26 13:53:56 [https-jsse-nio-8443-exec-10] WARN  c.exception.GlobalExceptionHandler - Business rule violation: Credenciales incorrectas
+2026-03-26 13:57:13 [main] WARN  o.s.b.a.s.s.UserDetailsServiceAutoConfiguration - 
+
+Using generated security password: 141b02d3-5fef-42f4-8e67-44af9ead27ff
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-03-26 13:57:16 [main] WARN  o.s.b.a.s.s.UserDetailsServiceAutoConfiguration - 
+
+Using generated security password: bb6cb240-e717-47c3-b48a-2fa74daeb656
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-03-26 13:58:05 [main] WARN  o.s.b.a.s.s.UserDetailsServiceAutoConfiguration - 
+
+Using generated security password: d872def9-3fff-4ac2-a22d-f83c078f3832
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-03-26 13:58:08 [main] WARN  o.s.b.a.s.s.UserDetailsServiceAutoConfiguration - 
+
+Using generated security password: b8505505-fb09-497c-86be-7643c34c2ad4
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+

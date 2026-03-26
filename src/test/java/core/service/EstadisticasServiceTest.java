@@ -24,19 +24,19 @@ public class EstadisticasServiceTest {
     public void testGetMaximosGoleadores_Ordenados() {
         Match p1 = new Match("A", "B", "hoy", "Liga");
         p1.setStatus("FINISHED");
-        p1.getGoles().put("jugador1@a.com", 2);
-        p1.getGoles().put("jugador2@a.com", 1);
+        p1.getGoles().put("user.test1-a@escuelaing.edu.co", 2);
+        p1.getGoles().put("user.test2-a@escuelaing.edu.co", 1);
 
         Match p2 = new Match("A", "C", "ayer", "Liga");
         p2.setStatus("FINISHED");
-        p2.getGoles().put("jugador1@a.com", 1); // jugador1 acumula 3 en total
+        p2.getGoles().put("user.test1-a@escuelaing.edu.co", 1); // jugador1 acumula 3 en total
 
         DataStorage.matches.add(p1);
         DataStorage.matches.add(p2);
 
         List<Map<String, Object>> result = estadisticasService.getTopScorers("Liga");
         assertEquals(2, result.size());
-        assertEquals("jugador1@a.com", result.get(0).get("playerEmail"));
+        assertEquals("user.test1-a@escuelaing.edu.co", result.get(0).get("playerEmail"));
         assertEquals(3, result.get(0).get("goals"));
     }
 

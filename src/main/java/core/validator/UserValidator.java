@@ -13,6 +13,12 @@ public class UserValidator {
         if (request.getEmail() == null || request.getEmail().trim().isEmpty()) {
             throw new IllegalArgumentException("Email cannot be empty");
         }
+        
+        // Permitimos números por si hay colisiones en el AD (ej. juan.perez2-a@...)
+        String emailRegex = "^[a-zA-Z0-9]+\\.[a-zA-Z0-9]+\\-[a-zA-Z]@escuelaing\\.edu\\.co$";
+        if (!request.getEmail().matches(emailRegex)) {
+            throw new IllegalArgumentException("El correo debe ser institucional (ej. nombre.apellido-a@escuelaing.edu.co)");
+        }
         if (request.getPassword() == null || request.getPassword().length() < 6) {
             throw new IllegalArgumentException("Password must be at least 6 characters");
         }

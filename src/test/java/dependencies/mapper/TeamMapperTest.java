@@ -13,7 +13,7 @@ public class TeamMapperTest {
 
     @Test
     public void testToEntity() {
-        TeamRequestDTO req = new TeamRequestDTO("Delta", "escudo.png", "Azul", Arrays.asList("j@a.com"));
+        TeamRequestDTO req = new TeamRequestDTO("Delta", "escudo.png", "Azul", Arrays.asList("user.test1-a@escuelaing.edu.co"));
         Team t = TeamMapper.toEntity(req);
         assertEquals("Delta", t.getTeamName());
         assertEquals("escudo.png", t.getEscudo());

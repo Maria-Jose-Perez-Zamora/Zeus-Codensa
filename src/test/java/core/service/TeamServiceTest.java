@@ -22,7 +22,7 @@ public class TeamServiceTest {
     public void setUp() {
         DataStorage.clearAll();
         teamService = new TeamService();
-        validPlayers = Arrays.asList("1@a.com", "2@a.com", "3@a.com", "4@a.com", "5@a.com", "6@a.com", "7@a.com");
+        validPlayers = Arrays.asList("user.test1-a@escuelaing.edu.co", "user.test2-a@escuelaing.edu.co", "user.test3-a@escuelaing.edu.co", "user.test4-a@escuelaing.edu.co", "user.test5-a@escuelaing.edu.co", "user.test6-a@escuelaing.edu.co", "user.test7-a@escuelaing.edu.co");
         
         for (String email : validPlayers) {
             Player j = new Player();
@@ -48,7 +48,7 @@ public class TeamServiceTest {
     public void testGetAllTeams() {
         TeamRequestDTO request1 = new TeamRequestDTO("Equipo A", null, null, validPlayers);
         
-        List<String> validPlayersB = Arrays.asList("8@a.com", "9@a.com", "10@a.com", "11@a.com", "12@a.com", "13@a.com", "14@a.com");
+        List<String> validPlayersB = Arrays.asList("user.test8-a@escuelaing.edu.co", "user.test9-a@escuelaing.edu.co", "user.test10-a@escuelaing.edu.co", "user.test11-a@escuelaing.edu.co", "user.test12-a@escuelaing.edu.co", "user.test13-a@escuelaing.edu.co", "user.test14-a@escuelaing.edu.co");
         for (String email : validPlayersB) {
             Player j = new Player(); j.setEmail(email); DataStorage.users.add(j);
         }
