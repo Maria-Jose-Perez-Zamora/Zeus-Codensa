@@ -14,6 +14,11 @@ public class SecurityInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String uri = request.getRequestURI();
         
+        // Permitir peticiones preflight OPTIONS para CORS
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            return true;
+        }
+        
         // Rutas publicas (sin token)
         if (uri.equalsIgnoreCase("/api/auth") && "POST".equalsIgnoreCase(request.getMethod())
             || uri.equalsIgnoreCase("/api/users") && "POST".equalsIgnoreCase(request.getMethod())
