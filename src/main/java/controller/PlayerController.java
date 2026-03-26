@@ -34,14 +34,14 @@ public class PlayerController {
         return ResponseEntity.ok(jugadorService.buscarJugadoresDisponibles(name, position));
     }
 
-    @PostMapping("/invite")
+    @PostMapping("/invitations")
     @Operation(summary = "Invite to Team", description = "The captain invites an available player to their team")
     public ResponseEntity<InvitationResponseDTO> enviarInvitacion(@RequestBody InvitationRequestDTO request) {
         log.info("REST request - enviarInvitacion para player: {} a team: {}", request.getPlayerEmail(), request.getTeamName());
         return ResponseEntity.ok(jugadorService.enviarInvitacion(request));
     }
 
-    @PutMapping("/invitations/{id}/accept")
+    @PutMapping("/invitations/{id}")
     @Operation(summary = "Accept Invitation", description = "A player accepts an invitation to join a team")
     public ResponseEntity<Void> acceptInvitation(@PathVariable String id, @RequestParam String playerEmail) {
         log.info("REST request - acceptInvitation id: {} player: {}", id, playerEmail);
@@ -49,7 +49,7 @@ public class PlayerController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/invitations/{id}/decline")
+    @DeleteMapping("/invitations/{id}")
     @Operation(summary = "Decline Invitation", description = "A player declines an invitation to join a team")
     public ResponseEntity<Void> declineInvitation(@PathVariable String id, @RequestParam String playerEmail) {
         log.info("REST request - declineInvitation id: {} player: {}", id, playerEmail);

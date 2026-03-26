@@ -25,7 +25,7 @@ public class MatchController {
         this.partidoService = partidoService;
     }
 
-    @PostMapping("/create")
+    @PostMapping
     @Operation(summary = "Create Match", description = "Creates a new match in the tournament")
     public ResponseEntity<MatchResponseDTO> registrarPartido(@RequestBody MatchRequestDTO request) {
         log.info("REST request - registrarPartido");
@@ -74,7 +74,7 @@ public class MatchController {
         return ResponseEntity.ok(partidoService.getMatchesByReferee(refereeEmail));
     }
 
-    @GetMapping("/all")
+    @GetMapping
     @Operation(summary = "Get All Matches", description = "Returns all matches in the system")
     public ResponseEntity<List<MatchResponseDTO>> getAll() {
         log.info("REST request - getAll Partidos");

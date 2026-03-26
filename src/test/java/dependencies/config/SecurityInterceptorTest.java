@@ -16,14 +16,19 @@ public class SecurityInterceptorTest {
 
     private final SecurityInterceptor interceptor = new SecurityInterceptor();
 
-    private HttpServletRequest mockRequest(String uri, String tokenContent) {
+    private HttpServletRequest mockRequest(String uri, String method, String tokenContent) {
         HttpServletRequest req = mock(HttpServletRequest.class);
         when(req.getRequestURI()).thenReturn(uri);
+        when(req.getMethod()).thenReturn(method != null ? method : "GET");
         if (tokenContent != null) {
             String encoded = Base64.getEncoder().encodeToString(tokenContent.getBytes());
             when(req.getHeader("Authorization")).thenReturn("Bearer " + encoded);
         }
         return req;
+    }
+
+    private HttpServletRequest mockRequest(String uri, String tokenContent) {
+        return mockRequest(uri, "GET", tokenContent);
     }
 
     private HttpServletResponse mockResponse() throws Exception {
@@ -35,22 +40,23 @@ public class SecurityInterceptorTest {
 
     @Test
     public void testPublicRoutes() throws Exception {
-        assertTrue(interceptor.preHandle(mockRequest("/api/auth/login", null), mockResponse(), null));
-        assertTrue(interceptor.preHandle(mockRequest("/api/users/register", null), mockResponse(), null));
+        assertTrue(interceptor.preHandle(mockRequest("/api/auth", "POST", null), mockResponse(), null));
+        assertTrue(interceptor.preHandle(mockRequest("/api/users", "POST", null), mockResponse(), null));
         assertTrue(interceptor.preHandle(mockRequest("/api/tournaments/consulta", null), mockResponse(), null));
     }
 
     @Test
     public void testMissingToken() throws Exception {
         HttpServletResponse res = mockResponse();
-        assertFalse(interceptor.preHandle(mockRequest("/api/teams/create", null), res, null));
+        assertFalse(interceptor.preHandle(mockRequest("/api/teams", "POST", null), res, null));
         verify(res).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     }
 
     @Test
     public void testInvalidToken() throws Exception {
         HttpServletRequest req = mock(HttpServletRequest.class);
-        when(req.getRequestURI()).thenReturn("/api/teams/create");
+        when(req.getRequestURI()).thenReturn("/api/teams");
+        when(req.getMethod()).thenReturn("POST");
         when(req.getHeader("Authorization")).thenReturn("Bearer invalid_base64");
         HttpServletResponse res = mockResponse();
         assertFalse(interceptor.preHandle(req, res, null));
@@ -60,57 +66,57 @@ public class SecurityInterceptorTest {
     @Test
     public void testTokenMissingParts() throws Exception {
         HttpServletResponse res = mockResponse();
-        assertFalse(interceptor.preHandle(mockRequest("/api/teams/create", "user_only_no_colon"), res, null));
+        assertFalse(interceptor.preHandle(mockRequest("/api/teams", "POST", "user_only_no_colon"), res, null));
         verify(res).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     }
 
     @Test
     public void testRoleCapitanAllowed() throws Exception {
-        assertTrue(interceptor.preHandle(mockRequest("/api/teams/create", "user:" + Role.CAPTAIN.name()), mockResponse(), null));
+        assertTrue(interceptor.preHandle(mockRequest("/api/teams", "POST", "user:" + Role.CAPTAIN.name()), mockResponse(), null));
     }
 
     @Test
     public void testRoleCapitanForbidden() throws Exception {
         HttpServletResponse res = mockResponse();
-        assertFalse(interceptor.preHandle(mockRequest("/api/teams/create", "user:" + Role.PLAYER.name()), res, null));
+        assertFalse(interceptor.preHandle(mockRequest("/api/teams", "POST", "user:" + Role.PLAYER.name()), res, null));
         verify(res).setStatus(HttpServletResponse.SC_FORBIDDEN);
     }
 
     @Test
     public void testRoleTournamentOrganizerAllowed() throws Exception {
-        assertTrue(interceptor.preHandle(mockRequest("/api/tournaments/create", "user:" + Role.TOURNAMENT_ORGANIZER.name()), mockResponse(), null));
+        assertTrue(interceptor.preHandle(mockRequest("/api/tournaments", "POST", "user:" + Role.TOURNAMENT_ORGANIZER.name()), mockResponse(), null));
     }
 
     @Test
     public void testRoleTournamentOrganizerForbidden() throws Exception {
         HttpServletResponse res = mockResponse();
-        assertFalse(interceptor.preHandle(mockRequest("/api/tournaments/create", "user:" + Role.CAPTAIN.name()), res, null));
+        assertFalse(interceptor.preHandle(mockRequest("/api/tournaments", "POST", "user:" + Role.CAPTAIN.name()), res, null));
         verify(res).setStatus(HttpServletResponse.SC_FORBIDDEN);
     }
 
     @Test
     public void testRoleArbitroAllowedPartidos() throws Exception {
-        assertTrue(interceptor.preHandle(mockRequest("/api/matches/update", "user:" + Role.REFEREE.name()), mockResponse(), null));
-        assertTrue(interceptor.preHandle(mockRequest("/api/matches/update", "user:" + Role.TOURNAMENT_ORGANIZER.name()), mockResponse(), null));
+        assertTrue(interceptor.preHandle(mockRequest("/api/matches/123/score", "PUT", "user:" + Role.REFEREE.name()), mockResponse(), null));
+        assertTrue(interceptor.preHandle(mockRequest("/api/matches/123/score", "PUT", "user:" + Role.TOURNAMENT_ORGANIZER.name()), mockResponse(), null));
     }
 
     @Test
     public void testRoleArbitroForbiddenPartidos() throws Exception {
         HttpServletResponse res = mockResponse();
-        assertFalse(interceptor.preHandle(mockRequest("/api/matches/update", "user:" + Role.PLAYER.name()), res, null));
+        assertFalse(interceptor.preHandle(mockRequest("/api/matches/123/score", "PUT", "user:" + Role.PLAYER.name()), res, null));
         verify(res).setStatus(HttpServletResponse.SC_FORBIDDEN);
     }
 
     @Test
     public void testRoleInscripcionesAllowed() throws Exception {
-        assertTrue(interceptor.preHandle(mockRequest("/api/registrations/add", "user:" + Role.CAPTAIN.name()), mockResponse(), null));
-        assertTrue(interceptor.preHandle(mockRequest("/api/registrations/add", "user:" + Role.TOURNAMENT_ORGANIZER.name()), mockResponse(), null));
+        assertTrue(interceptor.preHandle(mockRequest("/api/registrations", "POST", "user:" + Role.CAPTAIN.name()), mockResponse(), null));
+        assertTrue(interceptor.preHandle(mockRequest("/api/registrations", "POST", "user:" + Role.TOURNAMENT_ORGANIZER.name()), mockResponse(), null));
     }
 
     @Test
     public void testRoleInscripcionesForbidden() throws Exception {
         HttpServletResponse res = mockResponse();
-        assertFalse(interceptor.preHandle(mockRequest("/api/registrations/add", "user:" + Role.PLAYER.name()), res, null));
+        assertFalse(interceptor.preHandle(mockRequest("/api/registrations", "POST", "user:" + Role.PLAYER.name()), res, null));
         verify(res).setStatus(HttpServletResponse.SC_FORBIDDEN);
     }
 }

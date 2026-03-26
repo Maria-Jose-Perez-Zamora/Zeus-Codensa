@@ -15,9 +15,10 @@ public class SecurityInterceptor implements HandlerInterceptor {
         String uri = request.getRequestURI();
         
         // Rutas publicas (sin token)
-        if (uri.startsWith("/api/auth/login")
-            || uri.startsWith("/api/users/register")
+        if (uri.equalsIgnoreCase("/api/auth") && "POST".equalsIgnoreCase(request.getMethod())
+            || uri.equalsIgnoreCase("/api/users") && "POST".equalsIgnoreCase(request.getMethod())
             || uri.startsWith("/api/tournaments/consulta")
+            || uri.startsWith("/api/tournaments/query")
             || uri.startsWith("/swagger-ui")
             || uri.startsWith("/v3/api-docs")
             || uri.startsWith("/swagger-resources")
@@ -42,22 +43,22 @@ public class SecurityInterceptor implements HandlerInterceptor {
             Role roleEnum = Role.valueOf(userRole);
             
             // Reglas de Autorizacion por Rol
-            if (uri.startsWith("/api/teams/create") && roleEnum != Role.CAPTAIN) {
+            if (uri.startsWith("/api/teams") && "POST".equalsIgnoreCase(request.getMethod()) && roleEnum != Role.CAPTAIN) {
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 response.getWriter().write("Prohibido: Se requiere rol CAPTAIN");
                 return false;
             }
-            if (uri.startsWith("/api/tournaments") && !uri.startsWith("/api/tournaments/consulta") && roleEnum != Role.TOURNAMENT_ORGANIZER) {
+            if (uri.startsWith("/api/tournaments") && !"GET".equalsIgnoreCase(request.getMethod()) && !uri.startsWith("/api/tournaments/consulta") && !uri.startsWith("/api/tournaments/query") && roleEnum != Role.TOURNAMENT_ORGANIZER) {
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 response.getWriter().write("Prohibido: Se requiere rol TOURNAMENT_ORGANIZER");
                 return false;
             }
-            if (uri.startsWith("/api/matches") && roleEnum != Role.REFEREE && roleEnum != Role.TOURNAMENT_ORGANIZER) {
+            if (uri.startsWith("/api/matches") && !"GET".equalsIgnoreCase(request.getMethod()) && roleEnum != Role.REFEREE && roleEnum != Role.TOURNAMENT_ORGANIZER) {
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 response.getWriter().write("Prohibido: Se requiere rol REFEREE u TOURNAMENT_ORGANIZER");
                 return false;
             }
-            if (uri.startsWith("/api/registrations") && roleEnum != Role.CAPTAIN && roleEnum != Role.TOURNAMENT_ORGANIZER) {
+            if (uri.startsWith("/api/registrations") && !"GET".equalsIgnoreCase(request.getMethod()) && roleEnum != Role.CAPTAIN && roleEnum != Role.TOURNAMENT_ORGANIZER) {
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 response.getWriter().write("Prohibido: Rol irrelevante para registrations");
                 return false;

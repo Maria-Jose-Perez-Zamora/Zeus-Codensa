@@ -24,14 +24,14 @@ public class TournamentController {
         this.torneoService = torneoService;
     }
 
-    @PostMapping("/create")
+    @PostMapping
     @Operation(summary = "Create Tournament", description = "Creates a tournament in DRAFT status with initial specifications")
     public ResponseEntity<TournamentResponseDTO> createTorneo(@RequestBody TournamentRequestDTO request) {
         log.info("REST request - createTorneo: {}", request.getTournamentName());
         return ResponseEntity.ok(torneoService.createTorneo(request));
     }
 
-    @PutMapping("/{id}/configure")
+    @PutMapping("/{id}")
     @Operation(summary = "Configure Tournament", description = "Adds rules, fields, sanctions, and schedules to an existing tournament")
     public ResponseEntity<TournamentResponseDTO> configurarTorneo(@PathVariable String id, @RequestBody TournamentRequestDTO configInfo) {
         log.info("REST request - configurarTorneo ID: {}", id);
