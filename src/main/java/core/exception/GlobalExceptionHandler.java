@@ -32,6 +32,12 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(ex, HttpStatus.NOT_FOUND, request);
     }
 
+    @ExceptionHandler(PersistenceAccessException.class)
+    public ResponseEntity<ApiErrorDTO> handlePersistenceAccessException(PersistenceAccessException ex, WebRequest request) {
+        log.error("Persistence error: {}", ex.getMessage());
+        return buildErrorResponse(ex, HttpStatus.SERVICE_UNAVAILABLE, request);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorDTO> handleAllExceptions(Exception ex, WebRequest request) {
         log.error("Internal server error: ", ex);
