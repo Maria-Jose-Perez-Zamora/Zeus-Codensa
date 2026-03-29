@@ -30,7 +30,7 @@ public class TeamControllerTest {
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        validPlayers = Arrays.asList("1@a.com", "2@a.com", "3@a.com", "4@a.com", "5@a.com");
+        validPlayers = Arrays.asList("user.test1-a@escuelaing.edu.co", "user.test2-a@escuelaing.edu.co", "user.test3-a@escuelaing.edu.co", "user.test4-a@escuelaing.edu.co", "user.test5-a@escuelaing.edu.co");
     }
 
     @Test

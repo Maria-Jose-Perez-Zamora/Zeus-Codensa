@@ -24,15 +24,15 @@ public class TeamController {
         this.teamService = teamService;
     }
 
-    @PostMapping("/create")
-    @Operation(summary = "Create Team", description = "Registers a team associating colors and crest with a name")
+    @PostMapping
+    @Operation(summary = "Create Team", description = "Creates a new team and associates existing users via email")
     public ResponseEntity<TeamResponseDTO> createTeam(@RequestBody TeamRequestDTO request) {
         log.info("REST request - createTeam: {}", request.getTeamName());
         return ResponseEntity.ok(teamService.createTeam(request));
     }
 
-    @GetMapping("/all")
-    @Operation(summary = "List Teams", description = "Returns all registered teams generally")
+    @GetMapping
+    @Operation(summary = "Get All Teams", description = "Returns the list of all created teams")
     public ResponseEntity<List<TeamResponseDTO>> getAllTeams() {
         log.info("REST request - getAll Teams");
         return ResponseEntity.ok(teamService.getAllTeams());

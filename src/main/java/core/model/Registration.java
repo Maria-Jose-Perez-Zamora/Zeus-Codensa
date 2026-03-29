@@ -17,7 +17,7 @@ public class Registration {
         this.id = UUID.randomUUID().toString();
         this.teamName = teamName;
         this.tournamentName = tournamentName;
-        this.status = "PENDIENTE";
+        this.status = "PENDING";
         this.comprobantePagoUrl = comprobantePagoUrl;
         this.fechaInscripcion = LocalDateTime.now().toString();
     }

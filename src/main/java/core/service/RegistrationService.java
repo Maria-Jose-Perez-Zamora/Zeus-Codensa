@@ -35,13 +35,6 @@ public class RegistrationService {
 
     public RegistrationResponseDTO actualizarEstado(String id, String nuevoEstado) {
         log.debug("Intentando actualizar status de la inscripción {} a {}", id, nuevoEstado);
-        if (!nuevoEstado.equals("PENDIENTE") && 
-            !nuevoEstado.equals("EN_REVISION") && 
-            !nuevoEstado.equals("APROBADO") && 
-            !nuevoEstado.equals("RECHAZADO")) {
-            log.error("Violación transaccional: status '{}' no permitido", nuevoEstado);
-            throw new BusinessRuleException("Estado no valido para registration");
-        }
 
         Optional<Registration> inscripcionOpt = DataStorage.registrations.stream()
                 .filter(i -> i.getId().equals(id))
@@ -53,6 +46,24 @@ public class RegistrationService {
         }
 
         Registration registration = inscripcionOpt.get();
+        String estadoActual = registration.getStatus();
+        
+        // State Machine validation
+        if ("PENDING".equals(estadoActual) && !"IN_REVIEW".equals(nuevoEstado)) {
+            log.error("Violación transaccional: No se permite transición de {} a {}", estadoActual, nuevoEstado);
+            throw new BusinessRuleException("Desde PENDING solo se puede pasar a IN_REVIEW");
+        }
+        
+        if ("IN_REVIEW".equals(estadoActual) && (!"APPROVED".equals(nuevoEstado) && !"REJECTED".equals(nuevoEstado))) {
+            log.error("Violación transaccional: No se permite transición de {} a {}", estadoActual, nuevoEstado);
+            throw new BusinessRuleException("Desde IN_REVIEW solo se puede pasar a APPROVED o REJECTED");
+        }
+        
+        if ("APPROVED".equals(estadoActual) || "REJECTED".equals(estadoActual)) {
+            log.error("Violación transaccional: Intentando alterar un estado final: {}", estadoActual);
+            throw new BusinessRuleException("El estado de la inscripción ya es definitivo y no puede ser modificado");
+        }
+
         registration.setStatus(nuevoEstado);
 
         log.info("Estado de inscripción ID {} actualizado exitosamente a {}", id, nuevoEstado);

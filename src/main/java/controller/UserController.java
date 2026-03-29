@@ -24,15 +24,15 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping("/register")
-    @Operation(summary = "Register User", description = "Registers a user as an Administrator or Organizer")
+    @PostMapping
+    @Operation(summary = "Register User", description = "Registers a new user (Player, Organizer, Referee, Captain, or Admin) in the system")
     public ResponseEntity<UserResponseDTO> register(@RequestBody UserRequestDTO request) {
         log.info("REST request - register user: {}", request.getEmail());
         return ResponseEntity.ok(userService.registerUser(request));
     }
 
-    @GetMapping("/all")
-    @Operation(summary = "Get All Users", description = "Lists all system users without filtering")
+    @GetMapping
+    @Operation(summary = "Get All Users", description = "Returns a list of all registered users")
     public ResponseEntity<List<UserResponseDTO>> getAll() {
         log.info("REST request - getAll Usuarios");
         return ResponseEntity.ok(userService.getAllUsers());

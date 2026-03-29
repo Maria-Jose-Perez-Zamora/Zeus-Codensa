@@ -25,7 +25,7 @@ public class RegistrationController {
         this.inscripcionService = inscripcionService;
     }
 
-    @PostMapping("/create")
+    @PostMapping
     @Operation(summary = "Register Receipt", description = "Uploads the link/reference of the payment receipt (NEQUI or cash)")
     public ResponseEntity<RegistrationResponseDTO> createInscripcion(@RequestBody RegistrationRequestDTO request) {
         log.info("REST request - createInscripcion para el team: {}", request.getTeamName());
@@ -44,7 +44,7 @@ public class RegistrationController {
         return ResponseEntity.ok(inscripcionService.actualizarEstado(id, nuevoEstado));
     }
 
-    @GetMapping("/all")
+    @GetMapping
     @Operation(summary = "List Registrations", description = "Lists pending and approved receipts")
     public ResponseEntity<List<RegistrationResponseDTO>> getAll() {
         log.info("REST request - getAll Inscripciones");

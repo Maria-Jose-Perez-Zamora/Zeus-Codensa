@@ -16,12 +16,12 @@ public class UserMapperTest {
     public void testToEntity() {
         UserRequestDTO req = new UserRequestDTO();
         req.setName("Juan");
-        req.setEmail("j@a.com");
+        req.setEmail("user.test1-a@escuelaing.edu.co");
         req.setRole(Role.PLAYER);
         req.setPosition("Delantero");
         User u = UserMapper.toEntity(req);
         assertEquals("Juan", u.getName());
-        assertEquals("j@a.com", u.getEmail());
+        assertEquals("user.test1-a@escuelaing.edu.co", u.getEmail());
         assertTrue(u instanceof Player);
     }
 
@@ -29,11 +29,11 @@ public class UserMapperTest {
     public void testToDTO() {
         Player u = new Player();
         u.setName("Pedro");
-        u.setEmail("p@a.com");
+        u.setEmail("user.test2-a@escuelaing.edu.co");
         u.setRole(Role.PLAYER);
         UserResponseDTO dto = UserMapper.toDTO(u);
         assertEquals("Pedro", dto.getName());
-        assertEquals("p@a.com", dto.getEmail());
+        assertEquals("user.test2-a@escuelaing.edu.co", dto.getEmail());
         assertEquals(Role.PLAYER, dto.getRole());
     }
 }

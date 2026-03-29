@@ -32,7 +32,7 @@ public class UserControllerTest {
 
     @Test
     public void testRegisterUser_Success() {
-        UserRequestDTO request = new UserRequestDTO("Juan", "juan@test.com", "123456", "Delantero", 9, null, Role.PLAYER);
+        UserRequestDTO request = new UserRequestDTO("Juan", "user.test1-a@escuelaing.edu.co", "123456", "Delantero", 9, null, Role.PLAYER);
         UserResponseDTO responseDto = new UserResponseDTO();
         responseDto.setName("Juan");
 

@@ -54,7 +54,7 @@ public class PartidoControllerTest {
 
         Map<String, Object> body = new HashMap<>();
         body.put("nombreEquipo", "TeamA");
-        body.put("players", Arrays.asList("j1@a.com", "j2@a.com"));
+        body.put("players", Arrays.asList("user.test1-a@escuelaing.edu.co", "user.test2-a@escuelaing.edu.co"));
 
         ResponseEntity<?> response = partidoController.registrarAlineacion("1", body);
         assertEquals(200, response.getStatusCode().value());
@@ -67,7 +67,7 @@ public class PartidoControllerTest {
 
         Map<String, Object> body = new HashMap<>();
         body.put("nombreEquipo", "Otro");
-        body.put("players", List.of("j@a.com"));
+        body.put("players", List.of("user.test3-a@escuelaing.edu.co"));
 
         RuntimeException thrown = assertThrows(RuntimeException.class, () -> partidoController.registrarAlineacion("1", body));
         assertEquals("Equipo no participa", thrown.getMessage());
@@ -98,10 +98,10 @@ public class PartidoControllerTest {
     @Test
     public void testAsignarArbitro_Success() {
         MatchResponseDTO res = new MatchResponseDTO();
-        res.setRefereeEmail("ref@test.com");
-        when(partidoService.asignarArbitro("1", "ref@test.com")).thenReturn(res);
+        res.setRefereeEmail("user.test4-a@escuelaing.edu.co");
+        when(partidoService.asignarArbitro("1", "user.test4-a@escuelaing.edu.co")).thenReturn(res);
 
-        ResponseEntity<?> response = partidoController.asignarArbitro("1", Map.of("correoArbitro", "ref@test.com"));
+        ResponseEntity<?> response = partidoController.asignarArbitro("1", Map.of("correoArbitro", "user.test4-a@escuelaing.edu.co"));
         assertEquals(200, response.getStatusCode().value());
     }
 
@@ -110,14 +110,14 @@ public class PartidoControllerTest {
         when(partidoService.asignarArbitro(any(), any()))
                 .thenThrow(new IllegalArgumentException("No es árbitro"));
 
-        RuntimeException thrown = assertThrows(RuntimeException.class, () -> partidoController.asignarArbitro("1", Map.of("correoArbitro", "x@a.com")));
+        RuntimeException thrown = assertThrows(RuntimeException.class, () -> partidoController.asignarArbitro("1", Map.of("correoArbitro", "user.test5-a@escuelaing.edu.co")));
         assertEquals("No es árbitro", thrown.getMessage());
     }
 
     @Test
     public void testGetMisPartidos_Success() {
-        when(partidoService.getMatchesByReferee("ref@test.com")).thenReturn(Collections.emptyList());
-        ResponseEntity<List<MatchResponseDTO>> response = partidoController.getMisPartidos("ref@test.com");
+        when(partidoService.getMatchesByReferee("user.test4-a@escuelaing.edu.co")).thenReturn(Collections.emptyList());
+        ResponseEntity<List<MatchResponseDTO>> response = partidoController.getMisPartidos("user.test4-a@escuelaing.edu.co");
         assertEquals(200, response.getStatusCode().value());
     }
 }
