@@ -131,14 +131,15 @@ Para documentar el comportamiento del backend, se incluyen las 15 funcionalidade
 Descripción: permite que un usuario ingrese al sistema usando correo y contraseña. El servicio verifica que las credenciales existan y coincidan con un usuario registrado; si son correctas, devuelve un token junto con su rol para controlar permisos en las demás operaciones.
 
 Diagrama de secuencia:
-![alt text](docs/images/InicioDeSesion.jpg)
+![Diagrama de secuencia 1.png](docs/images/Diagrama%20de%20secuencia%201.png)
+
 
 
 ### 2. Registro de usuario
 Descripción: registra nuevos usuarios del sistema (por ejemplo, organizadores o administradores) validando campos obligatorios y reglas del dominio. Si la información es válida, el usuario se transforma a entidad, se almacena en memoria y se retorna su representación de respuesta.
 
 Diagrama de secuencia:
-![alt text](docs/images/RegistroDeUsuario.jpg)
+![Diagrama de secuencia 2.png](docs/images/Diagrama%20de%20secuencia%202.png)
 
 
 
@@ -146,67 +147,91 @@ Diagrama de secuencia:
 Descripción: obtiene el listado completo de usuarios creados en la aplicación para tareas de administración y seguimiento. La consulta toma los datos almacenados, los transforma a DTO y los entrega en un formato seguro para el cliente.
 
 Diagrama de secuencia:
-![alt text](docs/images/ConsultaDeUsuarios.jpg)
+![Diagrama de secuencia 3.png](docs/images/Diagrama%20de%20secuencia%203.png)
+
 
 
 ### 4. Creación de equipo
 Descripción: permite crear un equipo del torneo con su información principal (nombre, escudo y colores) y asociar jugadores existentes usando sus correos. Durante el proceso se valida la solicitud y se construye el equipo con su plantilla inicial.
 Diagrama de secuencia:
+![Diagrama de secuencia 4.png](docs/images/Diagrama%20de%20secuencia%204.png)
 
-![alt text](docs/images/CreaciónDeEquipo.jpg)
+
 
 ### 5. Consulta de equipos
 Descripción: retorna todos los equipos registrados para facilitar la visualización de participantes del torneo. La respuesta incluye los datos relevantes del equipo y su estado actual dentro de la información disponible en memoria.
 Diagrama de secuencia:
-
-![alt text](docs/images/5.jpg)
+![Diagrama de secuencia 5.png](docs/images/Diagrama%20de%20secuencia%205.png)
 
 
 
 ### 6. Creación de torneo
 Descripción: inicia un nuevo torneo con su configuración base y lo deja en estado BORRADOR para que pueda ser completado posteriormente. Esta funcionalidad centraliza la creación inicial de la competencia antes de abrir inscripciones o programar partidos.
 Diagrama de secuencia:
+![Diagrama de secuencia 6.png](docs/images/Diagrama%20de%20secuencia%206.png)
 
-![alt text](docs/images/6.jpg)
 
 
 ### 7. Configuración de torneo
 Descripción: actualiza la información operativa de un torneo existente, como reglamento, fechas, horarios, canchas y sanciones. Solo permite cambios cuando el torneo se encuentra en estados válidos, evitando modificaciones fuera del flujo definido por negocio.
 Diagrama de secuencia:
-![alt text](docs/images/7.jpg)
+![Diagrama de secuencia 7.png](docs/images/Diagrama%20de%20secuencia%207.png)
+
+
+
 ### 8. Consulta de torneos
 Descripción: consulta todos los torneos creados en el sistema para mostrar su información general y estado. Sirve como base para paneles de administración, seguimiento de competencia y selección de torneo en otros procesos.
 Diagrama de secuencia:
-![alt text](docs/images/8.jpg)
+![Diagrama de secuencia 8.png](docs/images/Diagrama%20de%20secuencia%208.png)
+
+
+
 ### 9. Registro de inscripción
 Descripción: registra la inscripción de un equipo al torneo incluyendo datos del pago o comprobante. El sistema valida la solicitud, crea el registro de inscripción y deja trazabilidad del proceso para su posterior revisión por el organizador.
 Diagrama de secuencia:
-![alt text](docs/images/9.jpg)
+![Diagrama de secuencia 9.png](docs/images/Diagrama%20de%20secuencia%209.png)
+
+
+
 ### 10. Actualización de estado de inscripción
 Descripción: permite que el organizador cambie el estado de una inscripción (por ejemplo, en revisión, aprobada o rechazada) de acuerdo con el flujo permitido. También valida que el nuevo estado sea correcto y que la inscripción exista antes de aplicar el cambio.
 Diagrama de secuencia:
-![alt text](docs/images/10.jpg)
+![Diagrama de secuencia 10.png](docs/images/Diagrama%20de%20secuencia%2010.png)
+
+
+
 ### 11. Consulta de inscripciones
 Descripción: muestra todas las inscripciones registradas junto con su estado actual para facilitar control administrativo y toma de decisiones. Esta vista permite identificar rápidamente qué equipos están pendientes, aprobados o rechazados.
 Diagrama de secuencia:
-![alt text](docs/images/11.jpg)
+![Diagrama de secuencia 11.png](docs/images/Diagrama%20de%20secuencia%2011.png)
+
+
+
 ### 12. Registro de partido
 Descripción: crea un partido entre dos equipos dentro del contexto de un torneo, guardando la información inicial necesaria para su gestión. Incluye validaciones de consistencia para asegurar que el encuentro quede correctamente preparado para etapas posteriores.
 Diagrama de secuencia:
-![alt text](docs/images/12.jpg)
+![Diagrama de secuencia 12.png](docs/images/Diagrama%20de%20secuencia%2012.png)
+
+
+
 ### 13. Actualización de marcador
 Descripción: actualiza los goles o puntos de un partido y consolida el resultado final del encuentro. Además, valida que los marcadores sean válidos y cambia el estado del partido a FINALIZADO cuando corresponde.
 Diagrama de secuencia:
-![alt text](docs/images/13.jpg)
+![Diagrama de secuencia 13.png](docs/images/Diagrama%20de%20secuencia%2013.png)
+
+
+
 ### 14. Registro de alineación
 Descripción: registra los jugadores que participarán en un partido para un equipo específico (local o visitante). La funcionalidad valida que el equipo pertenezca al encuentro y que la lista de jugadores cumpla condiciones mínimas antes de guardarla.
 Diagrama de secuencia:
-![alt text](docs/images/14.jpg)
+![Diagrama de secuencia 14.png](docs/images/Diagrama%20de%20secuencia%2014.png)
+
+
+
 ### 15. Registro de tarjetas
 Descripción: permite registrar eventos disciplinarios de un partido, como tarjetas amarillas o rojas asociadas a un jugador. Este control aporta trazabilidad deportiva y soporta posteriores decisiones arbitrales o sancionatorias.
 Diagrama de secuencia:
-
-![alt text](docs/images/15.jpg)
+![Diagrama de secuencia 15.png](docs/images/Diagrama%20de%20secuencia%2015.png)
 
 
 
