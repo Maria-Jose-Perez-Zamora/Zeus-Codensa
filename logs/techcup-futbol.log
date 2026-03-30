@@ -1358,3 +1358,4 @@ Using generated security password: 989f302c-0f37-4d9f-a5e9-930a03d9d525
 
 This generated password is for development use only. Your security configuration must be updated before running your application in production.
 
+2026-03-26 22:20:17 [main] INFO  controller.UserController - REST request - getAll Usuarios
