@@ -47,3 +47,7 @@ security:
   jwt:
     secret: ${JWT_SECRET:VGhpcyBpcyBhIHZlcnkgc2VjdXJlIGFuZCBsb25nIHNlY3JldCBrZXkgZm9yIEpXVCB2YWxpZGF0aW9u}
     ttl-ms: ${JWT_TTL_MS:3600000}
+
+app:
+  oauth2:
+    success-redirect-url: ${OAUTH2_SUCCESS_REDIRECT_URL:http://localhost:3000/dashboard}
