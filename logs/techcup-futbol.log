@@ -55,3 +55,9 @@ Using generated security password: b8505505-fb09-497c-86be-7643c34c2ad4
 
 This generated password is for development use only. Your security configuration must be updated before running your application in production.
 
+2026-03-29 01:10:06 [main] WARN  o.s.b.a.s.s.UserDetailsServiceAutoConfiguration - 
+
+Using generated security password: 4320a3f3-30b8-4d7e-94db-95b84b73540d
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
