@@ -84,6 +84,86 @@ Adicionalmente, el diagrama explicita reglas de negocio del torneo: mínimo y m�
 - CU-09 Consultar partidos asignados (Actor: Árbitro).
 - CU-10 Gestionar usuarios, roles y auditoría (Actor: Administrador).
 
+## 4. Diagrama de Base de Datos
 
+### 4.1 Descripción General
+La base de datos de Zeus-Codensa está diseñada en PostgreSQL con un modelo relacional que garantiza integridad de datos, consistencia transaccional y escalabilidad. El diseño separa claramente las entidades del negocio en tablas normalizadas con relaciones bien definidas que permiten consultas eficientes y mantenibilidad a largo plazo.
+
+### 4.2 Tablas/Documentos Utilizados
+
+> **Estado**: Por implementar en la base de datos PostgreSQL.
+>
+> Se documentarán las siguientes tablas principales:
+> - **users**: Información de usuarios (Estudiantes, Capitanes, Árbitros, Administradores, Organizadores)
+> - **teams**: Equipos registrados con identidad visual
+> - **team_players**: Relación muchos-a-muchos entre equipos y jugadores
+> - **tournaments**: Configuración y estado de torneos
+> - **tournament_horarios** y **tournament_canchas**: Colecciones de horarios y canchas
+> - **matches**: Partidos programados con puntuaciones y disciplina
+> - **registrations**: Inscripción de equipos a torneos
+> - **invitations**: Invitaciones de jugadores a equipos
+
+---
+
+## 5. Diagrama de Clases
+
+### 5.1 Descripción General
+El diagrama de clases de Zeus-Codensa refleja la arquitectura de tres capas del sistema: presentación (controladores), capa de negocio (modelos y servicios) y persistencia (entidades y repositorios). Las clases están organizadas siguiendo principios de separación de responsabilidades, herencia (polimorfismo de usuarios) y patrones de diseño como Factory y Strategy.
+
+### 5.2 Diagrama de Clases del Sistema
+
+El diagrama muestra la arquitectura en tres capas:
+
+- **Controllers** (`AuthController`, `UserController`, `TeamController`, `TournamentController`, `MatchController`): Reciben solicitudes HTTP y delegan a servicios.
+- **Services** (`AuthService`, `UserService`, `TeamService`, `TournamentService`, `MatchService`): Contienen la lógica de negocio y orquestan operaciones.
+- **Repositories & Entities**: Abstraen el acceso a datos mediante Spring Data JPA.
+
+**Clases principales**: `User` (base para Player, Captain, Referee, Administrator, Organizer), `Team`, `Tournament`, `Match`, `Registration`, `Invitation`.
+
+**Flujo**: Controller → DTO → Mapper → Service → Repository → Base de datos.
+
+### 5.3 Patrones de Diseño Implementados
+
+El sistema aplica patrones profesionales que facilitan mantenimiento y escalabilidad:
+
+#### **1. Factory Method**
+**Ubicación**: `core.factory.UserFactory`
+
+Centraliza la creación de diferentes tipos de usuarios (Player, Captain, Administrator, Referee, Organizer) en una única clase. En lugar de instanciar directamente cada tipo en los controladores, todas las creaciones pasan por la factory que encapsula la lógica de inicialización específica para cada rol. Esto permite agregar nuevos tipos de usuarios sin modificar el código cliente y facilita aplicar reglas de validación comunes durante la creación.
+
+#### **2. Strategy Pattern**
+**Ubicación**: `core.service.strategy.BracketGenerationStrategy` (interfaz) e `core.service.strategy.RandomDrawStrategy` (implementación)
+
+Define diferentes algoritmos para generar brackets de torneos sin cambiar el código que los utiliza. La interfaz establece el contrato, y cada implementación (actualmente `RandomDrawStrategy`) proporciona un algoritmo específico. Un torneo puede seleccionar su estrategia en tiempo de ejecución. Esto permite agregar nuevos algoritmos de emparejamiento (balanceado, por seeding, etc.) sin alterar el flujo principal del torneo.
+
+#### **3. Mapper Pattern**
+**Ubicación**: `dependencies.mapper.UserMapper` (y mappers adicionales)
+
+Transforma datos entre DTOs (formato de solicitud/respuesta HTTP) y entidades de dominio (modelos internos). Desacopla completamente la estructura que ve el cliente de la estructura interna del sistema. Permite evolucionar la base de datos y los servicios sin afectar la API REST, y proporciona seguridad exponiendo solo los campos necesarios.
+
+#### **4. DTO Pattern (Data Transfer Object)**
+**Ubicación**: `dependencies.dto.*` (UserRequestDTO, LoginResponseDTO, UserResponseDTO, etc.)
+
+Define contratos explícitos para peticiones y respuestas con validaciones declarativas usando Jakarta Validation (`@NotNull`, `@Email`, `@Size`, etc.). Cada DTO especifica exactamente qué campos se esperan o se devuelven. Centraliza la validación en un solo lugar antes de procesar datos, mejora la documentación de la API, y aísla cambios en la presentación de cambios en la lógica de negocio.
+
+#### **5. Dependency Injection (DI)**
+**Ubicación**: `core.service.*` (todas las clases de servicio) y `controller.*` (controladores)
+
+Spring gestiona automáticamente la inyección de dependencias mediante el contenedor IoC. Los controladores reciben sus servicios inyectados, y los servicios reciben sus repositorios sin crear instancias manualmente. Reduce el acoplamiento permitiendo cambiar implementaciones (ej: pasar de base de datos real a mock en pruebas), mejora testabilidad, y centraliza la gestión del ciclo de vida de componentes.
+
+#### **6. Repository Pattern**
+**Ubicación**: `dependencies.persistence.repository.*` (UserRepository, TeamRepository, TournamentRepository, MatchRepository, etc.)
+
+Abstrae completamente la lógica de acceso a datos. Cada repositorio hereda de Spring Data JPA proporcionando operaciones estándar (CRUD, búsquedas) sin escribir SQL. Los servicios trabajan solo con los repositorios, nunca directamente con la base de datos. Permite cambiar la estrategia de persistencia (cambiar de PostgreSQL a otra BD) sin afectar los servicios.
+
+#### **7. Exception Handling Pattern**
+**Ubicación**: `core.exception.GlobalExceptionHandler` (manejador centralizado) con excepciones personalizadas (`BusinessRuleException`, `ResourceNotFoundException`, `PersistenceAccessException`)
+
+Centraliza el manejo de todos los errores en un único componente con anotación `@RestControllerAdvice`. Define excepciones específicas para distintos escenarios, cada una convertida automáticamente a la respuesta HTTP apropiada. Garantiza respuestas de error uniformes, facilita logging y auditoría centralizada, e informa al cliente exactamente qué sucedió.
+
+#### **8. Singleton Pattern**
+**Ubicación**: Componentes de Spring (todos los servicios y controladores)
+
+Spring gestiona automáticamente los componentes como instancias únicas mediante el contenedor IoC. Cada servicio, controlador o repositorio existe en una sola copia compartida por toda la aplicación. Optimiza memoria, garantiza comportamiento consistente, y simplifica el estado compartido entre capas.
 
  
