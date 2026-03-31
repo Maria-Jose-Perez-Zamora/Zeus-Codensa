@@ -2,11 +2,19 @@ package core.validator;
 
 import dependencies.dto.UserRequestDTO;
 import core.model.Role;
-import dependencies.util.DataStorage;
+import dependencies.persistence.repository.UserRepository;
+import org.springframework.stereotype.Component;
 
+@Component
 public class UserValidator {
 
-    public static void validateForRegistration(UserRequestDTO request) {
+    private final UserRepository userRepository;
+
+    public UserValidator(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    public void validateForRegistration(UserRequestDTO request) {
         if (request.getName() == null || request.getName().trim().isEmpty()) {
             throw new IllegalArgumentException("El name no puede estar vacío");
         }
@@ -37,8 +45,7 @@ public class UserValidator {
         }
         
         // Check duplicated email
-        boolean exists = DataStorage.users.stream()
-                .anyMatch(u -> u.getEmail().equals(request.getEmail()));
+        boolean exists = userRepository.findByEmail(request.getEmail()).isPresent();
         if (exists) {
             throw new IllegalArgumentException("El correo ya se encuentra registrado");
         }

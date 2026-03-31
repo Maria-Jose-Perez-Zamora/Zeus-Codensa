@@ -1,32 +1,43 @@
 package core.service;
 
-import core.model.Registration;
 import core.model.KnockoutBracket;
-import dependencies.util.DataStorage;
+import dependencies.persistence.entity.RegistrationEntity;
+import dependencies.persistence.repository.RegistrationRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import java.util.List;
+import java.util.Arrays;
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 public class BracketServiceTest {
 
+    @Mock
+    private RegistrationRepository registrationRepository;
+
+    @InjectMocks
     private BracketService llaveService;
 
     @BeforeEach
     public void setUp() {
-        DataStorage.clearAll();
-        llaveService = new BracketService();
     }
 
     @Test
     public void testGenerarLlaves_Success() {
-        Registration i1 = new Registration("Eq1", "Liga", "url"); i1.setStatus("APPROVED");
-        Registration i2 = new Registration("Eq2", "Liga", "url"); i2.setStatus("APPROVED");
-        Registration i3 = new Registration("Eq3", "Liga", "url"); i3.setStatus("APPROVED");
-        Registration i4 = new Registration("Eq4", "Liga", "url"); i4.setStatus("APPROVED");
+        RegistrationEntity i1 = new RegistrationEntity(); i1.setTeamName("Eq1"); i1.setTournamentName("Liga"); i1.setStatus("APPROVED");
+        RegistrationEntity i2 = new RegistrationEntity(); i2.setTeamName("Eq2"); i2.setTournamentName("Liga"); i2.setStatus("APPROVED");
+        RegistrationEntity i3 = new RegistrationEntity(); i3.setTeamName("Eq3"); i3.setTournamentName("Liga"); i3.setStatus("APPROVED");
+        RegistrationEntity i4 = new RegistrationEntity(); i4.setTeamName("Eq4"); i4.setTournamentName("Liga"); i4.setStatus("APPROVED");
         
-        DataStorage.registrations.addAll(List.of(i1, i2, i3, i4));
+        when(registrationRepository.findByTournamentName("Liga")).thenReturn(Arrays.asList(i1, i2, i3, i4));
 
         List<KnockoutBracket> llaves = llaveService.generarLlaves("Liga", "Cuartos");
         
@@ -36,8 +47,8 @@ public class BracketServiceTest {
 
     @Test
     public void testGenerarLlaves_OddNumberThrows() {
-        Registration i1 = new Registration("Eq1", "Liga", "url"); i1.setStatus("APPROVED");
-        DataStorage.registrations.add(i1);
+        RegistrationEntity i1 = new RegistrationEntity(); i1.setTeamName("Eq1"); i1.setTournamentName("Liga"); i1.setStatus("APPROVED");
+        when(registrationRepository.findByTournamentName("Liga")).thenReturn(Collections.singletonList(i1));
 
         assertThrows(IllegalArgumentException.class, () -> llaveService.generarLlaves("Liga", "Cuartos"));
     }

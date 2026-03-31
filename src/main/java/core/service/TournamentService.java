@@ -7,7 +7,6 @@ import core.exception.ResourceNotFoundException;
 import core.exception.BusinessRuleException;
 import core.exception.PersistenceAccessException;
 import core.model.Tournament;
-import dependencies.util.DataStorage;
 import core.validator.TournamentValidator;
 import dependencies.mapper.TournamentMapper;
 import dependencies.persistence.entity.TournamentEntity;
@@ -29,55 +28,41 @@ public class TournamentService {
 
     private static final Logger log = LoggerFactory.getLogger(TournamentService.class);
     private final TournamentRepository tournamentRepository;
-
-    public TournamentService() {
-        this.tournamentRepository = null;
-    }
+    private final TournamentValidator tournamentValidator;
 
     @Autowired
-    public TournamentService(TournamentRepository tournamentRepository) {
+    public TournamentService(TournamentRepository tournamentRepository, TournamentValidator tournamentValidator) {
         this.tournamentRepository = tournamentRepository;
+        this.tournamentValidator = tournamentValidator;
     }
 
     public TournamentResponseDTO createTorneo(TournamentRequestDTO request) {
         log.debug("Ejecutando validaciones para creación de tournament: {}", request.getTournamentName());
-        TournamentValidator.validateForCreation(request);
+        tournamentValidator.validateForCreation(request);
         
         Tournament t = TournamentMapper.toEntity(request);
 
-        if (tournamentRepository != null) {
-            try {
-                if (tournamentRepository.findByTournamentName(t.getTournamentName()).isPresent()) {
-                    throw new BusinessRuleException("Ya existe un torneo con ese nombre");
-                }
-
-                TournamentEntity saved = tournamentRepository.save(ModelToEntityMapper.toTournamentEntity(t));
-                log.info("Tournament creado exitosamente en DB con ID: {}", saved.getId());
-                return TournamentMapper.toDTO(EntityToModelMapper.toTournamentModel(saved));
-            } catch (DataAccessException ex) {
-                throw new PersistenceAccessException("Error al crear tournament en base de datos", ex);
+        try {
+            if (tournamentRepository.findByTournamentName(t.getTournamentName()).isPresent()) {
+                throw new BusinessRuleException("Ya existe un torneo con ese nombre");
             }
+
+            TournamentEntity saved = tournamentRepository.save(ModelToEntityMapper.toTournamentEntity(t));
+            log.info("Tournament creado exitosamente en DB con ID: {}", saved.getId());
+            return TournamentMapper.toDTO(EntityToModelMapper.toTournamentModel(saved));
+        } catch (DataAccessException ex) {
+            throw new PersistenceAccessException("Error al crear tournament en base de datos", ex);
         }
-        
-        DataStorage.tournaments.add(t);
-        log.info("Tournament creado exitosamente en memoria con ID: {}", t.getId());
-        return TournamentMapper.toDTO(t);
     }
 
     public TournamentResponseDTO configurarTorneo(String id, TournamentRequestDTO configInfo) {
         log.debug("Buscando tournament con ID: {} para configuración", id);
         Optional<Tournament> torneoOpt;
 
-        if (tournamentRepository != null) {
-            try {
-                torneoOpt = tournamentRepository.findById(id).map(EntityToModelMapper::toTournamentModel);
-            } catch (DataAccessException ex) {
-                throw new PersistenceAccessException("Error al consultar tournament en base de datos", ex);
-            }
-        } else {
-            torneoOpt = DataStorage.tournaments.stream()
-                    .filter(t -> t.getId().equals(id))
-                    .findFirst();
+        try {
+            torneoOpt = tournamentRepository.findById(id).map(EntityToModelMapper::toTournamentModel);
+        } catch (DataAccessException ex) {
+            throw new PersistenceAccessException("Error al consultar tournament en base de datos", ex);
         }
 
         if (torneoOpt.isEmpty()) {
@@ -98,52 +83,34 @@ public class TournamentService {
         if (configInfo.getCanchas() != null) t.setCanchas(configInfo.getCanchas());
         if (configInfo.getSanctions() != null) t.setSanctions(configInfo.getSanctions());
 
-        if (tournamentRepository != null) {
-            try {
-                TournamentEntity saved = tournamentRepository.save(ModelToEntityMapper.toTournamentEntity(t));
-                log.info("Tournament ID {} configurado exitosamente en DB", id);
-                return TournamentMapper.toDTO(EntityToModelMapper.toTournamentModel(saved));
-            } catch (DataAccessException ex) {
-                throw new PersistenceAccessException("Error al actualizar tournament en base de datos", ex);
-            }
+        try {
+            TournamentEntity saved = tournamentRepository.save(ModelToEntityMapper.toTournamentEntity(t));
+            log.info("Tournament ID {} configurado exitosamente en DB", id);
+            return TournamentMapper.toDTO(EntityToModelMapper.toTournamentModel(saved));
+        } catch (DataAccessException ex) {
+            throw new PersistenceAccessException("Error al actualizar tournament en base de datos", ex);
         }
-
-        log.info("Tournament ID {} configurado exitosamente", id);
-        return TournamentMapper.toDTO(t);
     }
 
     public List<TournamentHistoryDTO> getAllTorneos() {
-        if (tournamentRepository != null) {
-            try {
-                return tournamentRepository.findAll().stream()
-                        .map(EntityToModelMapper::toTournamentModel)
-                        .map(TournamentHistoryDTO::new)
-                        .collect(Collectors.toList());
-            } catch (DataAccessException ex) {
-                throw new PersistenceAccessException("Error al consultar tournaments en base de datos", ex);
-            }
+        try {
+            return tournamentRepository.findAll().stream()
+                    .map(EntityToModelMapper::toTournamentModel)
+                    .map(TournamentHistoryDTO::new)
+                    .collect(Collectors.toList());
+        } catch (DataAccessException ex) {
+            throw new PersistenceAccessException("Error al consultar tournaments en base de datos", ex);
         }
-
-        log.debug("Recuperando todos los tournaments ({})", DataStorage.tournaments.size());
-        return DataStorage.tournaments.stream()
-                .map(TournamentHistoryDTO::new)
-                .collect(Collectors.toList());
     }
 
     public TournamentResponseDTO getTorneoById(String id) {
         log.debug("Buscando tournament con ID: {}", id);
         Optional<Tournament> torneoOpt;
 
-        if (tournamentRepository != null) {
-            try {
-                torneoOpt = tournamentRepository.findById(id).map(EntityToModelMapper::toTournamentModel);
-            } catch (DataAccessException ex) {
-                throw new PersistenceAccessException("Error al consultar tournament en base de datos", ex);
-            }
-        } else {
-            torneoOpt = DataStorage.tournaments.stream()
-                    .filter(t -> t.getId().equals(id))
-                    .findFirst();
+        try {
+            torneoOpt = tournamentRepository.findById(id).map(EntityToModelMapper::toTournamentModel);
+        } catch (DataAccessException ex) {
+            throw new PersistenceAccessException("Error al consultar tournament en base de datos", ex);
         }
 
         if (torneoOpt.isEmpty()) {

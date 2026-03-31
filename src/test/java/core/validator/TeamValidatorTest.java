@@ -1,22 +1,38 @@
 package core.validator;
 
 import dependencies.dto.TeamRequestDTO;
-import core.model.Team;
-import core.model.Player;
-import dependencies.util.DataStorage;
+import dependencies.persistence.entity.TeamEntity;
+import dependencies.persistence.entity.UserEntity;
+import dependencies.persistence.repository.TeamRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 public class TeamValidatorTest {
+
+    @Mock
+    private TeamRepository teamRepository;
+
+    @InjectMocks
+    private TeamValidator teamValidator;
 
     @BeforeEach
     public void setup() {
-        DataStorage.clearAll();
     }
 
     private TeamRequestDTO validReq() {
@@ -25,50 +41,64 @@ public class TeamValidatorTest {
 
     @Test
     public void testValid() {
-        assertDoesNotThrow(() -> TeamValidator.validateForCreation(validReq()));
+        when(teamRepository.findByTeamName(anyString())).thenReturn(Optional.empty());
+        when(teamRepository.findAll()).thenReturn(new ArrayList<>());
+        assertDoesNotThrow(() -> teamValidator.validateForCreation(validReq()));
     }
 
     @Test
     public void testNombreNullEmpty() {
         TeamRequestDTO req = validReq(); req.setTeamName(null);
-        assertThrows(IllegalArgumentException.class, () -> TeamValidator.validateForCreation(req));
+        assertThrows(IllegalArgumentException.class, () -> teamValidator.validateForCreation(req));
         req.setTeamName("  ");
-        assertThrows(IllegalArgumentException.class, () -> TeamValidator.validateForCreation(req));
+        assertThrows(IllegalArgumentException.class, () -> teamValidator.validateForCreation(req));
     }
 
     @Test
     public void testExists() {
-        DataStorage.teams.add(new Team("EqA"));
-        assertThrows(IllegalArgumentException.class, () -> TeamValidator.validateForCreation(validReq()));
+        when(teamRepository.findByTeamName("EqA")).thenReturn(Optional.of(new TeamEntity()));
+        assertThrows(IllegalArgumentException.class, () -> teamValidator.validateForCreation(validReq()));
     }
 
     @Test
     public void testJugadoresNull() {
         TeamRequestDTO req = validReq(); req.setPlayerEmails(null);
-        assertThrows(IllegalArgumentException.class, () -> TeamValidator.validateForCreation(req));
+        when(teamRepository.findByTeamName(anyString())).thenReturn(Optional.empty());
+        assertThrows(IllegalArgumentException.class, () -> teamValidator.validateForCreation(req));
     }
 
     @Test
     public void testJugadoresCount() {
         TeamRequestDTO req = validReq(); req.setPlayerEmails(Arrays.asList("1", "2"));
-        assertThrows(IllegalArgumentException.class, () -> TeamValidator.validateForCreation(req));
+        when(teamRepository.findByTeamName(anyString())).thenReturn(Optional.empty());
+        assertThrows(IllegalArgumentException.class, () -> teamValidator.validateForCreation(req));
         
         req.setPlayerEmails(Collections.nCopies(21, "x"));
-        assertThrows(IllegalArgumentException.class, () -> TeamValidator.validateForCreation(req));
+        assertThrows(IllegalArgumentException.class, () -> teamValidator.validateForCreation(req));
     }
 
     @Test
     public void testJugadoresDuplicatedList() {
         TeamRequestDTO req = validReq(); req.setPlayerEmails(Arrays.asList("1", "1", "3", "4", "5", "6", "7"));
-        assertThrows(IllegalArgumentException.class, () -> TeamValidator.validateForCreation(req));
+        when(teamRepository.findByTeamName(anyString())).thenReturn(Optional.empty());
+        assertThrows(IllegalArgumentException.class, () -> teamValidator.validateForCreation(req));
     }
 
     @Test
     public void testJugadorYaEnEquipo() {
-        Team t = new Team("EqB");
-        Player j = new Player(); j.setEmail("1");
-        t.getPlayers().add(j);
-        DataStorage.teams.add(t);
-        assertThrows(IllegalArgumentException.class, () -> TeamValidator.validateForCreation(validReq()));
+        TeamEntity t = new TeamEntity();
+        t.setTeamName("EqB");
+        UserEntity j = new UserEntity(); j.setEmail("1");
+        List<UserEntity> players = new ArrayList<>();
+        players.add(j);
+        t.setPlayers(players);
+
+        List<TeamEntity> teams = new ArrayList<>();
+        teams.add(t);
+
+        when(teamRepository.findByTeamName("EqA")).thenReturn(Optional.empty());
+        when(teamRepository.findAll()).thenReturn(teams);
+
+        assertThrows(IllegalArgumentException.class, () -> teamValidator.validateForCreation(validReq()));
     }
 }

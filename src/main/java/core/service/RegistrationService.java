@@ -6,7 +6,6 @@ import core.exception.ResourceNotFoundException;
 import core.exception.BusinessRuleException;
 import core.exception.PersistenceAccessException;
 import core.model.Registration;
-import dependencies.util.DataStorage;
 import core.validator.RegistrationValidator;
 import dependencies.mapper.RegistrationMapper;
 import dependencies.persistence.entity.RegistrationEntity;
@@ -32,47 +31,34 @@ public class RegistrationService {
     private final RegistrationRepository registrationRepository;
     private final TeamRepository teamRepository;
     private final TournamentRepository tournamentRepository;
-
-    public RegistrationService() {
-        this.registrationRepository = null;
-        this.teamRepository = null;
-        this.tournamentRepository = null;
-    }
+    private final RegistrationValidator registrationValidator;
 
     @Autowired
     public RegistrationService(
             RegistrationRepository registrationRepository,
             TeamRepository teamRepository,
-            TournamentRepository tournamentRepository
+            TournamentRepository tournamentRepository,
+            RegistrationValidator registrationValidator
     ) {
         this.registrationRepository = registrationRepository;
         this.teamRepository = teamRepository;
         this.tournamentRepository = tournamentRepository;
+        this.registrationValidator = registrationValidator;
     }
 
     public RegistrationResponseDTO inscribir(RegistrationRequestDTO request) {
         log.debug("Ejecutando validaciones para inscripción del team {}", request.getTeamName());
-        if (registrationRepository == null) {
-            RegistrationValidator.validateForInscripcion(request);
-        } else {
-            validateRegistrationWithRepositories(request);
-        }
+        registrationValidator.validateForInscripcion(request);
 
         Registration nuevaInscripcion = RegistrationMapper.toEntity(request);
 
-        if (registrationRepository != null) {
-            try {
-                RegistrationEntity saved = registrationRepository.save(ModelToEntityMapper.toRegistrationEntity(nuevaInscripcion));
-                log.info("Inscripción creada en DB con ID: {}, status {}", saved.getId(), saved.getStatus());
-                return RegistrationMapper.toDTO(EntityToModelMapper.toRegistrationModel(saved));
-            } catch (DataAccessException ex) {
-                throw new PersistenceAccessException("Error al crear inscripción en base de datos", ex);
-            }
+        try {
+            RegistrationEntity saved = registrationRepository.save(ModelToEntityMapper.toRegistrationEntity(nuevaInscripcion));
+            log.info("Inscripción creada en DB con ID: {}, status {}", saved.getId(), saved.getStatus());
+            return RegistrationMapper.toDTO(EntityToModelMapper.toRegistrationModel(saved));
+        } catch (DataAccessException ex) {
+            throw new PersistenceAccessException("Error al crear inscripción en base de datos", ex);
         }
-
-        DataStorage.registrations.add(nuevaInscripcion);
-        log.info("Inscripción creada con ID: {}, status {}", nuevaInscripcion.getId(), nuevaInscripcion.getStatus());
-        return RegistrationMapper.toDTO(nuevaInscripcion);
     }
 
     public RegistrationResponseDTO actualizarEstado(String id, String nuevoEstado) {
@@ -80,16 +66,10 @@ public class RegistrationService {
 
         Optional<Registration> inscripcionOpt;
 
-        if (registrationRepository != null) {
-            try {
-                inscripcionOpt = registrationRepository.findById(id).map(EntityToModelMapper::toRegistrationModel);
-            } catch (DataAccessException ex) {
-                throw new PersistenceAccessException("Error al consultar inscripción en base de datos", ex);
-            }
-        } else {
-            inscripcionOpt = DataStorage.registrations.stream()
-                    .filter(i -> i.getId().equals(id))
-                    .findFirst();
+        try {
+            inscripcionOpt = registrationRepository.findById(id).map(EntityToModelMapper::toRegistrationModel);
+        } catch (DataAccessException ex) {
+            throw new PersistenceAccessException("Error al consultar inscripción en base de datos", ex);
         }
 
         if (inscripcionOpt.isEmpty()) {
@@ -118,63 +98,23 @@ public class RegistrationService {
 
         registration.setStatus(nuevoEstado);
 
-        if (registrationRepository != null) {
-            try {
-                RegistrationEntity saved = registrationRepository.save(ModelToEntityMapper.toRegistrationEntity(registration));
-                log.info("Estado de inscripción ID {} actualizado exitosamente a {} en DB", id, nuevoEstado);
-                return RegistrationMapper.toDTO(EntityToModelMapper.toRegistrationModel(saved));
-            } catch (DataAccessException ex) {
-                throw new PersistenceAccessException("Error al actualizar inscripción en base de datos", ex);
-            }
+        try {
+            RegistrationEntity saved = registrationRepository.save(ModelToEntityMapper.toRegistrationEntity(registration));
+            log.info("Estado de inscripción ID {} actualizado exitosamente a {} en DB", id, nuevoEstado);
+            return RegistrationMapper.toDTO(EntityToModelMapper.toRegistrationModel(saved));
+        } catch (DataAccessException ex) {
+            throw new PersistenceAccessException("Error al actualizar inscripción en base de datos", ex);
         }
-
-        log.info("Estado de inscripción ID {} actualizado exitosamente a {}", id, nuevoEstado);
-        return RegistrationMapper.toDTO(registration);
     }
 
     public List<RegistrationResponseDTO> getAll() {
-        if (registrationRepository != null) {
-            try {
-                return registrationRepository.findAll().stream()
-                        .map(EntityToModelMapper::toRegistrationModel)
-                        .map(RegistrationMapper::toDTO)
-                        .collect(Collectors.toList());
-            } catch (DataAccessException ex) {
-                throw new PersistenceAccessException("Error al consultar inscripciones en base de datos", ex);
-            }
-        }
-
-        return DataStorage.registrations.stream()
-                .map(RegistrationMapper::toDTO)
-                .collect(Collectors.toList());
-    }
-
-    private void validateRegistrationWithRepositories(RegistrationRequestDTO request) {
-        if (request.getTeamName() == null || request.getTeamName().trim().isEmpty()) {
-            throw new IllegalArgumentException("Nombre de team es obligatorio");
-        }
-        if (request.getTournamentName() == null || request.getTournamentName().trim().isEmpty()) {
-            throw new IllegalArgumentException("Nombre de tournament es obligatorio");
-        }
-        if (request.getComprobantePagoUrl() == null || request.getComprobantePagoUrl().trim().isEmpty()) {
-            throw new IllegalArgumentException("El comprobante de pago es obligatorio");
-        }
-
-        if (teamRepository == null || teamRepository.findByTeamName(request.getTeamName()).isEmpty()) {
-            throw new BusinessRuleException("El team especificado no existe");
-        }
-
-        boolean torneoValido = tournamentRepository != null && tournamentRepository.findByTournamentName(request.getTournamentName())
-                .map(t -> "OPEN".equals(t.getStatus()))
-                .orElse(false);
-        if (!torneoValido) {
-            throw new BusinessRuleException("El tournament no existe o no se encuentra OPEN para registrations");
-        }
-
-        boolean estaInscrito = registrationRepository.findByTournamentName(request.getTournamentName()).stream()
-                .anyMatch(i -> request.getTeamName().equals(i.getTeamName()));
-        if (estaInscrito) {
-            throw new BusinessRuleException("El team ya cuenta con un proceso de registration para este tournament");
+        try {
+            return registrationRepository.findAll().stream()
+                    .map(EntityToModelMapper::toRegistrationModel)
+                    .map(RegistrationMapper::toDTO)
+                    .collect(Collectors.toList());
+        } catch (DataAccessException ex) {
+            throw new PersistenceAccessException("Error al consultar inscripciones en base de datos", ex);
         }
     }
 }

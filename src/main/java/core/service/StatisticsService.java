@@ -2,7 +2,6 @@ package core.service;
 
 import core.model.Match;
 import core.model.Standing;
-import dependencies.util.DataStorage;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -11,6 +10,12 @@ import java.util.stream.Collectors;
 @Service
 public class StatisticsService {
 
+    private final dependencies.persistence.repository.MatchRepository matchRepository;
+
+    public StatisticsService(dependencies.persistence.repository.MatchRepository matchRepository) {
+        this.matchRepository = matchRepository;
+    }
+
     /**
      * RF-008: Máximos goleadores del tournament.
      * Retorna lista ordenada de { correoJugador, goals } descendente.
@@ -18,8 +23,9 @@ public class StatisticsService {
     public List<Map<String, Object>> getTopScorers(String tournamentName) {
         Map<String, Integer> totales = new HashMap<>();
 
-        DataStorage.matches.stream()
-                .filter(p -> p.getTournamentName().equals(tournamentName) && "FINISHED".equals(p.getStatus()))
+        matchRepository.findByTournamentName(tournamentName).stream()
+                .map(dependencies.persistence.mapper.EntityToModelMapper::toMatchModel)
+                .filter(p -> "FINISHED".equals(p.getStatus()))
                 .forEach(p -> p.getGoles().forEach((player, g) ->
                         totales.merge(player, g, Integer::sum)));
 
@@ -38,8 +44,8 @@ public class StatisticsService {
      * RF-008: Historial de matches de un team (todos sus matches con resultado).
      */
     public List<Map<String, Object>> getTeamHistory(String tournamentName, String teamName) {
-        return DataStorage.matches.stream()
-                .filter(p -> p.getTournamentName().equals(tournamentName))
+        return matchRepository.findByTournamentName(tournamentName).stream()
+                .map(dependencies.persistence.mapper.EntityToModelMapper::toMatchModel)
                 .filter(p -> p.getHomeTeam().equals(teamName) || p.getAwayTeam().equals(teamName))
                 .map(p -> {
                     Map<String, Object> info = new LinkedHashMap<>();

@@ -1,11 +1,25 @@
 package core.validator;
 
 import dependencies.dto.RegistrationRequestDTO;
-import dependencies.util.DataStorage;
+import dependencies.persistence.repository.RegistrationRepository;
+import dependencies.persistence.repository.TeamRepository;
+import dependencies.persistence.repository.TournamentRepository;
+import org.springframework.stereotype.Component;
 
+@Component
 public class RegistrationValidator {
 
-    public static void validateForInscripcion(RegistrationRequestDTO request) {
+    private final TeamRepository teamRepository;
+    private final TournamentRepository tournamentRepository;
+    private final RegistrationRepository registrationRepository;
+
+    public RegistrationValidator(TeamRepository teamRepository, TournamentRepository tournamentRepository, RegistrationRepository registrationRepository) {
+        this.teamRepository = teamRepository;
+        this.tournamentRepository = tournamentRepository;
+        this.registrationRepository = registrationRepository;
+    }
+
+    public void validateForInscripcion(RegistrationRequestDTO request) {
         if (request.getTeamName() == null || request.getTeamName().trim().isEmpty()) {
             throw new IllegalArgumentException("Nombre de team es obligatorio");
         }
@@ -16,20 +30,20 @@ public class RegistrationValidator {
             throw new IllegalArgumentException("El comprobante de pago es obligatorio");
         }
 
-        boolean equipoExiste = DataStorage.teams.stream()
-                .anyMatch(t -> t.getTeamName().equals(request.getTeamName()));
+        boolean equipoExiste = teamRepository.findByTeamName(request.getTeamName()).isPresent();
         if (!equipoExiste) {
             throw new IllegalArgumentException("El team especificado no existe");
         }
 
-        boolean torneoExiste = DataStorage.tournaments.stream()
-                .anyMatch(t -> t.getTournamentName().equals(request.getTournamentName()) && t.getStatus().equals("OPEN"));
+        boolean torneoExiste = tournamentRepository.findByTournamentName(request.getTournamentName())
+                .map(t -> t.getStatus().equals("OPEN"))
+                .orElse(false);
         if (!torneoExiste) {
             throw new IllegalArgumentException("El tournament no existe o no se encuentra OPEN para registrations");
         }
 
-        boolean estaInscrito = DataStorage.registrations.stream()
-                .anyMatch(i -> i.getTeamName().equals(request.getTeamName()) && i.getTournamentName().equals(request.getTournamentName()));
+        boolean estaInscrito = registrationRepository.findAll().stream()
+                .anyMatch(r -> r.getTeamName().equals(request.getTeamName()) && r.getTournamentName().equals(request.getTournamentName()));
         if (estaInscrito) {
             throw new IllegalArgumentException("El team ya cuenta con un proceso de registration para este tournament");
         }
