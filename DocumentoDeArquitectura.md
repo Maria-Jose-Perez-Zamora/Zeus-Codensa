@@ -10,10 +10,11 @@ El servicio cubre el flujo operativo principal del campeonato: autenticación de
 Arquitectónicamente, Zeus-Codensa separa presentación, negocio y persistencia para mejorar mantenibilidad, trazabilidad y escalabilidad. Esta organización permite evolucionar funcionalidades de forma controlada, reforzar validaciones y mantener un manejo uniforme de errores y respuestas en todo el sistema.
 
 ### 1.2 Diagrama de contexto
-![Diagrama de contexto](docs/images/DiagramaContexto.png)
 
 El diagrama de contexto presenta a Zeus-Codensa como sistema central y su relación con actores externos. Permite delimitar el alcance del servicio y visualizar los flujos principales de entrada (solicitudes) y salida (respuestas y errores), sin entrar al detalle interno de implementación.
 
+
+![Diagrama de contexto](docs/images/DiagramaContexto.png) 
 En el contexto definido se identifican cinco actores principales: Estudiante, Capitán, Árbitro, Administrador y Organizador. El servicio también interactúa con dos sistemas externos: Correo Institucional (autenticación) y NEQUI/Efectivo (validación de comprobantes de pago).
 
 Las interacciones mostradas en el diagrama son:
@@ -71,6 +72,8 @@ Adicionalmente, el diagrama explicita reglas de negocio del torneo: mínimo y m�
 
 ### 3.2 Casos de uso
 
+El siguiente diagrama ilustra los principales casos de uso identificados en el sistema, mostrando la interacción entre los actores (Estudiante, Capitán, Árbitro, Administrador, Organizador) y las funcionalidades que cada uno puede ejecutar dentro de Zeus-Codensa.
+
 ![alt text](docs/images/Diagrama-Casos-De-Uso.png)
 
 - CU-01 Registrar usuario (Actor: Estudiante).
@@ -89,19 +92,106 @@ Adicionalmente, el diagrama explicita reglas de negocio del torneo: mínimo y m�
 ### 4.1 Descripción General
 La base de datos de Zeus-Codensa está diseñada en PostgreSQL con un modelo relacional que garantiza integridad de datos, consistencia transaccional y escalabilidad. El diseño separa claramente las entidades del negocio en tablas normalizadas con relaciones bien definidas que permiten consultas eficientes y mantenibilidad a largo plazo.
 
-### 4.2 Tablas/Documentos Utilizados
+### 4.2 Diagrama de Base de Datos y Explicación - Tablas/Documentos Utilizados
 
-> **Estado**: Por implementar en la base de datos PostgreSQL.
->
-> Se documentarán las siguientes tablas principales:
-> - **users**: Información de usuarios (Estudiantes, Capitanes, Árbitros, Administradores, Organizadores)
-> - **teams**: Equipos registrados con identidad visual
-> - **team_players**: Relación muchos-a-muchos entre equipos y jugadores
-> - **tournaments**: Configuración y estado de torneos
-> - **tournament_horarios** y **tournament_canchas**: Colecciones de horarios y canchas
-> - **matches**: Partidos programados con puntuaciones y disciplina
-> - **registrations**: Inscripción de equipos a torneos
-> - **invitations**: Invitaciones de jugadores a equipos
+El diagrama de base de datos representa el modelo relacional de Zeus-Codensa, mostrando todas las tablas, sus atributos principales, tipos de datos y las relaciones entre entidades. Este modelo permite gestionar de forma integrada usuarios, equipos, torneos, partidos e inscripciones con garantías de consistencia e integridad referencial.
+![alt text](<docs/images/DIAGRAMA DE CLASES BASE DE DATOS.png>)
+
+#### Tablas Principales y Atributos
+
+**users** (Tabla base de usuarios)
+- `id` (BIGINT, PK): Identificador único del usuario
+- `name` (VARCHAR): Nombre completo del usuario
+- `email` (VARCHAR, UNIQUE): Correo electrónico único para autenticación e identificación
+- `password` (VARCHAR): Contraseña encriptada del usuario
+- `photo` (VARCHAR): URL o ruta de foto de perfil
+- `role` (VARCHAR): Rol del usuario (Estudiante, Capitán, Árbitro, Administrador, Organizador)
+- `type` (VARCHAR): Clasificación adicional si aplica
+- `position` (VARCHAR): Posición en campo (relevante para jugadores)
+- `jerseyNumber` (INT): Número de dorsal del usuario
+
+**teams** (Tabla de equipos)
+- `id` (BIGINT, PK): Identificador único del equipo
+- `teamName` (VARCHAR, UNIQUE): Nombre del equipo
+- `escudo` (VARCHAR): Logo o escudo del equipo
+- `coloresUniforme` (VARCHAR): Colores representativos del equipo
+- Relación: un equipo tiene múltiples jugadores a través de `team_players`
+
+**team_players** (Tabla de relación muchos-a-muchos)
+- `team_id` (BIGINT, FK): Referencia a tabla teams
+- `user_id` (BIGINT, FK): Referencia a tabla users
+- Permite que un usuario sea jugador de un equipo; trackea la membresía
+
+**invitations** (Tabla de invitaciones)
+- `id` (VARCHAR, PK): Identificador único de invitación
+- `captainEmail` (VARCHAR): Email del capitán que invita
+- `playerEmail` (VARCHAR): Email del jugador invitado
+- `teamName` (VARCHAR): Nombre del equipo al que se invita
+- `status` (VARCHAR): Estado de la invitación
+- Relación: conecta usuarios (capitán e invitado) con equipos
+
+**registrations** (Tabla de inscripciones de torneos)
+- `id` (VARCHAR, PK): Identificador único de inscripción
+- `teamName` (VARCHAR): Nombre del equipo inscrito
+- `tournamentName` (VARCHAR): Nombre del torneo
+- `status` (VARCHAR): Estado de inscripción (pendiente, aprobado, rechazado)
+- `comprobantePagoUrl` (VARCHAR): URL del comprobante de pago
+- `fechaInscripcion` (VARCHAR): Fecha de la inscripción
+- Relación: vincula equipos con torneos y tracking de pagos
+
+**tournaments** (Tabla de torneos)
+- `id` (VARCHAR, PK): Identificador único del torneo
+- `tournamentName` (VARCHAR, UNIQUE): Nombre del torneo
+- `fechaInicio` (VARCHAR): Fecha de inicio del campeonato
+- `fechaFin` (VARCHAR): Fecha de finalización del campeonato
+- `numeroEquipos` (INT): Cantidad de equipos participantes
+- `costoInscripcion` (DOUBLE): Costo de inscripción por equipo
+- `status` (VARCHAR): Estado del torneo
+- `rules` (VARCHAR): Reglamento o normas del torneo
+- `fechaCierreInscripciones` (VARCHAR): Fecha límite para inscribirse
+- `fechaInicioFaseGrupos` (VARCHAR): Inicio de fase de grupos
+- `sanctions` (VARCHAR): Sanciones o restricciones del torneo
+- `campeon` (VARCHAR): Equipo campeón (se llena al finalizar)
+- Relaciones: tiene muchos matches, muchas registrations, tiene horarios y canchas
+
+**tournament_horarios** (Tabla de horarios disponibles)
+- `tournament_id` (VARCHAR, FK): Referencia a tabla tournaments
+- `horario` (VARCHAR): Hora del partido (ej: 10:00 AM)
+- Permite configurar múltiples franjas horarias por torneo
+
+**tournament_canchas** (Tabla de canchas disponibles)
+- `tournament_id` (VARCHAR, FK): Referencia a tabla tournaments
+- `cancha` (VARCHAR): Nombre o identificador de la cancha
+- Permite configurar múltiples canchas disponibles por torneo
+
+**matches** (Tabla de partidos)
+- `id` (VARCHAR, PK): Identificador único del partido
+- `homeTeam` (VARCHAR): Equipo local que juega en casa
+- `awayTeam` (VARCHAR): Equipo visitante
+- `matchDate` (VARCHAR): Fecha del partido
+- `homeScore` (INT): Goles del equipo local
+- `awayScore` (INT): Goles del equipo visitante
+- `status` (VARCHAR): Estado del partido (programado, en juego, finalizado)
+- `tournamentName` (VARCHAR): Torneo al que pertenece el partido
+- `refereeEmail` (VARCHAR): Email del árbitro asignado
+- `alineacionesJson` (TEXT): JSON con alineaciones de ambos equipos
+- `goalsJson` (TEXT): JSON con detalle de goles
+- `yellowCardsJson` (TEXT): JSON con tarjetas amarillas
+- `redCardsJson` (TEXT): JSON con tarjetas rojas
+- Relación: cada partido pertenece a un torneo y tiene árbitro asignado
+
+#### Relaciones Funcionales
+
+| Relación | Tipo | Descripción |
+|----------|------|------------|
+| users → team_players → teams | N:M | Un usuario puede jugar en un equipo; un equipo tiene múltiples jugadores |
+| teams → registrations | 1:N | Un equipo puede inscribirse a múltiples torneos |
+| tournaments → registrations | 1:N | Un torneo recibe múltiples inscripciones de equipos |
+| tournaments → matches | 1:N | Un torneo contiene múltiples partidos |
+| tournaments → tournament_horarios | 1:N | Un torneo tiene múltiples horarios disponibles |
+| tournaments → tournament_canchas | 1:N | Un torneo tiene múltiples canchas disponibles |
+| users → invitations | 1:N |Un capitán envía múltiples invitaciones a jugadores |
+| matches → teams | N:N | Los partidos enfrentan dos equipos (local y visitante) |
 
 ---
 
@@ -111,8 +201,10 @@ La base de datos de Zeus-Codensa está diseñada en PostgreSQL con un modelo rel
 El diagrama de clases de Zeus-Codensa refleja la arquitectura de tres capas del sistema: presentación (controladores), capa de negocio (modelos y servicios) y persistencia (entidades y repositorios). Las clases están organizadas siguiendo principios de separación de responsabilidades, herencia (polimorfismo de usuarios) y patrones de diseño como Factory y Strategy.
 
 ### 5.2 Diagrama de Clases del Sistema
-![alt text](<docs/images/diagrama de clases1.1.png>)
 
+A continuación se presenta el diagrama de clases que ilustra la estructura de los modelos del dominio, organizados por capas (presentación, lógica de negocio y persistencia), mostrando las entidades principales y sus relaciones.
+
+![alt text](<docs/images/diagrama de clases1.1.png>)
 
 El diagrama muestra la arquitectura en tres capas:
 
@@ -173,8 +265,10 @@ Spring gestiona automáticamente los componentes como instancias únicas mediant
 ## 6. Diagrama de Componentes del Servicio
 
 ### 6.1 Diagrama de Componentes General
-![alt text](docs/images/ComponentesGeneral.png)
 
+El diagrama general muestra la arquitectura de alto nivel del sistema, representando la interacción entre el usuario, el cliente (frontend), el backend Zeus-Codensa y la base de datos PostgreSQL como componentes principales.
+
+![alt text](docs/images/ComponentesGeneral.png)
 
 ```
 Usuario → Frontend (Web/Mobile) → Backend (Zeus-Codensa) → PostgreSQL
@@ -189,6 +283,9 @@ Usuario → Frontend (Web/Mobile) → Backend (Zeus-Codensa) → PostgreSQL
 **Flujo de comunicación**: El usuario interactúa con el frontend, que envía peticiones HTTP al backend. El backend procesa la solicitud, consulta/modifica datos en la base de datos y devuelve una respuesta JSON al frontend.
 
 ### 6.2 Diagrama de Componentes Específico (Desglose del Backend)
+
+Este diagrama detalla la arquitectura interna del backend Zeus-Codensa, mostrando las cadenas funcionales verticales de cada módulo (Match, Registration, Team, Tournament, User/Player) y los componentes transversales (seguridad, configuración, DTOs, mappers, persistencia) que soportan el sistema.
+
 ![alt text](docs/images/DiagramaDeComponentesEspecifico.drawio.png)
 
 Este diagrama muestra la descomposición interna del backend Zeus-Codensa por cadenas funcionales verticales. Cada cadena sigue el mismo patrón arquitectónico desde la entrada del usuario hasta la persistencia en base de datos.
@@ -221,6 +318,7 @@ Interpretación técnica:
 - La validación centralizada evita que reglas de negocio queden dispersas en controladores.
 - El uso de mappers estandariza la transformación de datos entre API y persistencia.
 - La convergencia de TournamentController y TournamentQueryController en TournamentService concentra la lógica de torneo en un único punto.
+
 
 ### 6.3 Funcionalidades Expuestas (Contratos API)
 
@@ -384,6 +482,8 @@ Esta sección presenta los diagramas de secuencia de las funcionalidades princip
 
 ### 7.1 Función 1 - Login (Flujo de Autenticación)
 
+Este diagrama de secuencia muestra el flujo completo de autenticación de un usuario: validación de credenciales, consulta en base de datos, generación de token JWT y respuesta al cliente.
+
 ![alt text](<docs/images/Diagrama de secuencia 1.png>)
 Explicación:
 - El cliente envía credenciales al endpoint de autenticación.
@@ -394,6 +494,8 @@ Explicación:
 
 ### 7.2 Función 2 - Registro de Usuario
 
+Muestra el flujo de registro de un nuevo usuario: validación de datos, verificación de unicidad de correo, persistencia en base de datos y respuesta con datos del usuario registrado.
+
 ![alt text](<docs/images/Diagrama de secuencia 2.png>)
 Explicación:
 - El cliente envía UserRequestDTO para creación de usuario.
@@ -403,6 +505,9 @@ Explicación:
 - Errores contemplados: 400 (datos inválidos), 409/400 lógica de duplicidad de correo.
 
 ### 7.3 Función 3 - Consulta de Usuarios
+
+Ilustra el proceso de consulta de la lista de usuarios: validación de autenticación, obtención de datos del repositorio, mapeo a DTOs y retorno de colección de usuarios.
+
 ![alt text](<docs/images/Diagrama de secuencia 3.png>)
 
 Explicación:
@@ -413,6 +518,9 @@ Explicación:
 - Errores contemplados: 401 (no autenticado), 500 (fallo no esperado).
 
 ### 7.4 Función 4 - Creación de Equipo
+
+Presenta el flujo de creación de un equipo: validación de nombre y cantidad de jugadores, verificación de no duplicidad, transformación de DTO a modelo y persistencia.
+
 ![alt text](<docs/images/Diagrama de secuencia 4.png>)
 Explicación:
 - El cliente envía TeamRequestDTO.
@@ -422,6 +530,9 @@ Explicación:
 - Se retorna TeamResponseDTO.
 
 ### 7.5 Función 5 - Consulta de Equipos
+
+Muestra el flujo de consulta de equipos: validación de autenticación, obtención de lista del repositorio, mapeo a DTOs de respuesta y retorno de colección de equipos.
+
 ![alt text](<docs/images/Diagrama de secuencia 5.png>)
 
 Explicación:
@@ -432,6 +543,9 @@ Explicación:
 - Escenarios alternos: 204 sin contenido o 500 por error interno.
 
 ### 7.6 Función 6 - Creación de Torneo
+
+Ilustra el flujo de creación de un torneo: validación de datos base (nombre, número de equipos, costo), transformación a modelo y persistencia en repositorio.
+
 ![alt text](<docs/images/Diagrama de secuencia 6.png>)
 Explicación:
 - El cliente envía TournamentRequestDTO con datos base del torneo.
@@ -441,6 +555,9 @@ Explicación:
 - Errores contemplados: 400 por validaciones o duplicidad.
 
 ### 7.7 Función 7 - Configuración de Torneo
+
+Presenta el flujo de configuración avanzada de un torneo: recepción de reglamento, horarios, canchas y sanciones; validación de consistencia y actualización persistida.
+
 ![alt text](<docs/images/Diagrama de secuencia 7.png>)
 Explicación:
 - El cliente envía configuración avanzada del torneo (reglas, horarios, canchas, sanciones).
@@ -450,6 +567,9 @@ Explicación:
 - Escenarios alternos: 404 si torneo no existe, 400 por formato/reglas inválidas.
 
 ### 7.8 Función 8 - Consulta de Torneos
+
+Muestra el flujo de consulta de torneos: validación de JWT, obtención de lista del repositorio, mapeo a DTOs de respuesta y envío de colección de torneos.
+
 ![alt text](<docs/images/Diagrama de secuencia 8.png>)
 Explicación:
 - Se valida JWT para acceso al endpoint.
@@ -458,6 +578,9 @@ Explicación:
 - Se responde lista agregada al cliente.
 
 ### 7.9 Función 9 - Creación de Inscripción
+
+Ilustra el flujo de inscripción de equipo a torneo: validación de existencia de equipo y torneo, verificación de no duplicidad, y persistencia de registro de inscripción.
+
 ![alt text](<docs/images/Diagrama de secuencia 9.png>)
 Explicación:
 - El cliente envía RegistrationRequestDTO.
@@ -467,6 +590,9 @@ Explicación:
 - Errores: 400 por regla de negocio, 404 en recursos no encontrados.
 
 ### 7.10 Función 10 - Actualización de Estado de Inscripción
+
+Presenta el flujo de cambio de estado de una inscripción: validación de autorización, verificación de transiciones válidas entre estados (PENDIENTE, EN_REVISIÓN, APROBADO, RECHAZADO) y actualización persistida.
+
 ![alt text](<docs/images/Diagrama de secuencia 10.png>)
 Explicación:
 - Se valida autenticación/autorización del actor que actualiza estado.
@@ -475,6 +601,9 @@ Explicación:
 - Se persiste el nuevo estado y se retorna la inscripción actualizada.
 
 ### 7.11 Función 11 - Consulta de Inscripciones
+
+Muestra el flujo de consulta de inscripciones: validación de JWT, obtención de lista filtrada del repositorio, mapeo a DTOs de respuesta y retorno de colección.
+
 ![alt text](<docs/images/Diagrama de secuencia 11.png>)
 Explicación:
 - Se valida JWT.
@@ -483,6 +612,9 @@ Explicación:
 - Se retorna lista o respuesta vacía según el resultado.
 
 ### 7.12 Función 12 - Creación de Partido
+
+Ilustra el flujo de creación de un partido: validación de equipos, torneo y elegibilidad; transformación de DTO a modelo y persistencia en repositorio.
+
 ![alt text](<docs/images/Diagrama de secuencia 12.png>)
 Explicación:
 - El cliente envía MatchRequestDTO.
@@ -492,6 +624,9 @@ Explicación:
 - Errores: 400 por datos inválidos o reglas no cumplidas.
 
 ### 7.13 Función 13 - Actualización de Marcador
+
+Presenta el flujo de actualización de marcador de un partido: validación de autorización y estado del partido, actualización de goles y persistencia de cambios.
+
 ![alt text](<docs/images/Diagrama de secuencia 13.png>)
 Explicación:
 - Se valida JWT y permisos del actor.
@@ -500,6 +635,9 @@ Explicación:
 - Se devuelve MatchResponseDTO actualizado.
 
 ### 7.14 Función 14 - Registro de Alineación
+
+Muestra el flujo de registro de alineación: validación de autenticación, verificación de jugadores y su participación en el partido, validación de cantidad permitida y persistencia.
+
 ![alt text](<docs/images/Diagrama de secuencia 14.png>)
 Explicación:
 - Se valida token y autorización.
@@ -508,6 +646,9 @@ Explicación:
 - Se guarda alineación y se retorna partido actualizado.
 
 ### 7.15 Función 15 - Registro de Tarjetas
+
+Ilustra el flujo de registro de tarjetas (amarillas/rojas): validación de permisos, verificación de tipo de tarjeta y jugador objetivo, validación de participación y actualización persistida.
+
 ![alt text](<docs/images/Diagrama de secuencia 15.png>)
 Explicación:
 - Se valida JWT y permisos de registro.
@@ -537,6 +678,8 @@ Explicación:
 - GitHub. (2026). *GitHub Copilot*. https://github.com/features/copilot (consultado el 30 de marzo de 2026).
 - Microsoft. (2026). *Visual Studio Code*. https://code.visualstudio.com/ (consultado el 30 de marzo de 2026).
 - diagrams.net. (2026). *draw.io*. https://www.diagrams.net/ (consultado el 30 de marzo de 2026).
+
+
 
 
 
