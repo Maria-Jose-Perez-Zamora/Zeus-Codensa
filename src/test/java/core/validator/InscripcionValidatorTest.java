@@ -52,7 +52,7 @@ public class InscripcionValidatorTest {
         t.setTournamentName("T1");
         t.setStatus("OPEN");
         when(tournamentRepository.findByTournamentName("T1")).thenReturn(Optional.of(t));
-        when(registrationRepository.findAll()).thenReturn(new ArrayList<>());
+        when(registrationRepository.existsByTeamNameAndTournamentName("EqA", "T1")).thenReturn(false);
     }
 
     @Test
@@ -110,10 +110,7 @@ public class InscripcionValidatorTest {
         t.setStatus("OPEN");
         when(tournamentRepository.findByTournamentName("T1")).thenReturn(Optional.of(t));
 
-        RegistrationEntity reg = new RegistrationEntity();
-        reg.setTeamName("EqA");
-        reg.setTournamentName("T1");
-        when(registrationRepository.findAll()).thenReturn(Collections.singletonList(reg));
+        when(registrationRepository.existsByTeamNameAndTournamentName("EqA", "T1")).thenReturn(true);
 
         assertThrows(IllegalArgumentException.class, () -> registrationValidator.validateForInscripcion(validReq()));
     }

@@ -22,10 +22,14 @@ public class MatchService {
     
     private final MatchValidator matchValidator;
     private final dependencies.persistence.repository.MatchRepository matchRepository;
+    private final dependencies.persistence.repository.UserRepository userRepository;
 
-    public MatchService(MatchValidator matchValidator, dependencies.persistence.repository.MatchRepository matchRepository) {
+    public MatchService(MatchValidator matchValidator, 
+                        dependencies.persistence.repository.MatchRepository matchRepository,
+                        dependencies.persistence.repository.UserRepository userRepository) {
         this.matchValidator = matchValidator;
         this.matchRepository = matchRepository;
+        this.userRepository = userRepository;
     }
 
     public MatchResponseDTO registrarPartido(MatchRequestDTO request) {
@@ -94,19 +98,15 @@ public class MatchService {
     }
 
     public List<MatchResponseDTO> getMatchesByReferee(String refereeEmail) {
-        return matchRepository.findAll().stream()
+        return matchRepository.findByRefereeEmail(refereeEmail).stream()
                 .map(dependencies.persistence.mapper.EntityToModelMapper::toMatchModel)
-                .filter(p -> refereeEmail.equals(p.getRefereeEmail()))
                 .map(MatchMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
-    @org.springframework.beans.factory.annotation.Autowired
-    private dependencies.persistence.repository.UserRepository userRepository;
-
     public MatchResponseDTO asignarArbitro(String id, String refereeEmail) {
         boolean esArbitro = userRepository.findByEmail(refereeEmail)
-                .map(u -> core.model.Role.REFEREE.name().equals(u.getRole()))
+                .map(u -> core.model.Role.REFEREE.equals(u.getRole()))
                 .orElse(false);
         if (!esArbitro) {
             log.error("Assignment failed: {} lacks the REFEREE role", refereeEmail);

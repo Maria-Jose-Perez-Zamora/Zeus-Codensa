@@ -36,10 +36,7 @@ public class TeamValidator {
         }
 
         for (String correo : players) {
-            boolean yaEnEquipo = teamRepository.findAll().stream()
-                    .anyMatch(t -> t.getPlayers() != null && t.getPlayers().stream()
-                            .anyMatch(u -> u.getEmail().equals(correo)));
-            if (yaEnEquipo) {
+            if (teamRepository.existsByPlayersEmail(correo)) {
                 throw new IllegalArgumentException("El player " + correo + " ya pertenece a otro team");
             }
         }

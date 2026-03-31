@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface MatchRepository extends JpaRepository<MatchEntity, String> {
     List<MatchEntity> findByTournamentName(String tournamentName);
+    List<MatchEntity> findByRefereeEmail(String refereeEmail);
 }

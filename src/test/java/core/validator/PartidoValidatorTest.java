@@ -46,17 +46,8 @@ public class PartidoValidatorTest {
         t.setTournamentName("T1");
         when(tournamentRepository.findByTournamentName("T1")).thenReturn(Optional.of(t));
 
-        RegistrationEntity i1 = new RegistrationEntity();
-        i1.setTeamName("EqA");
-        i1.setTournamentName("T1");
-        i1.setStatus("APPROVED");
-
-        RegistrationEntity i2 = new RegistrationEntity();
-        i2.setTeamName("EqB");
-        i2.setTournamentName("T1");
-        i2.setStatus("APPROVED");
-
-        when(registrationRepository.findAll()).thenReturn(Arrays.asList(i1, i2));
+        when(registrationRepository.existsByTeamNameAndTournamentNameAndStatus("EqA", "T1", "APPROVED")).thenReturn(true);
+        when(registrationRepository.existsByTeamNameAndTournamentNameAndStatus("EqB", "T1", "APPROVED")).thenReturn(true);
     }
 
     @Test
@@ -107,12 +98,8 @@ public class PartidoValidatorTest {
         t.setTournamentName("T1");
         when(tournamentRepository.findByTournamentName("T1")).thenReturn(Optional.of(t));
 
-        RegistrationEntity i1 = new RegistrationEntity();
-        i1.setTeamName("EqA");
-        i1.setTournamentName("T1");
-        i1.setStatus("APPROVED");
-
-        when(registrationRepository.findAll()).thenReturn(Collections.singletonList(i1));
+        when(registrationRepository.existsByTeamNameAndTournamentNameAndStatus("EqA", "T1", "APPROVED")).thenReturn(true);
+        when(registrationRepository.existsByTeamNameAndTournamentNameAndStatus("EqB", "T1", "APPROVED")).thenReturn(false);
 
         assertThrows(IllegalArgumentException.class, () -> matchValidator.validateForCreation(validReq()));
     }
@@ -123,12 +110,7 @@ public class PartidoValidatorTest {
         t.setTournamentName("T1");
         when(tournamentRepository.findByTournamentName("T1")).thenReturn(Optional.of(t));
 
-        RegistrationEntity i2 = new RegistrationEntity();
-        i2.setTeamName("EqB");
-        i2.setTournamentName("T1");
-        i2.setStatus("APPROVED");
-
-        when(registrationRepository.findAll()).thenReturn(Collections.singletonList(i2));
+        when(registrationRepository.existsByTeamNameAndTournamentNameAndStatus("EqA", "T1", "APPROVED")).thenReturn(false);
 
         assertThrows(IllegalArgumentException.class, () -> matchValidator.validateForCreation(validReq()));
     }
@@ -139,17 +121,7 @@ public class PartidoValidatorTest {
         t.setTournamentName("T1");
         when(tournamentRepository.findByTournamentName("T1")).thenReturn(Optional.of(t));
 
-        RegistrationEntity i1 = new RegistrationEntity();
-        i1.setTeamName("EqA");
-        i1.setTournamentName("T1");
-        i1.setStatus("PENDING");
-
-        RegistrationEntity i2 = new RegistrationEntity();
-        i2.setTeamName("EqB");
-        i2.setTournamentName("T1");
-        i2.setStatus("APPROVED");
-
-        when(registrationRepository.findAll()).thenReturn(Arrays.asList(i1, i2));
+        when(registrationRepository.existsByTeamNameAndTournamentNameAndStatus("EqA", "T1", "APPROVED")).thenReturn(false);
 
         assertThrows(IllegalArgumentException.class, () -> matchValidator.validateForCreation(validReq()));
     }

@@ -32,10 +32,8 @@ public class MatchValidator {
             throw new IllegalArgumentException("El tournament especificado no existe");
         }
 
-        boolean localInscrito = registrationRepository.findAll().stream()
-                .anyMatch(i -> i.getTeamName().equals(request.getHomeTeam()) && i.getTournamentName().equals(request.getTournamentName()) && i.getStatus().equals("APPROVED"));
-        boolean visitanteInscrito = registrationRepository.findAll().stream()
-                .anyMatch(i -> i.getTeamName().equals(request.getAwayTeam()) && i.getTournamentName().equals(request.getTournamentName()) && i.getStatus().equals("APPROVED"));
+        boolean localInscrito = registrationRepository.existsByTeamNameAndTournamentNameAndStatus(request.getHomeTeam(), request.getTournamentName(), "APPROVED");
+        boolean visitanteInscrito = registrationRepository.existsByTeamNameAndTournamentNameAndStatus(request.getAwayTeam(), request.getTournamentName(), "APPROVED");
 
         if (!localInscrito || !visitanteInscrito) {
             throw new IllegalArgumentException("Los teams deben estar inscritos y APPROVED en el tournament");

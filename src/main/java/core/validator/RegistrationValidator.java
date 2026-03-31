@@ -42,8 +42,7 @@ public class RegistrationValidator {
             throw new IllegalArgumentException("El tournament no existe o no se encuentra OPEN para registrations");
         }
 
-        boolean estaInscrito = registrationRepository.findAll().stream()
-                .anyMatch(r -> r.getTeamName().equals(request.getTeamName()) && r.getTournamentName().equals(request.getTournamentName()));
+        boolean estaInscrito = registrationRepository.existsByTeamNameAndTournamentName(request.getTeamName(), request.getTournamentName());
         if (estaInscrito) {
             throw new IllegalArgumentException("El team ya cuenta con un proceso de registration para este tournament");
         }

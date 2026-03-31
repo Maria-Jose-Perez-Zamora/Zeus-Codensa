@@ -42,7 +42,7 @@ public class TeamValidatorTest {
     @Test
     public void testValid() {
         when(teamRepository.findByTeamName(anyString())).thenReturn(Optional.empty());
-        when(teamRepository.findAll()).thenReturn(new ArrayList<>());
+        when(teamRepository.existsByPlayersEmail(anyString())).thenReturn(false);
         assertDoesNotThrow(() -> teamValidator.validateForCreation(validReq()));
     }
 
@@ -86,18 +86,7 @@ public class TeamValidatorTest {
 
     @Test
     public void testJugadorYaEnEquipo() {
-        TeamEntity t = new TeamEntity();
-        t.setTeamName("EqB");
-        UserEntity j = new UserEntity(); j.setEmail("1");
-        List<UserEntity> players = new ArrayList<>();
-        players.add(j);
-        t.setPlayers(players);
-
-        List<TeamEntity> teams = new ArrayList<>();
-        teams.add(t);
-
-        when(teamRepository.findByTeamName("EqA")).thenReturn(Optional.empty());
-        when(teamRepository.findAll()).thenReturn(teams);
+        when(teamRepository.existsByPlayersEmail("1")).thenReturn(true);
 
         assertThrows(IllegalArgumentException.class, () -> teamValidator.validateForCreation(validReq()));
     }

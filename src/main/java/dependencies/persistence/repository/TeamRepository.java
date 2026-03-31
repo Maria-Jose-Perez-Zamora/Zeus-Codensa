@@ -8,4 +8,5 @@ import dependencies.persistence.entity.TeamEntity;
 
 public interface TeamRepository extends JpaRepository<TeamEntity, Long> {
     Optional<TeamEntity> findByTeamName(String teamName);
+    boolean existsByPlayersEmail(String email);
 }
