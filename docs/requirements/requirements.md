@@ -1,11 +1,13 @@
 # Requerimientos del sistema – TECHCUP Fútbol
-**Nombre del Equipo:** Zeus-Codensa
+**Nombre del Equipo:** Zeus-Codensa  
 **Integrantes:** Nicolas Sanchez, Maria Jose Perez, Andres Pineda, Diego Andrade, Stiven Pardo
 
-## Requerimientos funcionales principales1. Gestionar torneos: crear, iniciar, finalizar y consultar torneos.
+## Requerimientos funcionales principales
+
+1. Gestionar torneos: crear, iniciar, finalizar y consultar torneos.
 2. Registrar usuarios y jugadores por rol (estudiante, graduado, profesor, administrativo, familiar, capitán, organizador, árbitro, administrador).
-3. Gestionar equipos: crear equipo, invitar jugadores y validar reglas de conformación (mínimo/máximo de jugadores y sin duplicidad).
-4. Gestionar inscripciones y pagos: cargar comprobante y administrar estados (pendiente, en revisión, aprobado, rechazado).
+3. Gestionar equipos: crear equipo, invitar jugadores y validar reglas de conformación (mínimo 7 / máximo 20 jugadores y sin duplicidad).
+4. Gestionar inscripciones y pagos: cargar comprobante y administrar estados (`PENDING` → `IN_REVIEW` → `APPROVED` / `REJECTED`).
 5. Configurar torneo: reglamento, fechas clave, cierre de inscripciones, horarios, canchas y sanciones.
 6. Registrar partidos: marcador, goleadores y tarjetas.
 7. Calcular automáticamente tabla de posiciones y generar llaves eliminatorias.
@@ -14,7 +16,7 @@
 # Requerimientos no funcionales principales
 
 1. Diseño responsivo: la plataforma debe adaptarse correctamente a pantallas de celular y computador.
-2. Seguridad y acceso: autenticación mediante **JWT (JSON Web Tokens)** con correo institucional `@escuelaing.edu.co` en formato `nombre.apellido-inicial@escuelaing.edu.co`. Los tokens tienen una vigencia de **1 hora (TTL)**. Rol-based access control (RBAC) enforces resource-level permissions.
+2. Seguridad y acceso: autenticación mediante **JWT (JSON Web Tokens)** con correo institucional `@escuelaing.edu.co` en formato `nombre.apellido-inicial@escuelaing.edu.co`. Los tokens tienen una vigencia de **1 hora (TTL)**. Control de acceso basado en roles (RBAC) que aplica permisos a nivel de recurso.
 3. Transporte seguro: la aplicación expone sus servicios exclusivamente por **HTTPS en el puerto 8443** con certificado SSL (PKCS12). Las peticiones entrantes por HTTP (puerto 8080) son redirigidas automáticamente a HTTPS.
 4. CORS controlado: se admiten peticiones de los orígenes de desarrollo del frontend (`localhost:3000`, `localhost:4200`, `localhost:5173`).
 5. Auditoría: registrar acciones relevantes para trazabilidad de cambios y operaciones mediante SLF4J/Logback.
@@ -27,424 +29,729 @@
 # Requerimientos funcionales detallados
 
 
-# RF-001: Gestionar Torneos
+# RF-001: Login – Flujo de Autenticación
 
 ## Funcionalidad
 
 | Código | Nombre |
 |--------|--------|
-| RF-001 | Gestión de Torneos |
+| RF-001 | Login – Flujo de Autenticación |
 
 | Descripción | Cómo se ejecuta | Actor principal | Precondiciones |
 |-------------|-----------------|-----------------|-----------------|
-| El sistema permite crear, configurar, iniciar y finalizar torneos. Un organizador puede definir la información básica del torneo (fechas, cantidad de equipos, costo) y cambiar su estado entre Borrador, Activo, En progreso y Finalizado. | El organizador accede a la sección de torneos y crea uno nuevo con los datos básicos. Luego puede iniciar el torneo cuando sea el momento. | Organizador | El usuario debe tener rol de organizador. |
+| El sistema permite a los usuarios autenticarse mediante su correo institucional y contraseña. Si las credenciales son válidas, se genera un JWT firmado con el rol del usuario como claim y un TTL de 1 hora. | El usuario envía `POST /api/auth/login` con su correo y contraseña. El sistema valida las credenciales, asigna el rol y retorna el token. | Cualquier usuario registrado | El usuario debe estar previamente registrado en el sistema. |
 
 ## Datos de entrada
 
-| Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
-|--------|-------------|----------------|-------------------|-------------|
-| tournamentName | Nombre del torneo | Texto | Único en el sistema. No puede estar vacío. | Sí |
-| numeroEquipos | Número de equipos máximo | Número | Mayor que 1 | Sí |
-| costoInscripcion | Costo de la inscripción | Dinero | No puede ser negativo | Sí |
+| Nombre | Descripción | Tipo de dato | Reglas / Validación | Obligatorio |
+|--------|-------------|--------------|---------------------|-------------|
+| `correo` | Correo institucional del usuario | `String` | No puede ser nulo. Debe cumplir el patrón `nombre.apellido-inicial@escuelaing.edu.co`. | Sí |
+| `contrasena` | Contraseña del usuario | `String` | No puede ser nula. Mínimo 6 caracteres. | Sí |
 
 ## Datos de salida
 
-| Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
-|--------|-------------|----------------|-------------------|-------------|
-| ID del torneo | Identificador único asignado | Número | Generado automáticamente | Sí |
-| Estado del torneo | Estado actual del torneo | Selección | Borrador, Activo, En progreso, Finalizado | Sí |
-| Mensaje de confirmación | Confirmación de la acción realizada | Texto | Mensaje de éxito o error | Sí |
+| Nombre | Descripción | Tipo de dato | Reglas / Aplicación | Obligatorio |
+|--------|-------------|--------------|---------------------|-------------|
+| `userId` | Identificador único del usuario | `Long` | Generado automáticamente. | Sí |
+| `correo` | Correo del usuario autenticado | `String` | Correo institucional del usuario. | Sí |
+| `role` | Rol del usuario en el sistema | `String` | Rol asignado al usuario (`PLAYER`, `CAPTAIN`, `REFEREE`, `TOURNAMENT_ORGANIZER`, `ADMINISTRADOR_SISTEMA`). | Sí |
+| `token` | JWT generado | `String` | Firmado con HS256. TTL: 1 hora. | Sí |
 
 ## Flujo básico
 
 | Paso | Actor | Descripción | Excepciones |
 |------|-------|-------------|-------------|
-| 1 | Organizador | Envía `POST /api/tournaments` con `tournamentName`, `numeroEquipos`, `costoInscripcion` | Sin autenticación JWT: `401 Unauthorized`. Sin rol `TOURNAMENT_ORGANIZER`: `403 Forbidden` |
-| 2 | Sistema (`TournamentValidator`) | Valida que el nombre no esté duplicado y `numeroEquipos > 1` y `costoInscripcion >= 0` | Datos inválidos: `400 Bad Request` con mensaje |
-| 3 | Sistema | Crea el torneo con estado `OPEN` | - |
-| 4 | Sistema | Responde con el DTO del torneo creado | - |
+| 1 | Cliente | Envía `POST /api/auth/login` con `correo` y `contrasena`. | — |
+| 2 | Sistema (`AuthService`) | Valida que `correo` y `contrasena` no sean nulos ni vacíos. | Campos nulos o vacíos: `400 Bad Request` con `IllegalArgumentException`. |
+| 3 | Sistema | Busca el usuario por correo en `UserRepository`. | — |
+| 4 | Sistema | Si el usuario no existe o la contraseña no coincide, lanza excepción. | Usuario no encontrado o credenciales incorrectas: `400 Bad Request`, `"Credenciales incorrectas"` con `BusinessRuleException`. |
+| 5 | Sistema | Asigna el rol del usuario encontrado. | — |
+| 6 | Sistema (`JWTProvider`) | Genera un JWT firmado (HS256) con el rol como claim. TTL: 1 hora. | — |
+| 7 | Sistema | Retorna `LoginResponseDTO(userId, correo, role, token)` con `200 OK`. | — |
 
 ## Flujo alterno
 
 | Paso | Actor | Descripción | Excepciones |
 |------|-------|-------------|-------------|
-| 1 | Organizador | Envía `PUT /api/tournaments/{id}` para actualizar datos | Torneo no encontrado: `404 Not Found` |
-| 2 | Sistema | Valida rol `TOURNAMENT_ORGANIZER` | Sin permiso: `403 Forbidden` |
+| 1 | Sistema | Un token previamente emitido es usado en una petición posterior y está inválido o expirado. | `401 Unauthorized`. |
 
 
-# RF-002: Registrar Usuarios y Jugadores
+# RF-002: Registro de Usuario
 
 ## Funcionalidad
 
 | Código | Nombre |
 |--------|--------|
-| RF-002 | Registro de Usuarios y Jugadores |
+| RF-002 | Registro de Usuario |
 
 | Descripción | Cómo se ejecuta | Actor principal | Precondiciones |
 |-------------|-----------------|-----------------|-----------------|
-| Cada participante se registra en el sistema con su **correo institucional** en formato `nombre.apellido-inicial@escuelaing.edu.co`. El sistema valida el formato del correo en el backend (`UserValidator`) antes de crear el usuario. Los roles disponibles en el sistema son: `PLAYER`, `CAPTAIN`, `REFEREE`, `TOURNAMENT_ORGANIZER`, `ADMINISTRADOR_SISTEMA`. | El usuario envía una petición `POST /api/users` con sus datos. El sistema valida el formato del correo, la contraseña (mínimo 6 caracteres), la posición y número de dorsal (obligatorios para PLAYER y CAPTAIN). | PLAYER / CAPTAIN / REFEREE / TOURNAMENT_ORGANIZER / ADMINISTRADOR_SISTEMA | Ninguna (endpoint público) |
+| Cada participante se registra en el sistema con su **correo institucional** en formato `nombre.apellido-inicial@escuelaing.edu.co`. El sistema valida el formato del correo en el backend (`UserValidator`) antes de crear el usuario. Los roles disponibles son: `PLAYER`, `CAPTAIN`, `REFEREE`, `TOURNAMENT_ORGANIZER`, `ADMINISTRADOR_SISTEMA`. | El usuario envía `POST /api/users/register` con sus datos. El sistema valida el correo, la contraseña (mínimo 6 caracteres), la posición y el número de dorsal (obligatorios para `PLAYER` y `CAPTAIN`). | `PLAYER`, `CAPTAIN`, `REFEREE`, `TOURNAMENT_ORGANIZER`, `ADMINISTRADOR_SISTEMA` | Ninguna (endpoint público). |
 
 ## Datos de entrada
 
-| Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
-|--------|-------------|----------------|-------------------|-------------|
-| name | Nombre del usuario | Texto | No puede estar vacío | Sí |
-| email | Correo institucional | Correo | Debe seguir el patrón `nombre.apellido-inicial@escuelaing.edu.co` | Sí |
-| password | Contraseña | Texto | Mínimo 6 caracteres | Sí |
-| role | Rol del sistema | Enum | `PLAYER`, `CAPTAIN`, `REFEREE`, `TOURNAMENT_ORGANIZER`, `ADMINISTRADOR_SISTEMA` | Sí |
-| position | Posición de juego | Texto | Obligatorio para `PLAYER` y `CAPTAIN` | Condicional |
-| jerseyNumber | Número de dorsal | Número | Mayor que 0. Obligatorio para `PLAYER` y `CAPTAIN` | Condicional |
+| Nombre | Descripción | Tipo de dato | Reglas / Validación | Obligatorio |
+|--------|-------------|--------------|---------------------|-------------|
+| `name` | Nombre completo del usuario | `String` | No puede estar vacío. | Sí |
+| `email` | Correo institucional | `String` | Debe cumplir el patrón `nombre.apellido-inicial@escuelaing.edu.co`. Único en el sistema. | Sí |
+| `password` | Contraseña | `String` | Mínimo 6 caracteres. Se almacena cifrada (BCrypt). | Sí |
+| `role` | Rol del usuario en el sistema | `Enum` | `PLAYER`, `CAPTAIN`, `REFEREE`, `TOURNAMENT_ORGANIZER`, `ADMINISTRADOR_SISTEMA`. | Sí |
+| `position` | Posición de juego | `String` | Obligatorio para `PLAYER` y `CAPTAIN`. Valores: `Portero`, `Defensa`, `Volante`, `Delantero`. | Condicional |
+| `jerseyNumber` | Número de dorsal | `Integer` | Mayor que 0. Obligatorio para `PLAYER` y `CAPTAIN`. | Condicional |
 
 ## Datos de salida
 
-| Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
-|--------|-------------|----------------|-------------------|-------------|
-| ID de usuario | Identificador único | Número | Generado automáticamente | Sí |
-| Perfil completado | Confirmación de registro | Booleano | Sí/No | Sí |
-| Mensaje de confirmación | Confirmación de créación | Texto | Mensaje de éxito | Sí |
+| Nombre | Descripción | Tipo de dato | Reglas / Aplicación | Obligatorio |
+|--------|-------------|--------------|---------------------|-------------|
+| `id` | Identificador único del usuario | `Long` | Generado automáticamente. | Sí |
+| `profileCompleted` | Indica si el perfil fue creado exitosamente | `Boolean` | `true` si el registro fue exitoso. | Sí |
+| `message` | Mensaje de confirmación | `String` | Mensaje de éxito o descripción del error. | Sí |
 
 ## Flujo básico
 
 | Paso | Actor | Descripción | Excepciones |
 |------|-------|-------------|-------------|
-| 1 | Jugador | Envía `POST /api/users` con `name`, `email`, `password`, `role` | - |
-| 2 | Sistema (`UserValidator`) | Valida que `email` cumpla `nombre.apellido-inicial@escuelaing.edu.co` | Formato incorrecto: `400 Bad Request` |
-| 3 | Sistema | Valida que `password` tenga al menos 6 caracteres | Contraseña corta: `400 Bad Request` |
-| 4 | Sistema | Para roles `PLAYER`/`CAPTAIN`: valida que `position` y `jerseyNumber` estén presentes | Datos faltantes: `400 Bad Request` |
-| 5 | Sistema | Valida que el correo no esté duplicado en el sistema | Correo existente: `400 Bad Request` |
-| 6 | Sistema | Crea el usuario según su rol (via `UserFactory`) y responde con el DTO | - |
+| 1 | Cliente | Envía `POST /api/users/register` con `name`, `email`, `password`, `role`. | — |
+| 2 | Sistema (`UserController`) | Valida que el token JWT sea válido si se requiere. | Token inválido/expirado: `401 Unauthorized`. |
+| 3 | Sistema (`UserValidator`) | Ejecuta `validateForRegistration(requestDTO)`: valida formato de `email`, longitud de `password`, y campos condicionales de `PLAYER`/`CAPTAIN`. | Datos inválidos o regla incumplida: `400 Bad Request` con `BusinessRuleException`. |
+| 4 | Sistema (`UserMapper`) | Ejecuta `toEntity(requestDTO)` para convertir el DTO al modelo `User`. | — |
+| 5 | Sistema (`UserRepository`) | Ejecuta `save(newUser)`. Si el correo ya está registrado, lanza excepción. | Correo ya registrado: `400 Bad Request` con `BusinessRuleException`. |
+| 6 | Sistema (`UserMapper`) | Ejecuta `toDTO(newUser)` para obtener `UserResponseDTO`. | — |
+| 7 | Sistema | Retorna `200 OK + UserResponseDTO`. | — |
 
 ## Flujo alterno
 
 | Paso | Actor | Descripción | Excepciones |
 |------|-------|-------------|-------------|
-| 1 | Usuario | Envía `POST /api/auth` con `email` y `password` | - |
-| 2 | Sistema (`AuthService`) | Busca usuario por correo y contraseña | Credenciales inválidas: `400 BusinessRuleException` |
-| 3 | Sistema (`JwtService`) | Genera un JWT firmado (HS256) con el rol del usuario como claim, TTL 1h | - |
-| 4 | Sistema | Retorna `LoginResponseDTO` con el token y datos del usuario | - |
+| 1 | Sistema | Error inesperado durante el proceso. | `500 Internal Server Error` con `GenericException`. |
 
 
-# RF-003: Gestionar Equipos (Creación, invitaciones, búsqueda de jugadores)
+# RF-003: Consulta de Usuarios
 
 ## Funcionalidad
 
 | Código | Nombre |
 |--------|--------|
-| RF-003 | Gestión de Equipos |
+| RF-003 | Consulta de Usuarios |
+
+| Descripción | Cómo se ejecuta | Actor principal | Precondiciones |
+|-------------|-----------------|-----------------|-----------------|
+| El sistema permite listar todos los usuarios registrados. Los datos se retornan como una lista de `UserResponseDTO`. | El cliente envía `GET /api/users/all`. El sistema valida el JWT, consulta el repositorio y mapea los resultados. | Cualquier usuario autenticado | Token JWT válido y no expirado. |
+
+## Datos de entrada
+
+| Nombre | Descripción | Tipo de dato | Reglas / Validación | Obligatorio |
+|--------|-------------|--------------|---------------------|-------------|
+| `Authorization` | Header con el token JWT | `String` | Formato `Bearer <token>`. | Sí |
+
+## Datos de salida
+
+| Nombre | Descripción | Tipo de dato | Reglas / Aplicación | Obligatorio |
+|--------|-------------|--------------|---------------------|-------------|
+| `List<UserResponseDTO>` | Lista de usuarios registrados | `List` | Cada elemento contiene los datos públicos del usuario. | Sí |
+
+## Flujo básico
+
+| Paso | Actor | Descripción | Excepciones |
+|------|-------|-------------|-------------|
+| 1 | Cliente | Envía `GET /api/users/all` con header `Authorization: Bearer <token>`. | — |
+| 2 | Sistema (`JWTProvider`) | Valida el token JWT. | Token inválido/expirado: `401 Unauthorized`. |
+| 3 | Sistema (`UserService`) | Ejecuta `getAllUsers()` → llama a `UserRepository.findAll()`. | — |
+| 4 | Sistema | Si la lista está vacía, retorna `[]`. | Lista vacía: `204 No Content`. |
+| 5 | Sistema (`UserMapper`) | Por cada usuario: ejecuta `toDTO(User)` → obtiene `UserResponseDTO`. (Loop) | — |
+| 6 | Sistema | Retorna `200 OK + List<UserResponseDTO>`. | — |
+
+## Flujo alterno
+
+| Paso | Actor | Descripción | Excepciones |
+|------|-------|-------------|-------------|
+| 1 | Sistema | Error inesperado durante la consulta. | `500 Internal Server Error` con `GenericException`. |
+
+
+# RF-004: Creación de Equipo
+
+## Funcionalidad
+
+| Código | Nombre |
+|--------|--------|
+| RF-004 | Creación de Equipo |
 
 ## Prototipos e Interfaces Visuales (Mockups)
 
-🔗 **Link de Figma:** [https://tag-skit-64046987.figma.site/](https://tag-skit-64046987.figma.site/)
-
-![img_1.png](img_1.png)
-
-## Funcionalidad Restante
+🔗 **Link de Figma:** https://www.figma.com/make/wZnY6r0oYU309jDTJmjvGY/Mockup-Zeus-Codensa?fullscreen=1&t=bSMPtVvNZMNYLrdZ-1&preview-route=%2Fauth%2Flogin
 
 | Descripción | Cómo se ejecuta | Actor principal | Precondiciones |
 |-------------|-----------------|-----------------|-----------------|
-| Los capitanes crean equipos con nombre, escudo, colores de uniforme. Invitan jugadores a sus equipos respetando las reglas: mínimo 7 jugadores, máximo 12, sin duplicidad de jugador en equipos, más de la mitad de los miembros deben ser de los programas de Ingeniería de Sistemas, IA, Ciberseguridad y Estadística. Los capitanes pueden buscar jugadores disponibles por posición, semestre, edad, género, nombre e identificación. | El capitán accede a su panel, crea el equipo ingresando nombre, carga escudo e indica colores. Luego busca jugadores por criterios y envía invitaciones. Los jugadores aceptan o rechazan iniciativas. | Capitán | El usuario debe tener o cambiar a rol de capitán. Debe existir un torneo activo. |
+| Los capitanes crean equipos con nombre, escudo y colores de uniforme. Se validan las reglas: mínimo 7 jugadores, máximo 20, sin duplicidad de jugador entre equipos, y más del 50% de los miembros deben pertenecer a programas autorizados. | El capitán envía `POST /api/teams/create` con `TeamRequestDTO`. El sistema valida el JWT, aplica reglas de negocio y persiste el equipo. | Capitán | El usuario debe tener rol `CAPTAIN`. Debe existir al menos un torneo en estado `OPEN`. |
 
 ## Datos de entrada (Crear equipo)
 
-| Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
-|--------|-------------|----------------|-------------------|-------------|
-| teamName | Nombre del equipo | Texto | Único en el sistema | Sí |
-| shieldUrl | URL del escudo del equipo | Texto | URL válida | No |
-| uniformColor | Color del uniforme | Texto | Libre | No |
-| playerEmails | Lista de correos de jugadores | Lista de Texto | Entre **7 y 20** correos. Sin duplicados. Cada correo debe pertenecer a un usuario registrado. Un jugador no puede pertenecer a dos equipos simultáneamente. | Sí |
+| Nombre | Descripción | Tipo de dato | Reglas / Validación | Obligatorio |
+|--------|-------------|--------------|---------------------|-------------|
+| `teamName` | Nombre del equipo | `String` | Único en el sistema. No puede estar vacío. | Sí |
+| `shieldUrl` | URL del escudo del equipo | `String` | URL válida (formato `http/https`). | No |
+| `uniformColor` | Color del uniforme | `String` | Valor libre (texto descriptivo). | No |
+| `jugadoresCorreos` | Lista de correos de jugadores | `List<String>` | Entre **7 y 20** correos. Sin duplicados. Cada correo debe pertenecer a un usuario registrado con rol `PLAYER`. Un jugador no puede pertenecer a dos equipos simultáneamente. | Sí |
 
 ## Datos de entrada (Búsqueda de jugadores)
 
-| Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
-|--------|-------------|----------------|-------------------|-------------|
-| Posición | Filtro por posición de juego | Selección | Portero, Defensa, Volante, Delantero | No |
-| Semestre | Filtro por semestre académico | Número | Aplica solo a estudiantes | No |
-| Edad | Filtro por edad | Número | Rango mínimo y máximo | No |
-| Género | Filtro por género | Selección | Masculino, Femenino, Otro | No |
-| Nombre | Búsqueda por nombre | Texto | Búsqueda parcial permitida | No |
-| Identificación | Búsqueda por ID | Texto | Búsqueda exacta | No |
+| Nombre | Descripción | Tipo de dato | Reglas / Validación | Obligatorio |
+|--------|-------------|--------------|---------------------|-------------|
+| `position` | Posición de juego | `Enum` | `Portero`, `Defensa`, `Volante`, `Delantero`. | No |
+| `semester` | Semestre académico | `Integer` | Solo aplica para usuarios con tipo `Estudiante`. | No |
+| `ageMin` | Edad mínima | `Integer` | Mayor que 0. | No |
+| `ageMax` | Edad máxima | `Integer` | Mayor o igual a `ageMin`. | No |
+| `gender` | Género del jugador | `Enum` | `Masculino`, `Femenino`, `Otro`. | No |
+| `name` | Nombre del jugador | `String` | Búsqueda parcial (contiene). | No |
+| `identification` | Número de identificación | `String` | Búsqueda exacta. | No |
 
 ## Datos de salida
 
-| Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
-|--------|-------------|----------------|-------------------|-------------|
-| ID del equipo | Identificador único | Número | Generado automáticamente | Sí |
-| Lista de jugadores disponibles | Resultados de búsqueda | Lista | Jugadores marcados como disponibles | Sí |
-| Estado de invitación | Estado de la invitación enviada | Selección | Pendiente, Aceptada, Rechazada | Sí |
-| Mensaje de confirmación | Confirmación de acción | Texto | Mensaje de éxito o error | Sí |
+| Nombre | Descripción | Tipo de dato | Reglas / Aplicación | Obligatorio |
+|--------|-------------|--------------|---------------------|-------------|
+| `teamId` | Identificador único del equipo | `Long` | Generado automáticamente. | Sí |
+| `availablePlayers` | Lista de jugadores disponibles | `List<PlayerDTO>` | Solo jugadores que no pertenecen a ningún equipo. | Sí |
+| `invitationStatus` | Estado de la invitación enviada | `Enum` | `PENDING`, `ACCEPTED`, `REJECTED`. | Sí |
+| `message` | Mensaje de confirmación o error | `String` | Mensaje de éxito o descripción del error. | Sí |
 
 ## Flujo básico
 
 | Paso | Actor | Descripción | Excepciones |
 |------|-------|-------------|-------------|
-| 1 | Capitán | Envía `POST /api/teams` con `teamName` y lista `playerEmails` | Sin rol `CAPTAIN`: `403 Forbidden` |
-| 2 | Sistema (`TeamValidator`) | Valida que el `teamName` sea único | Nombre duplicado: `400 Bad Request` |
-| 3 | Sistema | Valida que la lista tenga entre 7 y 20 correos, sin duplicados | Tamaño inválido o duplicados: `400 Bad Request` |
-| 4 | Sistema | Valida que ningún correo pertenezca ya a otro equipo | Jugador repetido: `400 Bad Request` con nombre del correo |
-| 5 | Sistema (`TeamService`) | Busca en `DataStorage` los usuarios con los correos provistos y los asocia al equipo | Correo no registrado: jugador no se suma (sin error bloqueante) |
-| 6 | Sistema | Agrega el equipo a `DataStorage` y retorna el DTO | - |
+| 1 | Cliente (Capitán) | Envía `POST /api/teams/create` con `TeamRequestDTO`. | — |
+| 2 | Sistema (`JWTProvider`) | Valida el token JWT. | Token inválido/expirado: `401 Unauthorized`. Sin rol `CAPTAIN`: `403 Forbidden`. |
+| 3 | Sistema (`TeamValidator`) | Ejecuta `validateForCreation(requestDTO)`: valida nombre único, tamaño de lista (7–20), sin correos duplicados. | Datos inválidos: `400 Bad Request` con `BusinessRuleException`. |
+| 4 | Sistema (`TeamMapper`) | Ejecuta `toEntity(requestDTO)` → obtiene objeto `Team`. | — |
+| 5 | Sistema (`UserRepository`) | Por cada correo en `jugadoresCorreos`: ejecuta `findByEmail(correo)`. (Loop) | Usuario no encontrado: `404 Not Found` con `ResourceNotFoundException`. |
+| 6 | Sistema | Si el usuario existe, lo agrega a `foundUsers`. | — |
+| 7 | Sistema | Si `foundUsers` está vacío, lanza excepción. | Lista vacía: `400 Bad Request` con `BusinessRuleException`. |
+| 8 | Sistema | Ejecuta `newTeam.setJugadores(foundUsers)`. | — |
+| 9 | Sistema (`TeamRepository`) | Ejecuta `save(newTeam)`. Retorna el `Team` persistido. | — |
+| 10 | Sistema (`TeamMapper`) | Ejecuta `toDTO(newTeam)` → obtiene `TeamResponseDTO`. | — |
+| 11 | Sistema | Retorna `200 OK + TeamResponseDTO`. | — |
 
 ## Flujo alterno
 
 | Paso | Actor | Descripción | Excepciones |
 |------|-------|-------------|-------------|
-| 1 | Capitán | Intenta agregar un jugador ya en otro equipo | `TeamValidator` rechaza la petición completa con `400` |
+| 1 | Capitán | Intenta agregar un jugador que ya pertenece a otro equipo. | `TeamValidator` rechaza toda la petición con `400 Bad Request`. |
 
 
-> **Endpoint REST:** `POST /api/auth` (público) — Retorna JWT Bearer con TTL 1 h.
-
-# RF-004: Gestionar Inscripciones y Pagos
+# RF-005: Consulta de Equipos
 
 ## Funcionalidad
 
 | Código | Nombre |
 |--------|--------|
-| RF-004 | Gestión de Inscripciones y Pagos |
+| RF-005 | Consulta de Equipos |
 
 | Descripción | Cómo se ejecuta | Actor principal | Precondiciones |
 |-------------|-----------------|-----------------|-----------------|
-| El capitán sube el comprobante de pago. El organizador o administrador cambia el estado siguiendo la **máquina de estados estricta**: `PENDING` → `IN_REVIEW` → `APPROVED` / `REJECTED`. Las transiciones fuera de secuencia son rechazadas. Solo equipos con estado `APPROVED` pueden participar en partidos. | `POST /api/registrations` (CAPTAIN, TOURNAMENT_ORGANIZER) para crear/subir comprobante; `PUT /api/registrations/{id}` (ADMINISTRADOR_SISTEMA, TOURNAMENT_ORGANIZER) para actualizar el estado. | Capitán (sube comprobante), Organizador / Administrador (cambia estado) | Torneo activo. Equipo conformado. |
+| El sistema permite listar todos los equipos registrados. Los datos se retornan como una lista de `TeamResponseDTO`. | El cliente envía `GET /api/teams/all`. El sistema valida el JWT, consulta el repositorio y mapea los resultados. | Cualquier usuario autenticado | Token JWT válido y no expirado. |
 
-## Datos de entrada (Capitán)
+## Datos de entrada
 
-| Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
-|--------|-------------|----------------|-------------------|-------------|
-| teamName | Nombre del equipo | Texto | Debe existir en el sistema | Sí |
-| tournamentName | Nombre del torneo | Texto | El torneo debe existir y estar en estado `OPEN` | Sí |
-| comprobantePagoUrl | URL del comprobante de pago | Texto | No puede estar vacía | Sí |
-
-## Datos de entrada (Organizador/Administrador — Actualización de Estado)
-
-| Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
-|--------|-------------|----------------|-------------------|-------------|
-| nuevoEstado | Nuevo estado de la inscripción | Enum | `IN_REVIEW`, `APPROVED` o `REJECTED` según la fase actual | Sí |
+| Nombre | Descripción | Tipo de dato | Reglas / Validación | Obligatorio |
+|--------|-------------|--------------|---------------------|-------------|
+| `Authorization` | Header con el token JWT | `String` | Formato `Bearer <token>`. | Sí |
 
 ## Datos de salida
 
-| Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
-|--------|-------------|----------------|-------------------|-------------|
-| Estado de inscripción | Estado actual del equipo | Enum | `PENDING`, `IN_REVIEW`, `APPROVED`, `REJECTED` | Sí |
-| Mensaje de confirmación | Confirmación de acción | Texto | Mensaje de éxito o error | Sí |
-| Notificación al capitán | Notificación de aceptación/rechazo | Correo electrónico | Enviado automáticamente | Sí |
+| Nombre | Descripción | Tipo de dato | Reglas / Aplicación | Obligatorio |
+|--------|-------------|--------------|---------------------|-------------|
+| `List<TeamResponseDTO>` | Lista de equipos registrados | `List` | Cada elemento contiene los datos del equipo. | Sí |
 
 ## Flujo básico
 
 | Paso | Actor | Descripción | Excepciones |
 |------|-------|-------------|-------------|
-| 1 | Capitán | Envía `POST /api/registrations` con `teamName`, `tournamentName`, `comprobantePagoUrl` | Sin rol `CAPTAIN`: `403 Forbidden` |
-| 2 | Sistema (`RegistrationValidator`) | Valida que el equipo exista en `DataStorage` | Equipo no encontrado: `400 Bad Request` |
-| 3 | Sistema | Valida que el torneo exista y esté en estado `OPEN` | Torneo cerrado o inexistente: `400 Bad Request` |
-| 4 | Sistema | Valida que el equipo no tenga ya una inscripción en ese torneo | Duplicado: `400 Bad Request` |
-| 5 | Sistema | Crea la inscripción con estado inicial `PENDING` | - |
-| 6 | Organizador/Admin | Envía `PUT /api/registrations/{id}` con `nuevoEstado: IN_REVIEW` | Sin rol `ADMINISTRADOR_SISTEMA`/`TOURNAMENT_ORGANIZER`: `403 Forbidden` |
-| 7 | Sistema (`RegistrationService`) | Valida transición `PENDING` → `IN_REVIEW` | Transición no válida: `BusinessRuleException` |
-| 8 | Organizador/Admin | Envía `PUT /api/registrations/{id}` con `nuevoEstado: APPROVED` o `REJECTED` | - |
-| 9 | Sistema | Valida transición `IN_REVIEW` → `APPROVED`/`REJECTED` | - |
-| 10 | Sistema | Estado queda en `APPROVED` o `REJECTED` (estado final, no modificable) | Intento de modificar estado final: `BusinessRuleException` |
+| 1 | Cliente | Envía `GET /api/teams/all` con header `Authorization: Bearer <token>`. | — |
+| 2 | Sistema (`JWTProvider`) | Valida el token JWT. | Token inválido/expirado: `401 Unauthorized`. |
+| 3 | Sistema (`TeamService`) | Ejecuta `getAllTeams()` → llama a `TeamRepository.findAll()`. | — |
+| 4 | Sistema | Si la lista está vacía, retorna `[]`. | Lista vacía: `204 No Content`. |
+| 5 | Sistema (`TeamMapper`) | Por cada equipo: ejecuta `toDTO(Team)` → obtiene `TeamResponseDTO`. (Loop) | — |
+| 6 | Sistema | Retorna `200 OK + List<TeamResponseDTO>`. | — |
 
 ## Flujo alterno
 
 | Paso | Actor | Descripción | Excepciones |
 |------|-------|-------------|-------------|
-| 1 | Organizador | Intenta rechazar una inscripción ya aprobada | `RegistrationService` rechaza con `BusinessRuleException: estado definitivo` |
+| 1 | Sistema | Error inesperado durante la consulta. | `500 Internal Server Error` con `GenericException`. |
 
 
-# RF-005: Configurar Torneo (Reglamento, fechas, horarios, canchas, sanciones)
-
-## Funcionalidad
-
-| Código | Nombre |
-|--------|--------|
-| RF-005 | Configuración del Torneo |
-
-| Descripción | Cómo se ejecuta | Actor principal | Precondiciones |
-|-------------|-----------------|-----------------|-----------------|
-| Después de crear el torneo, el organizador define el reglamento, fechas importantes (cierre de inscripciones, inicio de fase de grupos), horarios de partidos, canchas disponibles y sanciones. Esta información se publica en la plataforma para que todos los participantes la vean. | El organizador accede a la sección "Configuración" del torneo y completa cada campo. Los cambios se guardan y se publican inmediatamente en la sección de información del torneo. | Organizador | Torneo debe existir y estar en estado "Borrador" o "Activo". |
-
-## Datos de entrada
-
-| Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
-|--------|-------------|----------------|-------------------|-------------|
-| Reglamento | Reglas del torneo | Texto largo | Máximo 10000 caracteres | Sí |
-| Fecha cierre inscripciones | Fecha límite para inscribirse | Fecha | Formato YYYY-MM-DD, anterior a fecha de inicio | Sí |
-| Fecha inicio fase de grupos | Fecha de inicio de partidos | Fecha | Posterior a fecha inicial del torneo | Sí |
-| Horarios de partidos | Horas disponibles para partidos | Lista de horas | Formato HH:MM | Sí |
-| Canchas | Listado de canchas disponibles | Texto | Nombre y ubicación de cada cancha | Sí |
-| Sanciones | Definición de tarjetas y expulsiones | Texto largo | Máximo 5000 caracteres | Sí |
-
-## Datos de salida
-
-| Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
-|--------|-------------|----------------|-------------------|-------------|
-| Confirmación de configuración | Confirmación de guardado | Booleano | Sí/No | Sí |
-| Mensaje de éxito | Confirmación de cambios guardados | Texto | Mensaje de éxito | Sí |
-
-## Flujo básico
-
-| Paso | Actor | Descripción | Excepciones |
-|------|-------|-------------|-------------|
-| 1 | Organizador | Accede a "Configuración del torneo" | Organizador no autenticado: redirigir a login |
-| 2 | Organizador | Completa reglamento | Información incompleta: mostrar campos obligatorios |
-| 3 | Organizador | Define fechas importantes (cierre inscripciones, inicio fase) | Fechas inválidas: mostrar error |
-| 4 | Organizador | Define horarios disponibles para partidos | - |
-| 5 | Organizador | Ingresa canchas con nombres y ubicaciones | - |
-| 6 | Organizador | Define sanciones (tarjetas, expulsiones) | - |
-| 7 | Sistema | Valida información completada | - |
-| 8 | Sistema | Guarda configuración y la publica en la plataforma | - |
-| 9 | Sistema | Confirma cambios al organizador | - |
-
-
-# RF-006: Registrar Partidos y Resultados
+# RF-006: Creación de Torneo
 
 ## Funcionalidad
 
 | Código | Nombre |
 |--------|--------|
-| RF-006 | Registro de Partidos y Resultados |
+| RF-006 | Creación de Torneo |
 
 | Descripción | Cómo se ejecuta | Actor principal | Precondiciones |
 |-------------|-----------------|-----------------|-----------------|
-| El organizador registra los resultados de los partidos: marcador final, goleadores (con minuto de gol), tarjetas amarillas y tarjetas rojas. Esta información se actualiza en el sistema y automáticamente se recalcula la tabla de posiciones. | El organizador accede a "Registro de partidos", selecciona el partido, ingresa el marcador, goleadores y tarjetas, y confirma. El sistema calcula puntos automáticamente. | Organizador | Partido debe estar programado en el torneo. |
+| El sistema permite crear torneos con información básica. El organizador define nombre, número de equipos y costo de inscripción. El torneo se crea con estado `DRAFT`. | El organizador envía `POST /api/torneos/create` con `TorneoRequestDTO`. El sistema valida el JWT, aplica reglas y persiste el torneo. | Organizador | El usuario debe tener rol `TOURNAMENT_ORGANIZER`. |
 
 ## Datos de entrada
 
-| Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
-|--------|-------------|----------------|-------------------|-------------|
-| ID del partido | Identificador del partido | Número | Generado automáticamente | Sí |
-| Equipo 1 | Equipo local | Selección | Listado de equipos del torneo | Sí |
-| Equipo 2 | Equipo visitante | Selección | Listado de equipos del torneo | Sí |
-| Goles Equipo 1 | Cantidad de goles marcados | Número | Mínimo 0 | Sí |
-| Goles Equipo 2 | Cantidad de goles marcados | Número | Mínimo 0 | Sí |
-| Goleadores | Lista de goleadores | Nombre + minuto | Formato: "Nombre (minuto)" | No |
-| Tarjetas amarillas | Jugadores con tarjeta amarilla | Nombre + minuto | Formato: "Nombre (minuto)" | No |
-| Tarjetas rojas | Jugadores expulsados | Nombre + minuto | Formato: "Nombre (minuto)" | No |
+| Nombre | Descripción | Tipo de dato | Reglas / Validación | Obligatorio |
+|--------|-------------|--------------|---------------------|-------------|
+| `tournamentName` | Nombre del torneo | `String` | Único en el sistema. No puede estar vacío. | Sí |
+| `numeroEquipos` | Número máximo de equipos | `Integer` | Mayor que 1. | Sí |
+| `costoInscripcion` | Costo de inscripción (en COP) | `Decimal` | No puede ser negativo (`>= 0`). | Sí |
 
 ## Datos de salida
 
-| Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
-|--------|-------------|----------------|-------------------|-------------|
-| ID del partido registrado | Confirmación de registro | Número | Identificador único | Sí |
-| Tabla actualizada | Tabla con nueva información | Tabla | Calculada automáticamente | Sí |
-| Mensaje de confirmación | Confirmación de registro | Texto | Mensaje de éxito | Sí |
+| Nombre | Descripción | Tipo de dato | Reglas / Aplicación | Obligatorio |
+|--------|-------------|--------------|---------------------|-------------|
+| `id` | Identificador único del torneo | `Long` | Generado automáticamente. | Sí |
+| `status` | Estado actual del torneo | `Enum` | El estado inicial al crear es `DRAFT`. Estados posibles: `DRAFT`, `OPEN`, `IN_PROGRESS`, `FINISHED`. | Sí |
+| `message` | Mensaje de confirmación | `String` | Mensaje de éxito o descripción del error. | Sí |
 
 ## Flujo básico
 
 | Paso | Actor | Descripción | Excepciones |
 |------|-------|-------------|-------------|
-| 1 | Organizador/Árbitro | Envía `POST /api/matches` con `homeTeam`, `awayTeam`, `tournamentName`, `matchDate` | Sin rol `REFEREE`/`TOURNAMENT_ORGANIZER`: `403 Forbidden` |
-| 2 | Sistema (`MatchValidator`) | Valida que `homeTeam != awayTeam` | Mismo equipo: `400 Bad Request` |
-| 3 | Sistema | Valida que el torneo exista en `DataStorage` | Torneo inexistente: `400 Bad Request` |
-| 4 | Sistema | Verifica que ambos equipos tengan inscripción con estado `APPROVED` en ese torneo | Equipo no aprobado: `400 Bad Request` |
-| 5 | Sistema | Crea el partido y lo guarda en `DataStorage` | - |
-| 6 | Organizador/Árbitro | Envía `PUT /api/matches/{id}` para registrar goles, goleadores y tarjetas | - |
-| 7 | Sistema | Actualiza el partido con el resultado | Partido no encontrado: `404 Not Found` |
-
-
-# RF-007: Calcular Tabla de Posiciones y Generar Llaves Eliminatorias
-
-## Funcionalidad
-
-| Código | Nombre |
-|--------|--------|
-| RF-007 | Tabla de Posiciones y Llaves Eliminatorias |
-
-| Descripción | Cómo se ejecuta | Actor principal | Precondiciones |
-|-------------|-----------------|-----------------|-----------------|
-| El sistema calcula automáticamente la tabla de posiciones en tiempo real según resultados ingresados. Muestra partidos jugados, ganados, empatados, perdidos, goles a favor, goles en contra, diferencia de gol y puntos. Después de la fase de grupos, el sistema genera automáticamente las llaves eliminatorias (cuartos de final, semifinal, final) de manera aleatoria. | Después de cada resultado ingresado, el sistema recalcula. Al finalizar fase de grupos, genera llaves automáticamente según la tabla. | Sistema/Organizador (para validar) | Deben haber resultados registrados. Fase de grupos debe estar finalizada para generar llaves. |
-
-## Datos de entrada
-
-| Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
-|--------|-------------|----------------|-------------------|-------------|
-| tournament | Nombre del torneo (path param) | Texto | Debe existir en `DataStorage` | Sí |
-| phase | Fase eliminatoria (path param) | Texto | Valores válidos: `quarterfinals`, `semifinals`, `final` | Sí (solo para brackets) |
-
-## Datos de salida
-
-| Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
-|--------|-------------|----------------|-------------------|-------------|
-| Tabla de posiciones | Tabla ordenada por puntos | Tabla | Ordenada por puntos, diferencia gol, goles a favor | Sí |
-| Partidos jugados | Cantidad de partidos | Número | Calculado automáticamente | Sí |
-| Partidos ganados | Cantidad de partidos ganados | Número | Calculado automáticamente | Sí |
-| Partidos empatados | Cantidad de partidos empatados | Número | Calculado automáticamente | Sí |
-| Partidos perdidos | Cantidad de partidos perdidos | Número | Calculado automáticamente | Sí |
-| Goles a favor | Cantidad de goles marcados | Número | Calculado automáticamente | Sí |
-| Goles en contra | Cantidad de goles recibidos | Número | Calculado automáticamente | Sí |
-| Diferencia de gol | GF - GC | Número | Calculado automáticamente | Sí |
-| Puntos | Puntos totales (3 por victoria, 1 por empate) | Número | Calculado automáticamente | Sí |
-| Llaves eliminatorias | Estructura de cuartos, semis y final | Árbol visual | Generado automáticamente | Sí |
-
-## Flujo básico
-
-| Paso | Actor | Descripción | Excepciones |
-|------|-------|-------------|-------------|
-| 1 | Sistema | Recibe registro de nuevo resultado | Resultado no válido: no actualizar |
-| 2 | Sistema | Recalcula puntos del equipo ganador (+3 puntos) | - |
-| 3 | Sistema | Recalcula puntos de equipos empatados (+1 punto cada) | - |
-| 4 | Sistema | Recalcula goles a favor y goles en contra | - |
-| 5 | Sistema | Ordena tabla por puntos (descendente), luego por diferencia gol | - |
-| 6 | Sistema | Publica tabla actualizada en para consulta de todos | - |
-| 7 | Sistema | Valida si fase de grupos terminó | Fase aún activa: guardar para luego |
-| 8 | Sistema | Genera llaves eliminatorias de manera aleatoria entre los 8/16 mejores | Número de equipos insuficiente: mostrar error |
-| 9 | Sistema | Asigna fechas y horarios a cada llave | - |
-| 10 | Sistema | Publica llaves en la plataforma | - |
+| 1 | Cliente (Organizador) | Envía `POST /api/torneos/create` con `TorneoRequestDTO`. | — |
+| 2 | Sistema (`JWTProvider`) | Valida el token JWT. | Token inválido/expirado: `401 Unauthorized`. |
+| 3 | Sistema (`TorneoValidator`) | Ejecuta `validateForCreation(request)`: valida nombre único, `numeroEquipos > 1`, `costoInscripcion >= 0`. | Datos inválidos o regla incumplida: `400 Bad Request` con `BusinessRuleException`. |
+| 4 | Sistema (`TorneoMapper`) | Ejecuta `toEntity(request)` → obtiene objeto `Torneo`. | — |
+| 5 | Sistema (`TorneoRepository`) | Ejecuta `save(torneo)`. | Error en BD: `500 Internal Server Error` con `GenericException`. |
+| 6 | Sistema | Retorna el `Torneo` persistido. | — |
+| 7 | Sistema (`TorneoMapper`) | Ejecuta `toDTO(torneo)` → obtiene `TorneoResponseDTO`. | — |
+| 8 | Sistema | Retorna `200 OK + TorneoResponseDTO`. | — |
 
 ## Flujo alterno
 
 | Paso | Actor | Descripción | Excepciones |
 |------|-------|-------------|-------------|
-| 1 | Sistema | Si hay empate en puntos, diferencia gol desempata | - |
-| 2 | Sistema | Si aún hay empate, goles a favor desempata | - |
-| 3 | Organizador | Puede revisar y validar llaves generadas | - |
+| 1 | Sistema | Error en base de datos durante el guardado. | `500 Internal Server Error` con `GenericException`. |
 
 
-# RF-008: Consultar Información del Torneo (Calendario, Resultados, Estadísticas)
+# RF-007: Configuración de Torneo
 
 ## Funcionalidad
 
 | Código | Nombre |
 |--------|--------|
-| RF-008 | Consulta de Información del Torneo |
+| RF-007 | Configuración del Torneo |
 
 | Descripción | Cómo se ejecuta | Actor principal | Precondiciones |
 |-------------|-----------------|-----------------|-----------------|
-| Todos los usuarios autenticados pueden consultar: calendario de partidos programados, resultados de partidos finalizados, tabla de posiciones, llaves eliminatorias por fase y estadísticas (máximos goleadores e historial por equipo). | Los endpoints son públicos bajo `/api/tournaments/query/{tournament}/...`. Los datos se calculan dinámicamente desde `DataStorage`. | Cualquier usuario autenticado | Token JWT válido. Torneo debe existir en el sistema. |
+| Después de crear el torneo, el organizador define el reglamento, fechas importantes, horarios, canchas y sanciones. Cada campo es opcional en la actualización (campos `Opt`). El torneo debe estar en estado `DRAFT` u `OPEN`. | El organizador envía `PUT /api/torneos/{id}/configurar` con `TorneoRequestDTO`. El sistema valida el JWT, el estado del torneo y aplica los cambios. | Organizador | El usuario debe tener rol `TOURNAMENT_ORGANIZER`. El torneo debe existir y estar en estado `DRAFT` u `OPEN`. |
 
 ## Datos de entrada
 
-| Nombre | Descripción | Tipo de campo | Reglas/Aplicación | Obligatorio |
-|--------|-------------|----------------|-------------------|-------------|
-| tournament | Nombre del torneo (path param) | Texto | Debe existir en `DataStorage` | Sí |
-| team | Nombre del equipo, solo para historial (path param) | Texto | Debe existir en el torneo | Condicional |
+| Nombre | Descripción | Tipo de dato | Reglas / Validación | Obligatorio |
+|--------|-------------|--------------|---------------------|-------------|
+| `reglamento` | Reglas del torneo | `String` | Máximo 10 000 caracteres. | No (Opt) |
+| `fechaCierreInscripciones` | Fecha límite para inscribirse | `Date` (`YYYY-MM-DD`) | Debe ser anterior a `fechaInicioFaseGrupos`. | No (Opt) |
+| `fechaInicioFaseGrupos` | Fecha de inicio de partidos | `Date` (`YYYY-MM-DD`) | Debe ser posterior a la fecha de creación del torneo. | No (Opt) |
+| `horariosPartidos` | Horas disponibles para partidos | `List<String>` | Formato `HH:mm` (24 h). | No (Opt) |
+| `canchas` | Canchas disponibles | `List<String>` | Nombre y ubicación de cada cancha. | No (Opt) |
+| `sanciones` | Definición de tarjetas y expulsiones | `String` | Máximo 5 000 caracteres. | No (Opt) |
 
 ## Datos de salida
 
-| Endpoint | Descripción | Datos devueltos |
-|----------|-------------|-----------------|
-| `GET /api/tournaments/query/{tournament}/calendar` | Partidos programados con status `SCHEDULED` | `id`, `homeTeam`, `awayTeam`, `matchDate`, `status` |
-| `GET /api/tournaments/query/{tournament}/results` | Partidos finalizados con status `FINISHED` | `id`, `homeTeam`, `awayTeam`, `homeScore`, `awayScore`, `matchDate` |
-| `GET /api/tournaments/query/{tournament}/standings` | Tabla de posiciones calculada por `StandingService` | PJ, PG, PE, PP, GF, GC, DG, Pts |
-| `GET /api/tournaments/query/{tournament}/brackets/{phase}` | Llaves eliminatorias por fase | Emparejamientos según `BracketService` |
-| `GET /api/tournaments/query/{tournament}/scorers` | Máximos goleadores (partidos `FINISHED`) | `playerEmail`, `goals` (orden descendente) |
-| `GET /api/tournaments/query/{tournament}/history/{team}` | Historial de un equipo | `id`, `opponent`, `venue`, `homeScore`, `awayScore`, `result`, `date` |
+| Nombre | Descripción | Tipo de dato | Reglas / Aplicación | Obligatorio |
+|--------|-------------|--------------|---------------------|-------------|
+| `TorneoResponseDTO` | Torneo actualizado con la nueva configuración | `Object` | Refleja todos los campos actualizados. | Sí |
+| `message` | Mensaje de éxito o error | `String` | Mensaje de confirmación o descripción del error. | Sí |
 
 ## Flujo básico
 
 | Paso | Actor | Descripción | Excepciones |
 |------|-------|-------------|-------------|
-| 1 | Usuario | Envía `GET /api/tournaments/query/{tournament}/calendar` | Sin JWT válido: `401 Unauthorized` |
-| 2 | Sistema | Filtra partidos con `status = SCHEDULED` y los retorna | Sin partidos programados: mensaje informativo |
-| 3 | Usuario | Envía `GET /api/tournaments/query/{tournament}/results` | - |
-| 4 | Sistema | Filtra partidos con `status = FINISHED` y retorna marcadores | Sin resultados: mensaje informativo |
-| 5 | Usuario | Envía `GET /api/tournaments/query/{tournament}/standings` | - |
-| 6 | Sistema (`StandingService`) | Calcula tabla sumando victorias (+3), empates (+1), goles y ordena descendente | Tabla vacía: lista vacía |
-| 7 | Usuario | Envía `GET /api/tournaments/query/{tournament}/scorers` | - |
-| 8 | Sistema (`StatisticsService`) | Acumula goles por jugador en partidos `FINISHED` y ordena descendente | Sin goles registrados: mensaje informativo |
-| 9 | Usuario | Envía `GET /api/tournaments/query/{tournament}/history/{team}` | - |
-| 10 | Sistema | Filtra partidos del equipo y calcula `WIN`/`DRAW`/`LOSS` | Sin historial: mensaje informativo |
-| 11 | Usuario | Envía `GET /api/tournaments/query/{tournament}/brackets/{phase}` | - |
-| 12 | Sistema (`BracketService`) | Genera emparejamientos según la fase solicitada (`quarterfinals`, `semifinals`, `final`) | Fase inválida o sin equipos suficientes: error |
+| 1 | Cliente (Organizador) | Envía `PUT /api/torneos/{id}/configurar` con `TorneoRequestDTO`. | — |
+| 2 | Sistema (`JWTProvider`) | Valida el token JWT. | Token inválido/expirado: `401 Unauthorized`. |
+| 3 | Sistema (`TorneoService`) | Ejecuta `configurarTorneo(id, configInfo)` → llama a `TorneoRepository.findById(id)`. | — |
+| 4 | Sistema | Si el torneo no existe, lanza excepción. | Torneo no encontrado: `404 Not Found` con `ResourceNotFoundException`. |
+| 5 | Sistema | Valida que el estado del torneo sea `BORRADOR` u `OPEN`. | Estado no permitido: `400 Bad Request` con `BusinessRuleException`. |
+| 6 | Sistema | Aplica cada campo de configuración si no es `null` (campos `Opt`): `setReglamento(...)`, `setFechaCierreInscripciones(...)`, `setFechaInicioFaseGrupos(...)`, `setHorariosPartidos(...)`, `setCanchas(...)`, `setSanciones(...)`. | — |
+| 7 | Sistema (`TorneoRepository`) | Ejecuta `save(torneo actualizado)`. Retorna `Torneo` persistido. | — |
+| 8 | Sistema (`TorneoMapper`) | Ejecuta `toDTO(torneo)` → obtiene `TorneoResponseDTO`. | — |
+| 9 | Sistema | Retorna `100 OK + TorneoResponseDTO`. | — |
 
+## Flujo alterno
+
+| Paso | Actor | Descripción | Excepciones |
+|------|-------|-------------|-------------|
+| 1 | Organizador | Intenta configurar un torneo en estado `IN_PROGRESS` o `FINISHED`. | `400 Bad Request` con `BusinessRuleException: estado no permitido`. |
+
+
+# RF-008: Consulta de Torneos
+
+## Funcionalidad
+
+| Código | Nombre |
+|--------|--------|
+| RF-008 | Consulta de Torneos |
+
+| Descripción | Cómo se ejecuta | Actor principal | Precondiciones |
+|-------------|-----------------|-----------------|-----------------|
+| El sistema permite listar todos los torneos registrados. Los datos se retornan como una lista de `TorneoResponseDTO`. | El cliente envía `GET /api/torneos/consulta/all`. El sistema valida el JWT, consulta el repositorio y mapea los resultados. | Cualquier usuario autenticado | Token JWT válido y no expirado. |
+
+## Datos de entrada
+
+| Nombre | Descripción | Tipo de dato | Reglas / Validación | Obligatorio |
+|--------|-------------|--------------|---------------------|-------------|
+| `Authorization` | Header con el token JWT | `String` | Formato `Bearer <token>`. | Sí |
+
+## Datos de salida
+
+| Nombre | Descripción | Tipo de dato | Reglas / Aplicación | Obligatorio |
+|--------|-------------|--------------|---------------------|-------------|
+| `List<TorneoResponseDTO>` | Lista de torneos registrados | `List` | Cada elemento contiene los datos del torneo. | Sí |
+
+## Flujo básico
+
+| Paso | Actor | Descripción | Excepciones |
+|------|-------|-------------|-------------|
+| 1 | Cliente | Envía `GET /api/torneos/consulta/all` con header `Authorization: Bearer <token>`. | — |
+| 2 | Sistema (`JWTProvider`) | Valida el token JWT. | Token inválido/expirado: `401 Unauthorized`. |
+| 3 | Sistema (`TorneoService`) | Ejecuta `getAllTorneos()` → llama a `TorneoRepository.findAll()`. | — |
+| 4 | Sistema | Si la lista está vacía, retorna `[]`. | Lista vacía: `204 No Content`. |
+| 5 | Sistema (`TorneoMapper`) | Por cada torneo: ejecuta `toDTO(torneo)` → obtiene `TorneoResponseDTO`. (Loop) | — |
+| 6 | Sistema | Retorna `200 OK + List<TorneoResponseDTO>`. | — |
+
+## Flujo alterno
+
+| Paso | Actor | Descripción | Excepciones |
+|------|-------|-------------|-------------|
+| 1 | Sistema | Error inesperado durante la consulta. | `500 Internal Server Error` con `GenericException`. |
+
+
+# RF-009: Creación de Inscripción
+
+## Funcionalidad
+
+| Código | Nombre |
+|--------|--------|
+| RF-009 | Creación de Inscripción |
+
+| Descripción | Cómo se ejecuta | Actor principal | Precondiciones |
+|-------------|-----------------|-----------------|-----------------|
+| El capitán registra la inscripción de su equipo en un torneo y adjunta el comprobante de pago. La inscripción se crea con estado inicial `PENDING`. El pago se realiza fuera de la plataforma (NEQUI o efectivo al coordinador). | El capitán envía `POST /api/inscripciones/create` con `InscripcionRequestDTO`. El sistema valida el JWT, las reglas de negocio y persiste la inscripción. | Capitán | Token JWT válido. Torneo en estado `OPEN`. Equipo conformado con al menos 7 jugadores. |
+
+## Datos de entrada
+
+| Nombre | Descripción | Tipo de dato | Reglas / Validación | Obligatorio |
+|--------|-------------|--------------|---------------------|-------------|
+| `teamName` | Nombre del equipo | `String` | Debe existir en el sistema. | Sí |
+| `tournamentName` | Nombre del torneo | `String` | El torneo debe existir y estar en estado `OPEN`. | Sí |
+| `comprobantePagoUrl` | URL del comprobante de pago | `String` | No puede estar vacía. Debe ser una URL válida. | Sí |
+
+## Datos de salida
+
+| Nombre | Descripción | Tipo de dato | Reglas / Aplicación | Obligatorio |
+|--------|-------------|--------------|---------------------|-------------|
+| `InscripcionResponseDTO` | Inscripción creada con estado `PENDING` | `Object` | Refleja todos los datos de la inscripción. | Sí |
+| `message` | Mensaje de confirmación | `String` | Mensaje de éxito o descripción del error. | Sí |
+
+## Flujo básico
+
+| Paso | Actor | Descripción | Excepciones |
+|------|-------|-------------|-------------|
+| 1 | Cliente (Capitán) | Envía `POST /api/inscripciones/create` con `InscripcionRequestDTO`. | — |
+| 2 | Sistema (`JWTProvider`) | Valida el token JWT. | Token inválido/expirado: `401 Unauthorized`. |
+| 3 | Sistema (`InscripcionValidator`) | Ejecuta `validateForInscripcion(request)`: valida existencia del equipo, torneo en estado `OPEN`, sin inscripción duplicada. | Datos inválidos o regla incumplida: `400 Bad Request` con `BusinessRuleException`. |
+| 4 | Sistema (`InscripcionMapper`) | Ejecuta `toEntity(request)` → obtiene objeto `Inscripcion`. | — |
+| 5 | Sistema (`InscripcionRepository`) | Ejecuta `save(nuevaInscripcion)`. | Torneo cerrado o usuario ya inscrito: `400 Bad Request` con `BusinessRuleException`. |
+| 6 | Sistema | Retorna la `Inscripcion` persistida. | — |
+| 7 | Sistema (`InscripcionMapper`) | Ejecuta `toDTO(nuevaInscripcion)` → obtiene `InscripcionResponseDTO`. | — |
+| 8 | Sistema | Retorna `200 OK + InscripcionResponseDTO`. | — |
+
+## Flujo alterno
+
+| Paso | Actor | Descripción | Excepciones |
+|------|-------|-------------|-------------|
+| 1 | Sistema | Torneo cerrado o usuario ya inscrito al momento del `save`. | `400 Bad Request` con `BusinessRuleException`. |
+
+
+# RF-010: Consulta de Inscripciones
+
+## Funcionalidad
+
+| Código | Nombre |
+|--------|--------|
+| RF-010 | Consulta de Inscripciones |
+
+| Descripción | Cómo se ejecuta | Actor principal | Precondiciones |
+|-------------|-----------------|-----------------|-----------------|
+| El sistema permite listar todas las inscripciones registradas. Los datos se retornan como una lista de `InscripcionResponseDTO`. | El cliente envía `GET /api/inscripciones/all`. El sistema valida el JWT, consulta el repositorio y mapea los resultados. | Cualquier usuario autenticado | Token JWT válido y no expirado. |
+
+## Datos de entrada
+
+| Nombre | Descripción | Tipo de dato | Reglas / Validación | Obligatorio |
+|--------|-------------|--------------|---------------------|-------------|
+| `Authorization` | Header con el token JWT | `String` | Formato `Bearer <token>`. | Sí |
+
+## Datos de salida
+
+| Nombre | Descripción | Tipo de dato | Reglas / Aplicación | Obligatorio |
+|--------|-------------|--------------|---------------------|-------------|
+| `List<InscripcionResponseDTO>` | Lista de inscripciones registradas | `List` | Cada elemento contiene los datos de la inscripción. | Sí |
+
+## Flujo básico
+
+| Paso | Actor | Descripción | Excepciones |
+|------|-------|-------------|-------------|
+| 1 | Cliente | Envía `GET /api/inscripciones/all` con header `Authorization: Bearer <token>`. | — |
+| 2 | Sistema (`JWTProvider`) | Valida el token JWT. | Token inválido/expirado: `401 Unauthorized`. |
+| 3 | Sistema (`InscripcionService`) | Ejecuta `getAll()` → llama a `InscripcionRepository.findAll()`. | — |
+| 4 | Sistema | Si la lista está vacía, retorna `[]`. | Lista vacía: `204 No Content`. |
+| 5 | Sistema (`InscripcionMapper`) | Por cada inscripción: ejecuta `toDTO(Inscripcion)` → obtiene `InscripcionResponseDTO`. (Loop) | — |
+| 6 | Sistema | Retorna `200 OK + List<InscripcionResponseDTO>`. | — |
+
+## Flujo alterno
+
+| Paso | Actor | Descripción | Excepciones |
+|------|-------|-------------|-------------|
+| 1 | Sistema | Error inesperado durante la consulta. | `500 Internal Server Error` con `GenericException`. |
+
+
+# RF-011: Actualización de Estado de Inscripción
+
+## Funcionalidad
+
+| Código | Nombre |
+|--------|--------|
+| RF-011 | Actualización de Estado de Inscripción |
+
+| Descripción | Cómo se ejecuta | Actor principal | Precondiciones |
+|-------------|-----------------|-----------------|-----------------|
+| El organizador o administrador cambia el estado de una inscripción siguiendo la **máquina de estados estricta**: `PENDING` → `IN_REVIEW` → `APPROVED` / `REJECTED`. Los estados `APPROVED` y `REJECTED` son finales. Solo equipos con estado `APPROVED` pueden participar en partidos. | El organizador / admin envía `PUT /api/inscripciones/{id}/estado` con el nuevo estado. El sistema valida el JWT, el estado permitido y actualiza la inscripción. | Organizador / Administrador | Token JWT válido. Inscripción existente. Rol `ADMINISTRADOR_SISTEMA` o `TOURNAMENT_ORGANIZER`. |
+
+## Datos de entrada
+
+| Nombre | Descripción | Tipo de dato | Reglas / Validación | Obligatorio |
+|--------|-------------|--------------|---------------------|-------------|
+| `estado` | Nuevo estado de la inscripción | `Enum` | Estados válidos: `PENDIENTE`, `EN_REVISION`, `APROBADO`, `RECHAZADO`. | Sí |
+
+## Datos de salida
+
+| Nombre | Descripción | Tipo de dato | Reglas / Aplicación | Obligatorio |
+|--------|-------------|--------------|---------------------|-------------|
+| `InscripcionResponseDTO` | Inscripción actualizada con el nuevo estado | `Object` | Refleja el estado actualizado. | Sí |
+| `message` | Mensaje de confirmación | `String` | Mensaje de éxito o descripción del error. | Sí |
+
+## Máquina de estados – Inscripción
+
+```
+PENDIENTE → EN_REVISION → APROBADO
+                        → RECHAZADO
+```
+
+`APROBADO` y `RECHAZADO` son estados finales. No admiten transiciones posteriores.
+
+## Flujo básico
+
+| Paso | Actor | Descripción | Excepciones |
+|------|-------|-------------|-------------|
+| 1 | Cliente (Organizador / Admin) | Envía `PUT /api/inscripciones/{id}/estado` con `{estado}` en el body. | — |
+| 2 | Sistema (`JWTProvider`) | Valida el token JWT. | Token inválido/expirado: `401 Unauthorized`. |
+| 3 | Sistema (`InscripcionController`) | Valida que el body contenga el campo `estado`. | Estado no enviado: `400 Bad Request`, `"Es necesario el campo 'estado'"`. |
+| 4 | Sistema (`InscripcionService`) | Ejecuta `actualizarEstado(id, nuevoEstado)` → valida que el estado sea uno de los permitidos (`PENDIENTE`, `EN_REVISION`, `APROBADO`, `RECHAZADO`). | Estado inválido: `400 Bad Request` con `BusinessRuleException`. |
+| 5 | Sistema (`InscripcionRepository`) | Busca la inscripción por `id`. | Inscripción no encontrada: `404 Not Found` con `ResourceNotFoundException`. |
+| 6 | Sistema | Ejecuta `setEstado(nuevoEstado)` sobre la inscripción encontrada. | — |
+| 7 | Sistema (`InscripcionRepository`) | Guarda la inscripción actualizada. Retorna `Inscripcion` persistida. | — |
+| 8 | Sistema | Retorna `InscripcionResponseDTO` actualizado con `200 OK + InscripcionResponseDTO`. | — |
+
+## Flujo alterno
+
+| Paso | Actor | Descripción | Excepciones |
+|------|-------|-------------|-------------|
+| 1 | Organizador | Intenta cambiar el estado de una inscripción en estado final (`APROBADO` o `RECHAZADO`). | `400 Bad Request` con `BusinessRuleException: estado definitivo`. |
+
+
+# RF-012: Creación de Partido
+
+## Funcionalidad
+
+| Código | Nombre |
+|--------|--------|
+| RF-012 | Creación de Partido |
+
+| Descripción | Cómo se ejecuta | Actor principal | Precondiciones |
+|-------------|-----------------|-----------------|-----------------|
+| El organizador o árbitro registra un nuevo partido entre dos equipos del torneo. Ambos equipos deben tener inscripción con estado `APPROVED`. El partido se crea con estado `SCHEDULED`. | El organizador / árbitro envía `POST /api/partidos/create` con `PartidoRequestDTO`. El sistema valida el JWT, las reglas y persiste el partido. | Organizador, Árbitro | Token JWT válido. Roles `REFEREE` o `TOURNAMENT_ORGANIZER`. Ambos equipos con inscripción `APPROVED`. |
+
+## Datos de entrada
+
+| Nombre | Descripción | Tipo de dato | Reglas / Validación | Obligatorio |
+|--------|-------------|--------------|---------------------|-------------|
+| `homeTeam` | Equipo local | `String` | Debe existir en el torneo con inscripción `APPROVED`. Distinto de `awayTeam`. | Sí |
+| `awayTeam` | Equipo visitante | `String` | Debe existir en el torneo con inscripción `APPROVED`. Distinto de `homeTeam`. | Sí |
+| `tournamentName` | Nombre del torneo | `String` | Debe existir en `DataStorage`. | Sí |
+| `matchDate` | Fecha y hora del partido | `DateTime` (`YYYY-MM-DD HH:mm`) | Dentro del periodo activo del torneo. | Sí |
+
+## Datos de salida
+
+| Nombre | Descripción | Tipo de dato | Reglas / Aplicación | Obligatorio |
+|--------|-------------|--------------|---------------------|-------------|
+| `PartidoResponseDTO` | Partido creado con estado `SCHEDULED` | `Object` | Refleja todos los datos del partido. | Sí |
+| `message` | Mensaje de confirmación | `String` | Mensaje de éxito o descripción del error. | Sí |
+
+## Flujo básico
+
+| Paso | Actor | Descripción | Excepciones |
+|------|-------|-------------|-------------|
+| 1 | Cliente (Organizador / Árbitro) | Envía `POST /api/partidos/create` con `PartidoRequestDTO`. | — |
+| 2 | Sistema (`JWTProvider`) | Valida el token JWT. | Token inválido/expirado: `401 Unauthorized`. |
+| 3 | Sistema (`PartidoValidator`) | Ejecuta `validateForCreation(request)`: valida que `homeTeam != awayTeam`, torneo existente y ambos equipos con inscripción `APPROVED`. | Datos inválidos o regla incumplida: `400 Bad Request` con `BusinessRuleException`. |
+| 4 | Sistema (`PartidoMapper`) | Ejecuta `toEntity(request)` → obtiene objeto `Partido`. | — |
+| 5 | Sistema (`PartidoRepository`) | Ejecuta `save(nuevoPartido)`. | Error en BD: `500 Internal Server Error` con `GenericException`. |
+| 6 | Sistema | Retorna el `Partido` persistido. | — |
+| 7 | Sistema (`PartidoMapper`) | Ejecuta `toDTO(nuevoPartido)` → obtiene `PartidoResponseDTO`. | — |
+| 8 | Sistema | Retorna `200 OK + PartidoResponseDTO`. | — |
+
+## Flujo alterno
+
+| Paso | Actor | Descripción | Excepciones |
+|------|-------|-------------|-------------|
+| 1 | Sistema | Error en base de datos durante el guardado. | `500 Internal Server Error` con `GenericException`. |
+
+
+# RF-013: Actualización de Marcador
+
+## Funcionalidad
+
+| Código | Nombre |
+|--------|--------|
+| RF-013 | Actualización de Marcador |
+
+| Descripción | Cómo se ejecuta | Actor principal | Precondiciones |
+|-------------|-----------------|-----------------|-----------------|
+| El organizador o árbitro actualiza el marcador de un partido en curso. Al confirmar el marcador, el partido cambia su estado a `FINALIZADO`. El sistema recalcula la tabla de posiciones automáticamente. | El organizador / árbitro envía `PUT /api/partidos/{id}/marcador` con `marcadorLocal` y `marcadorVisitante`. | Organizador, Árbitro | Token JWT válido. El partido debe existir y estar en estado `EN_CURSO`. |
+
+## Datos de entrada
+
+| Nombre | Descripción | Tipo de dato | Reglas / Validación | Obligatorio |
+|--------|-------------|--------------|---------------------|-------------|
+| `marcadorLocal` | Goles del equipo local | `Integer` | Mayor o igual a 0. | Sí |
+| `marcadorVisitante` | Goles del equipo visitante | `Integer` | Mayor o igual a 0. | Sí |
+
+## Datos de salida
+
+| Nombre | Descripción | Tipo de dato | Reglas / Aplicación | Obligatorio |
+|--------|-------------|--------------|---------------------|-------------|
+| `PartidoResponseDTO` | Partido actualizado con estado `FINALIZADO` | `Object` | Refleja el marcador final y el nuevo estado. | Sí |
+| `message` | Mensaje de confirmación | `String` | Mensaje de éxito o descripción del error. | Sí |
+
+## Flujo básico
+
+| Paso | Actor | Descripción | Excepciones |
+|------|-------|-------------|-------------|
+| 1 | Cliente (Organizador / Árbitro) | Envía `PUT /api/partidos/{id}/marcador` con `marcadorLocal` y `marcadorVisitante`. | — |
+| 2 | Sistema (`JWTProvider`) | Valida el token JWT. | Token inválido/expirado: `401 Unauthorized`. |
+| 3 | Sistema (`PartidoService`) | Ejecuta `actualizarMarcador(id, marcadorLocal, marcadorVisitante)` → valida que los marcadores sean `>= 0`. | Marcadores inválidos: `400 Bad Request` con `BusinessRuleException`. |
+| 4 | Sistema (`PartidoRepository`) | Ejecuta `findById(id)`. | Partido no encontrado: `404 Not Found` con `ResourceNotFoundException`. |
+| 5 | Sistema | Valida que el estado del partido sea `EN_CURSO`. | Partido no en curso: `400 Bad Request` con `BusinessRuleException`. |
+| 6 | Sistema | Ejecuta `setMarcadorLocal(marcadorLocal)`, `setMarcadorVisitante(marcadorVisitante)`, `setEstado("FINALIZADO")`. | — |
+| 7 | Sistema (`PartidoRepository`) | Ejecuta `save(partido actualizado)`. Retorna `Partido` persistido. | — |
+| 8 | Sistema (`PartidoMapper`) | Ejecuta `toDTO(partido)` → obtiene `PartidoResponseDTO`. | — |
+| 9 | Sistema | Retorna `200 OK + PartidoResponseDTO`. | — |
+
+## Flujo alterno
+
+| Paso | Actor | Descripción | Excepciones |
+|------|-------|-------------|-------------|
+| 1 | Organizador | Intenta actualizar el marcador de un partido no en estado `EN_CURSO`. | `400 Bad Request` con `BusinessRuleException: Partido no en curso`. |
+
+
+# RF-014: Registro de Alineación
+
+## Funcionalidad
+
+| Código | Nombre |
+|--------|--------|
+| RF-014 | Registro de Alineación |
+
+| Descripción | Cómo se ejecuta | Actor principal | Precondiciones |
+|-------------|-----------------|-----------------|-----------------|
+| El organizador o árbitro registra la alineación (lista de jugadores) de un equipo para un partido. Se valida que el equipo participe en el partido y que la lista de jugadores no esté vacía. | El organizador / árbitro envía `PUT /api/partidos/{id}/alineacion` con `nombreEquipo` y la lista de `jugadores`. | Organizador, Árbitro | Token JWT válido. El partido debe existir. El equipo debe participar en el partido como local o visitante. |
+
+## Datos de entrada
+
+| Nombre | Descripción | Tipo de dato | Reglas / Validación | Obligatorio |
+|--------|-------------|--------------|---------------------|-------------|
+| `nombreEquipo` | Nombre del equipo que registra alineación | `String` | Debe ser el equipo local o visitante del partido. | Sí |
+| `jugadores` | Lista de jugadores en la alineación | `List<String>` | No puede estar vacía. Exactamente 7 jugadores por regla de negocio (RN-006). | Sí |
+
+## Datos de salida
+
+| Nombre | Descripción | Tipo de dato | Reglas / Aplicación | Obligatorio |
+|--------|-------------|--------------|---------------------|-------------|
+| `PartidoResponseDTO` | Partido actualizado con la alineación registrada | `Object` | Refleja la alineación del equipo. | Sí |
+| `message` | Mensaje de confirmación | `String` | Mensaje de éxito o descripción del error. | Sí |
+
+## Flujo básico
+
+| Paso | Actor | Descripción | Excepciones |
+|------|-------|-------------|-------------|
+| 1 | Cliente (Organizador / Árbitro) | Envía `PUT /api/partidos/{id}/alineacion` con `nombreEquipo` y `jugadores`. | — |
+| 2 | Sistema (`JWTProvider`) | Valida el token JWT. | Token inválido/expirado: `401 Unauthorized`. |
+| 3 | Sistema (`PartidoService`) | Ejecuta `registrarAlineacion(id, nombreEquipo, jugadores)` → valida que `jugadores` no esté vacío. | Alineación vacía: `400 Bad Request` con `BusinessRuleException`. |
+| 4 | Sistema (`PartidoRepository`) | Ejecuta `findById(id)`. | Partido no encontrado: `404 Not Found` con `ResourceNotFoundException`. |
+| 5 | Sistema | Valida que `nombreEquipo` participe en el partido (local o visitante). | Equipo no participa: `400 Bad Request` con `BusinessRuleException`. |
+| 6 | Sistema | Ejecuta `setAlineacionLocal(jugadores)` o `setAlineacionVisitante(jugadores)` según corresponda. | — |
+| 7 | Sistema (`PartidoRepository`) | Ejecuta `save(partido actualizado)`. Retorna `Partido` persistido. | — |
+| 8 | Sistema (`PartidoMapper`) | Ejecuta `toDTO(partido)` → obtiene `PartidoResponseDTO`. | — |
+| 9 | Sistema | Retorna `200 OK + PartidoResponseDTO`. | — |
+
+## Flujo alterno
+
+| Paso | Actor | Descripción | Excepciones |
+|------|-------|-------------|-------------|
+| 1 | Organizador | El equipo indicado no participa en el partido. | `400 Bad Request` con `BusinessRuleException: Equipo no participa`. |
+
+
+# RF-015: Registro de Tarjetas
+
+## Funcionalidad
+
+| Código | Nombre |
+|--------|--------|
+| RF-015 | Registro de Tarjetas |
+
+| Descripción | Cómo se ejecuta | Actor principal | Precondiciones |
+|-------------|-----------------|-----------------|-----------------|
+| El organizador o árbitro registra una tarjeta (amarilla o roja) a un jugador durante un partido en curso. Se valida el tipo de tarjeta, la existencia del partido, que el jugador participe y que el partido esté en estado `EN_CURSO`. Las sanciones son responsabilidad del árbitro en el terreno; el sistema solo registra la información. | El árbitro / organizador envía `PUT /api/partidos/{id}/tarjetas` con `jugador` y `tipoTarjeta`. | Árbitro, Organizador | Token JWT válido. El partido debe existir y estar en estado `EN_CURSO`. El jugador debe participar en el partido. |
+
+## Datos de entrada
+
+| Nombre | Descripción | Tipo de dato | Reglas / Validación | Obligatorio |
+|--------|-------------|--------------|---------------------|-------------|
+| `jugador` | Nombre o identificador del jugador sancionado | `String` | Debe pertenecer a uno de los equipos del partido. | Sí |
+| `tipoTarjeta` | Tipo de tarjeta aplicada | `Enum` | `AMARILLA` o `ROJA`. | Sí |
+
+## Datos de salida
+
+| Nombre | Descripción | Tipo de dato | Reglas / Aplicación | Obligatorio |
+|--------|-------------|--------------|---------------------|-------------|
+| `PartidoResponseDTO` | Partido actualizado con el evento de tarjeta registrado | `Object` | Refleja el evento de tarjeta agregado. | Sí |
+| `message` | Mensaje de confirmación | `String` | Mensaje de éxito o descripción del error. | Sí |
+
+## Flujo básico
+
+| Paso | Actor | Descripción | Excepciones |
+|------|-------|-------------|-------------|
+| 1 | Cliente (Árbitro / Organizador) | Envía `PUT /api/partidos/{id}/tarjetas` con `jugador` y `tipoTarjeta`. | — |
+| 2 | Sistema (`JWTProvider`) | Valida el token JWT. | Token inválido/expirado: `401 Unauthorized`. |
+| 3 | Sistema (`PartidoService`) | Ejecuta `RegistrarTarjeta(id, jugador, tipoTarjeta)` → valida que `tipoTarjeta` sea `AMARILLA` o `ROJA`. | Tipo de tarjeta inválido: `400 Bad Request` con `BusinessRuleException`. |
+| 4 | Sistema (`PartidoRepository`) | Ejecuta `findById(id)`. | Partido no encontrado: `404 Not Found` con `ResourceNotFoundException`. |
+| 5 | Sistema | Valida que el `jugador` pertenezca a uno de los equipos del partido. | Jugador no participa: `400 Bad Request` con `BusinessRuleException`. |
+| 6 | Sistema | Valida que el estado del partido sea `EN_CURSO`. | Partido no en curso: `400 Bad Request` con `BusinessRuleException`. |
+| 7 | Sistema | Ejecuta `agregar evento de tarjeta` al partido. | — |
+| 8 | Sistema (`PartidoRepository`) | Ejecuta `save(partido actualizado)`. Retorna `Partido` persistido. | — |
+| 9 | Sistema (`PartidoMapper`) | Ejecuta `toDTO(partido)` → obtiene `PartidoResponseDTO`. | — |
+| 10 | Sistema | Retorna `200 OK + PartidoResponseDTO`. | — |
+
+## Flujo alterno
+
+| Paso | Actor | Descripción | Excepciones |
+|------|-------|-------------|-------------|
+| 1 | Árbitro | El jugador indicado no participa en el partido. | `400 Bad Request` con `BusinessRuleException: Jugador no participa`. |
+| 2 | Árbitro | El partido no está en estado `EN_CURSO`. | `400 Bad Request` con `BusinessRuleException: Partido no en curso`. |
 
 
 # Anexos
@@ -454,30 +761,18 @@
 ## Actores del Sistema:
 
 - Estudiante: Se registra como jugador y puede ser capitán.
-
 - Graduado: Se registra como jugador y puede ser capitán.
-
 - Profesor: Se registra como jugador y puede ser capitán.
-
 - Personal Administrativo: Se registra como jugador y puede ser capitán.
-
-- Familiares: Se registra como jugador y puede ser capitán.
-
+- Familiares: Se registra como jugador y puede ser capitán (requiere patrocinador de la comunidad académica).
 - Capitán: Crea y administra un equipo.
-
 - Organizador: Administra el torneo.
-
-- Árbitro: Visualiza la información de los partidos a arbitrar.
-
+- Árbitro: Visualiza y registra información de los partidos que arbitra.
 - Administrador: Control total del sistema.
-
-[Diagrama-Casos-De-Uso3.asta](..%2Fuml%2FDiagrama-Casos-De-Uso3.asta)
-
-![Diagrama-Casos-De-Uso.png](..%2Fimages%2FDiagrama-Casos-De-Uso.png)
 
 ## Mockup:
 
-https://tag-skit-64046987.figma.site/
+https://www.figma.com/make/wZnY6r0oYU309jDTJmjvGY/Mockup-Zeus-Codensa?fullscreen=1&t=8dnOrDdsbGlZBPMa-1&preview-route=%2Fauth%2Flogin
 
 ## Reglas de Negocio
 
@@ -487,38 +782,38 @@ https://tag-skit-64046987.figma.site/
 | RN-002 | Familiares solo pueden participar si son patrocinados por un miembro de la comunidad académica registrada en el sistema. |
 | RN-003 | Cada equipo debe tener mínimo 7 jugadores y máximo 20 jugadores (`TeamValidator`). |
 | RN-004 | Un jugador no puede pertenecer a dos equipos simultáneamente durante el mismo torneo. |
-| RN-005 | Más del 50% de los miembros de cada equipo deben ser de los programas autorizados. |
-| RN-006 | Durante cada partido participan exactamente 7 jugadores por equipo (de los 12 totales). |
-| RN-007 | No se permiten cambios de equipo una vez conformado. |
-| RN-008 | El pago se realiza fuera de la plataforma (NEQUI o efectivo al coordinador). |
-| RN-009 | Solo equipos con estado de inscripción `APPROVED` pueden participar en partidos (`MatchValidator` lo valida). |
-| RN-010 | El estado de inscripción sigue una máquina de estados estricta: `PENDING` → `IN_REVIEW` → `APPROVED` / `REJECTED`. Saltos de estado son rechazados con excepción de negocio. |
+| RN-005 | Más del 50% de los miembros de cada equipo deben ser de los programas autorizados (Ingeniería de Sistemas, IA, Ciberseguridad o Estadística). |
+| RN-006 | Durante cada partido participan exactamente 7 jugadores por equipo (de los registrados en el plantel). |
+| RN-007 | No se permiten cambios en la nómina del equipo una vez conformado e inscrito. |
+| RN-008 | El pago se realiza fuera de la plataforma (NEQUI o efectivo al coordinador). La plataforma solo gestiona el comprobante. |
+| RN-009 | Solo equipos con estado de inscripción `APPROVED` pueden participar en partidos (`MatchValidator` lo verifica). |
+| RN-010 | El estado de inscripción sigue una máquina de estados estricta: `PENDING` → `IN_REVIEW` → `APPROVED` / `REJECTED`. Los saltos de estado son rechazados con excepción de negocio. |
 | RN-011 | Solo `ADMINISTRADOR_SISTEMA` y `TOURNAMENT_ORGANIZER` pueden cambiar el estado de una inscripción (PUT). Solo `CAPTAIN` y `TOURNAMENT_ORGANIZER` pueden crearla (POST). |
 | RN-012 | El reglamento del torneo prevalece sobre cualquier decisión del sistema. |
-| RN-013 | Las sanciones (tarjetas) son responsabilidad del árbitro en el terreno; el sistema solo registra la información. |
+| RN-013 | Las sanciones (tarjetas) son responsabilidad del árbitro en el terreno; el sistema solo registra la información suministrada. |
 | RN-014 | Los máximos goleadores se calculan de manera acumulativa durante todo el torneo (fases de grupo y eliminatorias). |
 
 ## Endpoints REST del Backend
 
-| Método | URI | Acceso | Descripción |
-|--------|-----|--------|-------------|
-| POST | `/api/auth` | Público | Login — retorna JWT |
-| POST | `/api/users` | Público | Registro de nuevos usuarios |
-| GET | `/api/users` | Autenticado | Listar todos los usuarios |
-| POST | `/api/teams` | CAPTAIN | Crear equipo |
-| GET | `/api/teams` | Autenticado | Listar equipos |
-| POST | `/api/tournaments` | TOURNAMENT_ORGANIZER | Crear torneo |
-| PUT | `/api/tournaments/{id}` | TOURNAMENT_ORGANIZER | Actualizar torneo |
-| GET | `/api/tournaments` | Público | Consultar torneos |
-| POST | `/api/registrations` | CAPTAIN, TOURNAMENT_ORGANIZER | Crear inscripción / subir comprobante |
-| PUT | `/api/registrations/{id}` | ADMINISTRADOR_SISTEMA, TOURNAMENT_ORGANIZER | Actualizar estado de inscripción |
-| GET | `/api/registrations` | Autenticado | Listar inscripciones |
-| POST | `/api/matches` | REFEREE, TOURNAMENT_ORGANIZER | Registrar partido |
-| PUT | `/api/matches/{id}` | REFEREE, TOURNAMENT_ORGANIZER | Actualizar partido |
-| GET | `/api/matches` | Autenticado | Listar partidos |
+> **Autenticación:** todas las rutas protegidas requieren el header `Authorization: Bearer <JWT>`. Un token expirado devuelve `401 Unauthorized` con mensaje JSON explicativo.
 
-> **Autenticación:** todas las rutas protegidas requieren header `Authorization: Bearer <JWT>`. Un token expirado devuelve `401 Unauthorized` con mensaje JSON explicativo.
-
+| Método | URI | Roles permitidos | Descripción |
+|--------|-----|-----------------|-------------|
+| `POST` | `/api/auth/login` | Público | Login — retorna JWT. |
+| `POST` | `/api/users/register` | Público | Registro de nuevos usuarios. |
+| `GET` | `/api/users/all` | Autenticado | Listar todos los usuarios. |
+| `POST` | `/api/teams/create` | `CAPTAIN` | Crear equipo. |
+| `GET` | `/api/teams/all` | Autenticado | Listar equipos. |
+| `POST` | `/api/torneos/create` | `TOURNAMENT_ORGANIZER` | Crear torneo. |
+| `PUT` | `/api/torneos/{id}/configurar` | `TOURNAMENT_ORGANIZER` | Configurar torneo (reglamento, fechas, horarios, canchas, sanciones). |
+| `GET` | `/api/torneos/consulta/all` | Autenticado | Consultar todos los torneos. |
+| `POST` | `/api/inscripciones/create` | `CAPTAIN`, `TOURNAMENT_ORGANIZER` | Crear inscripción / subir comprobante. |
+| `PUT` | `/api/inscripciones/{id}/estado` | `ADMINISTRADOR_SISTEMA`, `TOURNAMENT_ORGANIZER` | Actualizar estado de inscripción. |
+| `GET` | `/api/inscripciones/all` | Autenticado | Listar inscripciones. |
+| `POST` | `/api/partidos/create` | `REFEREE`, `TOURNAMENT_ORGANIZER` | Registrar partido. |
+| `PUT` | `/api/partidos/{id}/marcador` | `REFEREE`, `TOURNAMENT_ORGANIZER` | Actualizar marcador del partido. |
+| `PUT` | `/api/partidos/{id}/alineacion` | `REFEREE`, `TOURNAMENT_ORGANIZER` | Registrar alineación de un equipo. |
+| `PUT` | `/api/partidos/{id}/tarjetas` | `REFEREE`, `TOURNAMENT_ORGANIZER` | Registrar tarjeta a un jugador. |
 
 ## Abreviaturas
 
@@ -529,17 +824,28 @@ https://tag-skit-64046987.figma.site/
 | RF | Requerimiento Funcional |
 | RNF | Requerimiento No Funcional |
 | RN | Regla de Negocio |
-| API | Interfaz de Programación de Aplicaciones |
-| REST | Transferencia de Estado Representacional |
-| NEQUI | Aplicación móvil de pago de dinero |
+| API | Interfaz de Programación de Aplicaciones (Application Programming Interface) |
+| REST | Transferencia de Estado Representacional (Representational State Transfer) |
+| JWT | JSON Web Token |
+| RBAC | Control de Acceso Basado en Roles (Role-Based Access Control) |
+| HTTPS | Protocolo seguro de transferencia de hipertexto |
+| SSL | Capa de Conexión Segura (Secure Sockets Layer) |
+| CORS | Intercambio de Recursos de Origen Cruzado (Cross-Origin Resource Sharing) |
+| MVC | Modelo-Vista-Controlador |
+| DTO | Objeto de Transferencia de Datos (Data Transfer Object) |
+| NEQUI | Aplicación móvil de pagos digitales |
+| BCrypt | Algoritmo de cifrado de contraseñas |
+| TTL | Tiempo de vida del token (Time To Live) |
+| COP | Peso Colombiano |
 | PJ | Partidos Jugados |
 | PG | Partidos Ganados |
 | PE | Partidos Empatados |
 | PP | Partidos Perdidos |
 | GF | Goles a Favor |
 | GC | Goles en Contra |
-| DG | Diferencia de Gol |
+| DG | Diferencia de Gol (GF − GC) |
 | Pts | Puntos |
-| SQL | Lenguaje de Consulta Estructurado |
-| UX | Experiencia de Usuario |
-| UI | Interfaz de Usuario |
+| SQL | Lenguaje de Consulta Estructurado (Structured Query Language) |
+| UX | Experiencia de Usuario (User Experience) |
+| UI | Interfaz de Usuario (User Interface) |
+| SRS | Especificación de Requerimientos de Software |
