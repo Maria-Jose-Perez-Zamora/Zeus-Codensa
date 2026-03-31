@@ -95,6 +95,7 @@ public final class EntityToModelMapper {
         model.setHorariosPartidos(entity.getHorariosPartidos() != null ? new ArrayList<>(entity.getHorariosPartidos()) : new ArrayList<>());
         model.setCanchas(entity.getCanchas() != null ? new ArrayList<>(entity.getCanchas()) : new ArrayList<>());
         model.setSanctions(entity.getSanctions());
+        model.setCampeon(entity.getCampeon());
 
         return model;
     }

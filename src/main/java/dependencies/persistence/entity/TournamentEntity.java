@@ -49,6 +49,8 @@ public class TournamentEntity {
 
     private String sanctions;
 
+    private String campeon;
+
     public String getId() {
         return id;
     }
@@ -151,5 +153,13 @@ public class TournamentEntity {
 
     public void setSanctions(String sanctions) {
         this.sanctions = sanctions;
+    }
+
+    public String getCampeon() {
+        return campeon;
+    }
+
+    public void setCampeon(String campeon) {
+        this.campeon = campeon;
     }
 }

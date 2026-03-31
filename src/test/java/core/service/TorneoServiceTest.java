@@ -2,6 +2,7 @@ package core.service;
 
 import dependencies.dto.TournamentRequestDTO;
 import dependencies.dto.TournamentResponseDTO;
+import dependencies.dto.TournamentHistoryDTO;
 import core.model.Tournament;
 import dependencies.util.DataStorage;
 import org.junit.jupiter.api.BeforeEach;
@@ -74,7 +75,7 @@ public class TorneoServiceTest {
         DataStorage.tournaments.add(new Tournament("Liga 1"));
         DataStorage.tournaments.add(new Tournament("Liga 2"));
 
-        List<TournamentResponseDTO> res = torneoService.getAllTorneos();
+        List<TournamentHistoryDTO> res = torneoService.getAllTorneos();
         assertEquals(2, res.size());
     }
 }

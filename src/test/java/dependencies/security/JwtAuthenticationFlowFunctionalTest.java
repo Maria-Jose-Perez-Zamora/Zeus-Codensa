@@ -17,12 +17,14 @@ import Zeus_Codensa.Techcup_Futbol.TechcupFutbolApplication;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest(classes = TechcupFutbolApplication.class, properties = {
         "security.jwt.secret=VGhpcyBpcyBhIHZlcnkgc2VjdXJlIGFuZCBsb25nIHNlY3JldCBrZXkgZm9yIEpXVCB2YWxpZGF0aW9u",
         "security.jwt.ttl-ms=3600000"
 })
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 class JwtAuthenticationFlowFunctionalTest {
 
     private static final String SECRET = "VGhpcyBpcyBhIHZlcnkgc2VjdXJlIGFuZCBsb25nIHNlY3JldCBrZXkgZm9yIEpXVCB2YWxpZGF0aW9u";

@@ -2,6 +2,7 @@ package controller;
 
 import dependencies.dto.TournamentRequestDTO;
 import dependencies.dto.TournamentResponseDTO;
+import dependencies.dto.TournamentHistoryDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,9 +40,16 @@ public class TournamentController {
     }
 
     @GetMapping("/query/all")
-    @Operation(summary = "Get All Tournaments", description = "Gets a list of all registered tournaments")
-    public ResponseEntity<List<TournamentResponseDTO>> getAllTorneos() {
+    @Operation(summary = "Get Tournament History", description = "Gets an optimized list of all registered tournaments with essential footprint (name, dates, status, champion)")
+    public ResponseEntity<List<TournamentHistoryDTO>> getAllTorneos() {
         log.info("REST request - getAllTorneos");
         return ResponseEntity.ok(torneoService.getAllTorneos());
+    }
+
+    @GetMapping("/query/{id}")
+    @Operation(summary = "Get Tournament Details", description = "Gets full detailed configuration of a specific tournament by ID")
+    public ResponseEntity<TournamentResponseDTO> getTorneoById(@PathVariable String id) {
+        log.info("REST request - getTorneoById: {}", id);
+        return ResponseEntity.ok(torneoService.getTorneoById(id));
     }
 }

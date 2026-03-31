@@ -2,6 +2,7 @@ package controller;
 
 import dependencies.dto.TournamentRequestDTO;
 import dependencies.dto.TournamentResponseDTO;
+import dependencies.dto.TournamentHistoryDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -69,7 +70,7 @@ public class TorneoControllerTest {
     public void testGetAllTorneos_Success() {
         when(torneoService.getAllTorneos()).thenReturn(Collections.emptyList());
 
-        ResponseEntity<List<TournamentResponseDTO>> response = torneoController.getAllTorneos();
+        ResponseEntity<List<TournamentHistoryDTO>> response = torneoController.getAllTorneos();
         assertEquals(200, response.getStatusCode().value());
         assertTrue(response.getBody().isEmpty());
     }

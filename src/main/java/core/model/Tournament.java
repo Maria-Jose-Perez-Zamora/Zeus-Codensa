@@ -19,6 +19,7 @@ public class Tournament {
     private List<String> horariosPartidos;
     private List<String> canchas;
     private String sanctions;
+    private String campeon;
 
     public Tournament() {}
 
@@ -55,4 +56,6 @@ public class Tournament {
     public void setCanchas(List<String> canchas) { this.canchas = canchas; }
     public String getSanctions() { return sanctions; }
     public void setSanctions(String sanctions) { this.sanctions = sanctions; }
+    public String getCampeon() { return campeon; }
+    public void setCampeon(String campeon) { this.campeon = campeon; }
 }

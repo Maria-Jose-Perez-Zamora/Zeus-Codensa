@@ -2,6 +2,7 @@ package core.service;
 
 import dependencies.dto.TournamentRequestDTO;
 import dependencies.dto.TournamentResponseDTO;
+import dependencies.dto.TournamentHistoryDTO;
 import core.exception.ResourceNotFoundException;
 import core.exception.BusinessRuleException;
 import core.exception.PersistenceAccessException;
@@ -111,12 +112,12 @@ public class TournamentService {
         return TournamentMapper.toDTO(t);
     }
 
-    public List<TournamentResponseDTO> getAllTorneos() {
+    public List<TournamentHistoryDTO> getAllTorneos() {
         if (tournamentRepository != null) {
             try {
                 return tournamentRepository.findAll().stream()
                         .map(EntityToModelMapper::toTournamentModel)
-                        .map(TournamentMapper::toDTO)
+                        .map(TournamentHistoryDTO::new)
                         .collect(Collectors.toList());
             } catch (DataAccessException ex) {
                 throw new PersistenceAccessException("Error al consultar tournaments en base de datos", ex);
@@ -125,7 +126,30 @@ public class TournamentService {
 
         log.debug("Recuperando todos los tournaments ({})", DataStorage.tournaments.size());
         return DataStorage.tournaments.stream()
-                .map(TournamentMapper::toDTO)
+                .map(TournamentHistoryDTO::new)
                 .collect(Collectors.toList());
+    }
+
+    public TournamentResponseDTO getTorneoById(String id) {
+        log.debug("Buscando tournament con ID: {}", id);
+        Optional<Tournament> torneoOpt;
+
+        if (tournamentRepository != null) {
+            try {
+                torneoOpt = tournamentRepository.findById(id).map(EntityToModelMapper::toTournamentModel);
+            } catch (DataAccessException ex) {
+                throw new PersistenceAccessException("Error al consultar tournament en base de datos", ex);
+            }
+        } else {
+            torneoOpt = DataStorage.tournaments.stream()
+                    .filter(t -> t.getId().equals(id))
+                    .findFirst();
+        }
+
+        if (torneoOpt.isEmpty()) {
+            throw new ResourceNotFoundException("Tournament no encontrado con ID: " + id);
+        }
+
+        return TournamentMapper.toDTO(torneoOpt.get());
     }
 }
