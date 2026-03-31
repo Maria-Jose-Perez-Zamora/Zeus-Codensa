@@ -2,6 +2,7 @@ package controller;
 
 import dependencies.dto.InvitationRequestDTO;
 import dependencies.dto.InvitationResponseDTO;
+import dependencies.dto.InvitationAcceptanceDTO;
 import dependencies.dto.UserResponseDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -41,19 +42,14 @@ public class PlayerController {
         return ResponseEntity.ok(jugadorService.enviarInvitacion(request));
     }
 
-    @PutMapping("/invitations/{id}")
-    @Operation(summary = "Accept Invitation", description = "A player accepts an invitation to join a team")
-    public ResponseEntity<Void> acceptInvitation(@PathVariable String id, @RequestParam String playerEmail) {
-        log.info("REST request - acceptInvitation id: {} player: {}", id, playerEmail);
-        jugadorService.acceptInvitation(id, playerEmail);
-        return ResponseEntity.ok().build();
-    }
-
-    @DeleteMapping("/invitations/{id}")
-    @Operation(summary = "Decline Invitation", description = "A player declines an invitation to join a team")
-    public ResponseEntity<Void> declineInvitation(@PathVariable String id, @RequestParam String playerEmail) {
-        log.info("REST request - declineInvitation id: {} player: {}", id, playerEmail);
-        jugadorService.declineInvitation(id, playerEmail);
+    @PatchMapping("/invitations/{id}/acceptance")
+    @Operation(summary = "Process Invitation", description = "A player accepts or declines an invitation to join a team")
+    public ResponseEntity<Void> processInvitation(
+            @PathVariable String id,
+            @RequestParam String playerEmail,
+            @RequestBody InvitationAcceptanceDTO request) {
+        log.info("REST request - processInvitation id: {}, player: {}, status: {}", id, playerEmail, request.getStatus());
+        jugadorService.processInvitation(id, playerEmail, request.getStatus());
         return ResponseEntity.ok().build();
     }
 }
