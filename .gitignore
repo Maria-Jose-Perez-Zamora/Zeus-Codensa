@@ -53,3 +53,9 @@ front_full_report.txt
 
 ## Los diff
 *.patch
+
+
+## los md para la presemtacion 
+database_diagram.md
+sprint_presentation.md
+swagger_testing_guide.md

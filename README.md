@@ -609,6 +609,12 @@ Se implementó la entidad Team para la organización del torneo.
 
 ---
 
+
+## DIAGRAMA DE CLASES DE LA BASE DE DATOS
+
+![alt text](<DIAGRAMA DE CLASES BASE DE DATOS.png>)
+
+
 ## Seguridad
 
 ### Autenticación con JWT
