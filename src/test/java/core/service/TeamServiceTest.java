@@ -2,62 +2,101 @@ package core.service;
 
 import dependencies.dto.TeamRequestDTO;
 import dependencies.dto.TeamResponseDTO;
-import core.model.Player;
+import core.validator.TeamValidator;
+import dependencies.persistence.entity.TeamEntity;
+import dependencies.persistence.entity.UserEntity;
+import dependencies.persistence.repository.TeamRepository;
+import dependencies.persistence.repository.UserRepository;
 import core.model.Role;
-import dependencies.util.DataStorage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 public class TeamServiceTest {
     
+    @Mock
+    private TeamRepository teamRepository;
+
+    @Mock
+    private UserRepository userRepository;
+
+    @Mock
+    private TeamValidator teamValidator;
+
+    @InjectMocks
     private TeamService teamService;
+    
     private List<String> validPlayers;
 
     @BeforeEach
     public void setUp() {
-        DataStorage.clearAll();
-        teamService = new TeamService();
-        validPlayers = Arrays.asList("user.test1-a@escuelaing.edu.co", "user.test2-a@escuelaing.edu.co", "user.test3-a@escuelaing.edu.co", "user.test4-a@escuelaing.edu.co", "user.test5-a@escuelaing.edu.co", "user.test6-a@escuelaing.edu.co", "user.test7-a@escuelaing.edu.co");
-        
-        for (String email : validPlayers) {
-            Player j = new Player();
-            j.setEmail(email);
-            j.setName("Player " + email);
-            j.setRole(Role.PLAYER);
-            DataStorage.users.add(j);
-        }
+        validPlayers = Arrays.asList("user.test1-a@escuelaing.edu.co", "user.test2-a@escuelaing.edu.co", 
+                "user.test3-a@escuelaing.edu.co", "user.test4-a@escuelaing.edu.co", "user.test5-a@escuelaing.edu.co", 
+                "user.test6-a@escuelaing.edu.co", "user.test7-a@escuelaing.edu.co");
     }
 
     @Test
     public void testCreateTeam_WithPlayers_Success() {
         TeamRequestDTO request = new TeamRequestDTO("Tigres FC", "tigres.png", "Amarillo", validPlayers);
+        
+        doNothing().when(teamValidator).validateForCreation(request);
+        when(teamRepository.findByTeamName("Tigres FC")).thenReturn(Optional.empty());
+
+        for (String email : validPlayers) {
+            UserEntity u = new UserEntity();
+            u.setEmail(email);
+            u.setRole(Role.PLAYER);
+            when(userRepository.findByEmail(email)).thenReturn(Optional.of(u));
+        }
+
+        TeamEntity savedTeam = new TeamEntity();
+        savedTeam.setTeamName("Tigres FC");
+        List<UserEntity> teamPlayers = new ArrayList<>();
+        for(int i=0; i<7; i++) {
+            UserEntity pe = new UserEntity();
+            pe.setEmail(validPlayers.get(i));
+            teamPlayers.add(pe);
+        }
+        savedTeam.setPlayers(teamPlayers);
+        when(teamRepository.save(any(TeamEntity.class))).thenReturn(savedTeam);
+
         TeamResponseDTO response = teamService.createTeam(request);
         
         assertNotNull(response);
-        assertEquals(7, response.getPlayers().size());
         assertEquals("Tigres FC", response.getTeamName());
-        assertEquals(1, DataStorage.teams.size());
+        assertEquals(7, response.getPlayers().size());
+        verify(teamRepository, times(1)).save(any(TeamEntity.class));
     }
 
     @Test
     public void testGetAllTeams() {
-        TeamRequestDTO request1 = new TeamRequestDTO("Equipo A", null, null, validPlayers);
+        TeamEntity t1 = new TeamEntity();
+        t1.setTeamName("Equipo A");
         
-        List<String> validPlayersB = Arrays.asList("user.test8-a@escuelaing.edu.co", "user.test9-a@escuelaing.edu.co", "user.test10-a@escuelaing.edu.co", "user.test11-a@escuelaing.edu.co", "user.test12-a@escuelaing.edu.co", "user.test13-a@escuelaing.edu.co", "user.test14-a@escuelaing.edu.co");
-        for (String email : validPlayersB) {
-            Player j = new Player(); j.setEmail(email); DataStorage.users.add(j);
-        }
-        TeamRequestDTO request2 = new TeamRequestDTO("Equipo B", null, null, validPlayersB);
-        
-        teamService.createTeam(request1);
-        teamService.createTeam(request2);
+        TeamEntity t2 = new TeamEntity();
+        t2.setTeamName("Equipo B");
+
+        List<TeamEntity> entityList = new ArrayList<>();
+        entityList.add(t1);
+        entityList.add(t2);
+
+        when(teamRepository.findAll()).thenReturn(entityList);
         
         List<TeamResponseDTO> teams = teamService.getAllTeams();
         assertEquals(2, teams.size());
+        verify(teamRepository, times(1)).findAll();
     }
 }

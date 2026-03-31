@@ -1,19 +1,26 @@
 package core.validator;
 
 import dependencies.dto.TeamRequestDTO;
-import dependencies.util.DataStorage;
+import dependencies.persistence.repository.TeamRepository;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 public class TeamValidator {
 
-    public static void validateForCreation(TeamRequestDTO request) {
+    private final TeamRepository teamRepository;
+
+    public TeamValidator(TeamRepository teamRepository) {
+        this.teamRepository = teamRepository;
+    }
+
+    public void validateForCreation(TeamRequestDTO request) {
         if (request.getTeamName() == null || request.getTeamName().trim().isEmpty()) {
             throw new IllegalArgumentException("El name del team no puede estar vacío");
         }
         
-        boolean exists = DataStorage.teams.stream()
-                .anyMatch(t -> t.getTeamName().equals(request.getTeamName()));
+        boolean exists = teamRepository.findByTeamName(request.getTeamName()).isPresent();
         if (exists) {
             throw new IllegalArgumentException("El name del team ya existe");
         }
@@ -29,10 +36,7 @@ public class TeamValidator {
         }
 
         for (String correo : players) {
-            boolean yaEnEquipo = DataStorage.teams.stream()
-                    .anyMatch(t -> t.getPlayers().stream()
-                            .anyMatch(u -> u.getEmail().equals(correo)));
-            if (yaEnEquipo) {
+            if (teamRepository.existsByPlayersEmail(correo)) {
                 throw new IllegalArgumentException("El player " + correo + " ya pertenece a otro team");
             }
         }

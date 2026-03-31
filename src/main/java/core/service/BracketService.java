@@ -1,10 +1,9 @@
 package core.service;
 
 import core.model.KnockoutBracket;
-import core.model.Registration;
 import core.service.strategy.BracketGenerationStrategy;
 import core.service.strategy.RandomDrawStrategy;
-import dependencies.util.DataStorage;
+import dependencies.persistence.repository.RegistrationRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,9 +12,11 @@ import java.util.stream.Collectors;
 @Service
 public class BracketService {
     private BracketGenerationStrategy strategy;
+    private final RegistrationRepository registrationRepository;
 
-    public BracketService() {
+    public BracketService(RegistrationRepository registrationRepository) {
         this.strategy = new RandomDrawStrategy();
+        this.registrationRepository = registrationRepository;
     }
 
     public void setStrategy(BracketGenerationStrategy strategy) {
@@ -23,9 +24,9 @@ public class BracketService {
     }
 
     public List<KnockoutBracket> generarLlaves(String tournamentName, String phase) {
-        List<String> approvedTeams = DataStorage.registrations.stream()
-                .filter(i -> i.getTournamentName().equals(tournamentName) && i.getStatus().equals("APPROVED"))
-                .map(Registration::getTeamName)
+        List<String> approvedTeams = registrationRepository.findByTournamentName(tournamentName).stream()
+                .filter(i -> i.getStatus().equals("APPROVED"))
+                .map(dependencies.persistence.entity.RegistrationEntity::getTeamName)
                 .collect(Collectors.toList());
 
         if (approvedTeams.isEmpty() || approvedTeams.size() % 2 != 0) {

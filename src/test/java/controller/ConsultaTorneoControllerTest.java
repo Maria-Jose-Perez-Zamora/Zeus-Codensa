@@ -1,6 +1,5 @@
 package controller;
 
-import core.model.Match;
 import core.model.Standing;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,7 +10,8 @@ import org.springframework.http.ResponseEntity;
 import core.service.StatisticsService;
 import core.service.BracketService;
 import core.service.StandingService;
-import dependencies.util.DataStorage;
+import dependencies.persistence.entity.MatchEntity;
+import dependencies.persistence.repository.MatchRepository;
 
 import java.util.Collections;
 import java.util.List;
@@ -31,13 +31,15 @@ public class ConsultaTorneoControllerTest {
     @Mock
     private StatisticsService estadisticasService;
 
+    @Mock
+    private MatchRepository matchRepository;
+
     @InjectMocks
     private TournamentQueryController consultaTorneoController;
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        DataStorage.clearAll();
     }
 
     @Test
@@ -63,9 +65,15 @@ public class ConsultaTorneoControllerTest {
 
     @Test
     public void testGetCalendario_ConPartidos_ReturnsLista() {
-        Match p = new Match("A", "B", "2026-06-01", "LigaX");
+        MatchEntity p = new MatchEntity();
+        p.setId("1");
+        p.setHomeTeam("A");
+        p.setAwayTeam("B");
+        p.setMatchDate("2026-06-01");
+        p.setTournamentName("LigaX");
         p.setStatus("SCHEDULED");
-        DataStorage.matches.add(p);
+        
+        when(matchRepository.findByTournamentName("LigaX")).thenReturn(Collections.singletonList(p));
 
         ResponseEntity<?> res = consultaTorneoController.getCalendar("LigaX");
         assertEquals(200, res.getStatusCode().value());
@@ -81,11 +89,17 @@ public class ConsultaTorneoControllerTest {
 
     @Test
     public void testGetResultados_ConPartidoFinalizado() {
-        Match p = new Match("A", "B", "2026-06-01", "LigaX");
+        MatchEntity p = new MatchEntity();
+        p.setId("2");
+        p.setHomeTeam("A");
+        p.setAwayTeam("B");
+        p.setMatchDate("2026-06-01");
+        p.setTournamentName("LigaX");
         p.setStatus("FINISHED");
         p.setHomeScore(2);
         p.setAwayScore(1);
-        DataStorage.matches.add(p);
+        
+        when(matchRepository.findByTournamentName("LigaX")).thenReturn(Collections.singletonList(p));
 
         ResponseEntity<?> res = consultaTorneoController.getResultados("LigaX");
         assertEquals(200, res.getStatusCode().value());

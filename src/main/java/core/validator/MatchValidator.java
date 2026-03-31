@@ -1,11 +1,22 @@
 package core.validator;
 
 import dependencies.dto.MatchRequestDTO;
-import dependencies.util.DataStorage;
+import dependencies.persistence.repository.RegistrationRepository;
+import dependencies.persistence.repository.TournamentRepository;
+import org.springframework.stereotype.Component;
 
+@Component
 public class MatchValidator {
 
-    public static void validateForCreation(MatchRequestDTO request) {
+    private final TournamentRepository tournamentRepository;
+    private final RegistrationRepository registrationRepository;
+
+    public MatchValidator(TournamentRepository tournamentRepository, RegistrationRepository registrationRepository) {
+        this.tournamentRepository = tournamentRepository;
+        this.registrationRepository = registrationRepository;
+    }
+
+    public void validateForCreation(MatchRequestDTO request) {
         if (request.getHomeTeam() == null || request.getAwayTeam() == null) {
             throw new IllegalArgumentException("Se deben especificar ambos teams");
         }
@@ -16,16 +27,13 @@ public class MatchValidator {
             throw new IllegalArgumentException("El tournament y la fecha del match son obligatorios");
         }
 
-        boolean torneoExiste = DataStorage.tournaments.stream()
-                .anyMatch(t -> t.getTournamentName().equals(request.getTournamentName()));
+        boolean torneoExiste = tournamentRepository.findByTournamentName(request.getTournamentName()).isPresent();
         if (!torneoExiste) {
             throw new IllegalArgumentException("El tournament especificado no existe");
         }
 
-        boolean localInscrito = DataStorage.registrations.stream()
-                .anyMatch(i -> i.getTeamName().equals(request.getHomeTeam()) && i.getTournamentName().equals(request.getTournamentName()) && i.getStatus().equals("APPROVED"));
-        boolean visitanteInscrito = DataStorage.registrations.stream()
-                .anyMatch(i -> i.getTeamName().equals(request.getAwayTeam()) && i.getTournamentName().equals(request.getTournamentName()) && i.getStatus().equals("APPROVED"));
+        boolean localInscrito = registrationRepository.existsByTeamNameAndTournamentNameAndStatus(request.getHomeTeam(), request.getTournamentName(), "APPROVED");
+        boolean visitanteInscrito = registrationRepository.existsByTeamNameAndTournamentNameAndStatus(request.getAwayTeam(), request.getTournamentName(), "APPROVED");
 
         if (!localInscrito || !visitanteInscrito) {
             throw new IllegalArgumentException("Los teams deben estar inscritos y APPROVED en el tournament");

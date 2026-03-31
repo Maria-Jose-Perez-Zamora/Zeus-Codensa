@@ -1,10 +1,18 @@
 package core.validator;
 
 import dependencies.dto.TournamentRequestDTO;
-import dependencies.util.DataStorage;
+import dependencies.persistence.repository.TournamentRepository;
+import org.springframework.stereotype.Component;
 
+@Component
 public class TournamentValidator {
-    public static void validateForCreation(TournamentRequestDTO request) {
+    
+    private final TournamentRepository tournamentRepository;
+
+    public TournamentValidator(TournamentRepository tournamentRepository) {
+        this.tournamentRepository = tournamentRepository;
+    }
+    public void validateForCreation(TournamentRequestDTO request) {
         if (request.getTournamentName() == null || request.getTournamentName().trim().isEmpty()) {
             throw new IllegalArgumentException("El name del tournament es obligatorio");
         }
@@ -15,8 +23,7 @@ public class TournamentValidator {
             throw new IllegalArgumentException("El costo de registration no puede ser negativo");
         }
 
-        boolean exists = DataStorage.tournaments.stream()
-                .anyMatch(t -> t.getTournamentName().equals(request.getTournamentName()));
+        boolean exists = tournamentRepository.findByTournamentName(request.getTournamentName()).isPresent();
         if (exists) {
             throw new IllegalArgumentException("Ya existe un tournament con este name");
         }

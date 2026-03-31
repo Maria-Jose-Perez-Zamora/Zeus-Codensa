@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import core.service.StatisticsService;
 import core.service.BracketService;
 import core.service.StandingService;
-import dependencies.util.DataStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,11 +25,13 @@ public class TournamentQueryController {
     private final StandingService tablaService;
     private final BracketService llaveService;
     private final StatisticsService estadisticasService;
+    private final dependencies.persistence.repository.MatchRepository matchRepository;
 
-    public TournamentQueryController(StandingService tablaService, BracketService llaveService, StatisticsService estadisticasService) {
+    public TournamentQueryController(StandingService tablaService, BracketService llaveService, StatisticsService estadisticasService, dependencies.persistence.repository.MatchRepository matchRepository) {
         this.tablaService = tablaService;
         this.llaveService = llaveService;
         this.estadisticasService = estadisticasService;
+        this.matchRepository = matchRepository;
     }
 
     @GetMapping("")
@@ -60,8 +61,9 @@ public class TournamentQueryController {
     @Operation(summary = "Match Calendar", description = "Returns scheduled matches")
     public ResponseEntity<?> getCalendar(@PathVariable String tournament) {
         log.info("REST request - getCalendar para tournament: {}", tournament);
-        List<Map<String, Object>> calendario = DataStorage.matches.stream()
-                .filter(p -> p.getTournamentName().equals(tournament) && "SCHEDULED".equals(p.getStatus()))
+        List<Map<String, Object>> calendario = matchRepository.findByTournamentName(tournament).stream()
+                .map(dependencies.persistence.mapper.EntityToModelMapper::toMatchModel)
+                .filter(p -> "SCHEDULED".equals(p.getStatus()))
                 .map(p -> Map.<String, Object>of(
                         "id", p.getId(),
                         "homeTeam", p.getHomeTeam(),
@@ -81,8 +83,9 @@ public class TournamentQueryController {
     @Operation(summary = "Historical Results", description = "All finished matches")
     public ResponseEntity<?> getResultados(@PathVariable String tournament) {
         log.info("REST request - getResultados Historicos para tournament: {}", tournament);
-        List<Map<String, Object>> resultados = DataStorage.matches.stream()
-                .filter(p -> p.getTournamentName().equals(tournament) && "FINISHED".equals(p.getStatus()))
+        List<Map<String, Object>> resultados = matchRepository.findByTournamentName(tournament).stream()
+                .map(dependencies.persistence.mapper.EntityToModelMapper::toMatchModel)
+                .filter(p -> "FINISHED".equals(p.getStatus()))
                 .map(p -> Map.<String, Object>of(
                         "id", p.getId(),
                         "homeTeam", p.getHomeTeam(),

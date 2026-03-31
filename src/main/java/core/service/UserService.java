@@ -5,7 +5,6 @@ import dependencies.dto.UserResponseDTO;
 import core.exception.BusinessRuleException;
 import core.exception.PersistenceAccessException;
 import core.model.User;
-import dependencies.util.DataStorage;
 import core.validator.UserValidator;
 import dependencies.mapper.UserMapper;
 import dependencies.persistence.entity.UserEntity;
@@ -26,55 +25,41 @@ public class UserService {
 
     private static final Logger log = LoggerFactory.getLogger(UserService.class);
     private final UserRepository userRepository;
-
-    public UserService() {
-        this.userRepository = null;
-    }
+    private final UserValidator userValidator;
 
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, UserValidator userValidator) {
         this.userRepository = userRepository;
+        this.userValidator = userValidator;
     }
 
     public UserResponseDTO registerUser(UserRequestDTO requestDTO) {
         log.debug("Validating creation rules for user {}", requestDTO.getEmail());
-        UserValidator.validateForRegistration(requestDTO);
+        userValidator.validateForRegistration(requestDTO);
 
         User newUser = UserMapper.toEntity(requestDTO);
 
-        if (userRepository != null) {
-            try {
-                if (userRepository.findByEmail(newUser.getEmail()).isPresent()) {
-                    throw new BusinessRuleException("Ya existe un usuario con ese correo");
-                }
-
-                UserEntity saved = userRepository.save(ModelToEntityMapper.toUserEntity(newUser));
-                log.info("User created successfully in DB: {} with role {}", newUser.getEmail(), newUser.getRole());
-                return UserMapper.toDTO(EntityToModelMapper.toUserModel(saved));
-            } catch (DataAccessException ex) {
-                throw new PersistenceAccessException("Error al persistir el usuario en base de datos", ex);
+        try {
+            if (userRepository.findByEmail(newUser.getEmail()).isPresent()) {
+                throw new BusinessRuleException("Ya existe un usuario con ese correo");
             }
-        }
 
-        DataStorage.users.add(newUser);
-        log.info("User created successfully: {} with role {}", newUser.getEmail(), newUser.getRole());
-        return UserMapper.toDTO(newUser);
+            UserEntity saved = userRepository.save(ModelToEntityMapper.toUserEntity(newUser));
+            log.info("User created successfully in DB: {} with role {}", newUser.getEmail(), newUser.getRole());
+            return UserMapper.toDTO(EntityToModelMapper.toUserModel(saved));
+        } catch (DataAccessException ex) {
+            throw new PersistenceAccessException("Error al persistir el usuario en base de datos", ex);
+        }
     }
 
     public List<UserResponseDTO> getAllUsers() {
-        if (userRepository != null) {
-            try {
-                return userRepository.findAll().stream()
-                        .map(EntityToModelMapper::toUserModel)
-                        .map(UserMapper::toDTO)
-                        .collect(Collectors.toList());
-            } catch (DataAccessException ex) {
-                throw new PersistenceAccessException("Error al consultar usuarios en base de datos", ex);
-            }
+        try {
+            return userRepository.findAll().stream()
+                    .map(EntityToModelMapper::toUserModel)
+                    .map(UserMapper::toDTO)
+                    .collect(Collectors.toList());
+        } catch (DataAccessException ex) {
+            throw new PersistenceAccessException("Error al consultar usuarios en base de datos", ex);
         }
-
-        return DataStorage.users.stream()
-                .map(UserMapper::toDTO)
-                .collect(Collectors.toList());
     }
 }

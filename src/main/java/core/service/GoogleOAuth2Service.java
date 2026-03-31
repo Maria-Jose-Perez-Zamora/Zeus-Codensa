@@ -1,13 +1,11 @@
 package core.service;
 
-import core.model.Player;
 import core.model.Role;
 import core.model.User;
 import core.model.UserType;
 import dependencies.dto.LoginResponseDTO;
 import dependencies.dto.UserResponseDTO;
 import dependencies.security.JwtService;
-import dependencies.util.DataStorage;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
@@ -17,9 +15,11 @@ import java.util.Optional;
 public class GoogleOAuth2Service {
 
     private final JwtService jwtService;
+    private final dependencies.persistence.repository.UserRepository userRepository;
 
-    public GoogleOAuth2Service(JwtService jwtService) {
+    public GoogleOAuth2Service(JwtService jwtService, dependencies.persistence.repository.UserRepository userRepository) {
         this.jwtService = jwtService;
+        this.userRepository = userRepository;
     }
 
     public LoginResponseDTO authenticateExternalUser(OAuth2User oAuth2User) {
@@ -35,39 +35,44 @@ public class GoogleOAuth2Service {
             throw new IllegalArgumentException("El email de Google no esta verificado");
         }
 
-        Optional<User> existingUser = DataStorage.users.stream()
-                .filter(user -> email.equalsIgnoreCase(user.getEmail()))
-                .findFirst();
+        Optional<dependencies.persistence.entity.UserEntity> existingUserOpt = userRepository.findByEmail(email);
 
-        User user = existingUser.orElseGet(() -> createExternalUser(email, name, photo));
-
-        if (user.getType() == null) {
-            user.setType(UserType.EXTERNAL);
+        dependencies.persistence.entity.UserEntity entity;
+        if (existingUserOpt.isPresent()) {
+            entity = existingUserOpt.get();
+        } else {
+            entity = createExternalUser(email, name, photo);
         }
-        if (user.getRole() == null) {
-            user.setRole(Role.PLAYER);
+
+        if (entity.getType() == null) {
+            entity.setType(UserType.EXTERNAL);
+        }
+        if (entity.getRole() == null) {
+            entity.setRole(Role.PLAYER);
         }
 
         if (photo != null && !photo.isBlank()) {
-            user.setPhoto(photo);
+            entity.setPhoto(photo);
         }
         if (name != null && !name.isBlank()) {
-            user.setName(name);
+            entity.setName(name);
         }
+        
+        entity = userRepository.save(entity);
 
+        User user = dependencies.persistence.mapper.EntityToModelMapper.toUserModel(entity);
         String token = jwtService.generateToken(user.getEmail(), user.getRole().name());
         return new LoginResponseDTO(token, new UserResponseDTO(user));
     }
 
-    private User createExternalUser(String email, String name, String photo) {
-        Player player = new Player();
-        player.setEmail(email);
-        player.setName(name != null && !name.isBlank() ? name : email);
-        player.setPhoto(photo);
-        player.setRole(Role.PLAYER);
-        player.setType(UserType.EXTERNAL);
-        player.setPassword("OAUTH2");
-        DataStorage.users.add(player);
-        return player;
+    private dependencies.persistence.entity.UserEntity createExternalUser(String email, String name, String photo) {
+        dependencies.persistence.entity.UserEntity entity = new dependencies.persistence.entity.UserEntity();
+        entity.setEmail(email);
+        entity.setName(name != null && !name.isBlank() ? name : email);
+        entity.setPhoto(photo);
+        entity.setRole(Role.PLAYER);
+        entity.setType(UserType.EXTERNAL);
+        entity.setPassword("OAUTH2");
+        return userRepository.save(entity);
     }
 }

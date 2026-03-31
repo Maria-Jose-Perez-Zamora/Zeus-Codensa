@@ -2,7 +2,6 @@ package core.service;
 
 import core.model.Match;
 import core.model.Standing;
-import dependencies.util.DataStorage;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -13,11 +12,18 @@ import java.util.stream.Collectors;
 @Service
 public class StandingService {
 
+    private final dependencies.persistence.repository.MatchRepository matchRepository;
+
+    public StandingService(dependencies.persistence.repository.MatchRepository matchRepository) {
+        this.matchRepository = matchRepository;
+    }
+
     public List<Standing> calcularTabla(String tournamentName) {
         Map<String, Standing> standingTable = new HashMap<>();
 
-        List<Match> matches = DataStorage.matches.stream()
-                .filter(p -> p.getTournamentName().equals(tournamentName) && p.getStatus().equals("FINISHED"))
+        List<Match> matches = matchRepository.findByTournamentName(tournamentName).stream()
+                .filter(p -> p.getStatus().equals("FINISHED"))
+                .map(dependencies.persistence.mapper.EntityToModelMapper::toMatchModel)
                 .collect(Collectors.toList());
 
         for (Match p : matches) {
