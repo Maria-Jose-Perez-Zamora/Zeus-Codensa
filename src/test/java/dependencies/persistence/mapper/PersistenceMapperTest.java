@@ -162,4 +162,97 @@ class PersistenceMapperTest {
         assertEquals("captain@mail.com", mappedBack.getCaptainEmail());
         assertEquals("player@mail.com", mappedBack.getPlayerEmail());
     }
+
+    @Test
+    void shouldReturnNullWhenInputsAreNull() {
+        // Entity to Model
+        org.junit.jupiter.api.Assertions.assertNull(EntityToModelMapper.toUserModel(null));
+        org.junit.jupiter.api.Assertions.assertNull(EntityToModelMapper.toTeamModel(null));
+        org.junit.jupiter.api.Assertions.assertNull(EntityToModelMapper.toTournamentModel(null));
+        org.junit.jupiter.api.Assertions.assertNull(EntityToModelMapper.toRegistrationModel(null));
+        org.junit.jupiter.api.Assertions.assertNull(EntityToModelMapper.toMatchModel(null));
+        org.junit.jupiter.api.Assertions.assertNull(EntityToModelMapper.toInvitationModel(null));
+
+        // Model to Entity
+        org.junit.jupiter.api.Assertions.assertNull(ModelToEntityMapper.toUserEntity(null));
+        org.junit.jupiter.api.Assertions.assertNull(ModelToEntityMapper.toTeamEntity(null));
+        org.junit.jupiter.api.Assertions.assertNull(ModelToEntityMapper.toTournamentEntity(null));
+        org.junit.jupiter.api.Assertions.assertNull(ModelToEntityMapper.toRegistrationEntity(null));
+        org.junit.jupiter.api.Assertions.assertNull(ModelToEntityMapper.toMatchEntity(null));
+        org.junit.jupiter.api.Assertions.assertNull(ModelToEntityMapper.toInvitationEntity(null));
+    }
+
+    @Test
+    void shouldMapDifferentRolesAndNullRole() {
+        UserEntity admin = new UserEntity(); admin.setRole(Role.ADMINISTRADOR_SISTEMA);
+        UserEntity org = new UserEntity(); org.setRole(Role.TOURNAMENT_ORGANIZER);
+        UserEntity ref = new UserEntity(); ref.setRole(Role.REFEREE);
+        UserEntity nullRole = new UserEntity(); nullRole.setRole(null);
+
+        assertInstanceOf(core.model.AdministradorSistema.class, EntityToModelMapper.toUserModel(admin));
+        assertInstanceOf(core.model.TournamentOrganizer.class, EntityToModelMapper.toUserModel(org));
+        assertInstanceOf(core.model.Referee.class, EntityToModelMapper.toUserModel(ref));
+        assertInstanceOf(core.model.Player.class, EntityToModelMapper.toUserModel(nullRole)); // default
+    }
+
+    @Test
+    void shouldMapEntitiesWithNullLists() {
+        // Team with null players
+        TeamEntity teamEntity = new TeamEntity();
+        teamEntity.setTeamName("Los Tigres");
+        teamEntity.setPlayers(null);
+        Team teamModel = EntityToModelMapper.toTeamModel(teamEntity);
+        assertEquals("Los Tigres", teamModel.getTeamName());
+        assertNotNull(teamModel.getPlayers());
+        assertEquals(0, teamModel.getPlayers().size());
+
+        // Tournament with null lists
+        TournamentEntity tornEntity = new TournamentEntity();
+        tornEntity.setHorariosPartidos(null);
+        tornEntity.setCanchas(null);
+        Tournament tornModel = EntityToModelMapper.toTournamentModel(tornEntity);
+        assertNotNull(tornModel.getHorariosPartidos());
+        assertNotNull(tornModel.getCanchas());
+
+        // Match with null json
+        MatchEntity matchEntity = new MatchEntity();
+        matchEntity.setAlineacionesJson(null);
+        matchEntity.setGoalsJson("");
+        matchEntity.setYellowCardsJson("   ");
+        matchEntity.setRedCardsJson(null);
+        Match matchModel = EntityToModelMapper.toMatchModel(matchEntity);
+        assertNotNull(matchModel.getAlineaciones());
+        assertEquals(0, matchModel.getAlineaciones().size());
+        assertNotNull(matchModel.getGoles());
+    }
+
+    @Test
+    void shouldMapModelsWithNullLists() {
+        // Team with null players
+        Team teamModel = new Team("Los Tigres");
+        teamModel.setPlayers(null);
+        TeamEntity teamEntity = ModelToEntityMapper.toTeamEntity(teamModel);
+        assertEquals("Los Tigres", teamEntity.getTeamName());
+        assertNotNull(teamEntity.getPlayers());
+        assertEquals(0, teamEntity.getPlayers().size());
+
+        // Tournament with null lists
+        Tournament tornModel = new Tournament("Apertura");
+        tornModel.setHorariosPartidos(null);
+        tornModel.setCanchas(null);
+        TournamentEntity tornEntity = ModelToEntityMapper.toTournamentEntity(tornModel);
+        assertNotNull(tornEntity.getHorariosPartidos());
+        assertEquals(0, tornEntity.getHorariosPartidos().size());
+        assertNotNull(tornEntity.getCanchas());
+
+        // Match with null maps
+        Match match = new Match();
+        match.setAlineaciones(null);
+        match.setGoles(null);
+        match.setYellowCards(null);
+        match.setRedCards(null);
+        MatchEntity matchEntity = ModelToEntityMapper.toMatchEntity(match);
+        assertEquals("{}", matchEntity.getAlineacionesJson());
+        assertEquals("{}", matchEntity.getGoalsJson());
+    }
 }

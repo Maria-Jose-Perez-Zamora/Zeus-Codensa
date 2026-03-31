@@ -16,6 +16,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import core.exception.BusinessRuleException;
+import core.exception.PersistenceAccessException;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -83,5 +87,41 @@ public class UserServiceTest {
         List<UserResponseDTO> users = userService.getAllUsers();
         assertEquals(2, users.size());
         verify(userRepository, times(1)).findAll();
+    }
+
+    @Test
+    public void testRegisterUser_DuplicateEmail_Throws() {
+        UserRequestDTO request = new UserRequestDTO("Ana", "user.test1-a@escuelaing.edu.co", "123456", "Defensa", 3, null, Role.PLAYER);
+        UserEntity existing = new UserEntity();
+        existing.setEmail("user.test1-a@escuelaing.edu.co");
+
+        doNothing().when(userValidator).validateForRegistration(request);
+        when(userRepository.findByEmail(request.getEmail())).thenReturn(Optional.of(existing));
+
+        assertThrows(BusinessRuleException.class, () -> userService.registerUser(request));
+    }
+
+    @Test
+    public void testRegisterUser_PersistenceError_Throws() {
+        UserRequestDTO request = new UserRequestDTO("Ana", "user.test1-a@escuelaing.edu.co", "123456", "Defensa", 3, null, Role.PLAYER);
+
+        doNothing().when(userValidator).validateForRegistration(request);
+        when(userRepository.findByEmail(request.getEmail())).thenReturn(Optional.empty());
+        when(userRepository.save(any(UserEntity.class))).thenThrow(new DataIntegrityViolationException("db error"));
+
+        assertThrows(PersistenceAccessException.class, () -> userService.registerUser(request));
+    }
+
+    @Test
+    public void testGetAllUsers_Empty() {
+        when(userRepository.findAll()).thenReturn(new ArrayList<>());
+        List<UserResponseDTO> users = userService.getAllUsers();
+        assertTrue(users.isEmpty());
+    }
+
+    @Test
+    public void testGetAllUsers_PersistenceError_Throws() {
+        when(userRepository.findAll()).thenThrow(new DataIntegrityViolationException("db error"));
+        assertThrows(PersistenceAccessException.class, () -> userService.getAllUsers());
     }
 }

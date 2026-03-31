@@ -20,9 +20,9 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/techcup_db
-    username: tu_usuario
-    password: tu_contraseña
+    url: jdbc:postgresql://localhost:5432/techcuo_db
+    username: techcuo_user
+    password: 1507Ezio.Creed
   jpa:
     open-in-view: false
     hibernate:

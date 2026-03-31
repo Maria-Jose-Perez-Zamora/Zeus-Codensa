@@ -116,4 +116,191 @@ public class PlayerServiceTest {
         assertThrows(BusinessRuleException.class, () -> 
             playerService.processInvitation("inv-123", "player@test.com", "ACEPTADA"));
     }
+
+    @Test
+    public void testProcessInvitation_WrongRecipient() {
+        InvitationEntity inv = new InvitationEntity();
+        inv.setId("inv-123");
+        inv.setPlayerEmail("player@test.com");
+        when(invitationRepository.findById("inv-123")).thenReturn(Optional.of(inv));
+
+        assertThrows(BusinessRuleException.class, () ->
+            playerService.processInvitation("inv-123", "wrong@test.com", "ACEPTADA"));
+    }
+
+    @Test
+    public void testProcessInvitation_AlreadyAnswered() {
+        InvitationEntity inv = new InvitationEntity();
+        inv.setId("inv-123");
+        inv.setPlayerEmail("player@test.com");
+        inv.setStatus("ACEPTADA");
+        when(invitationRepository.findById("inv-123")).thenReturn(Optional.of(inv));
+
+        assertThrows(BusinessRuleException.class, () ->
+            playerService.processInvitation("inv-123", "player@test.com", "ACEPTADA"));
+    }
+
+    @Test
+    public void testProcessInvitation_InvalidStatus() {
+        InvitationEntity inv = new InvitationEntity();
+        inv.setId("inv-123");
+        inv.setPlayerEmail("player@test.com");
+        inv.setStatus("PENDING");
+        when(invitationRepository.findById("inv-123")).thenReturn(Optional.of(inv));
+
+        assertThrows(BusinessRuleException.class, () ->
+            playerService.processInvitation("inv-123", "player@test.com", "INVALID_STATUS"));
+    }
+
+    @Test
+    public void testBuscarJugadoresDisponibles_AllFilters() {
+        UserEntity u1 = new UserEntity();
+        u1.setEmail("p1@test.com");
+        u1.setName("Messi");
+        u1.setRole(Role.PLAYER);
+        u1.setPosition("Forward");
+
+        UserEntity u2 = new UserEntity();
+        u2.setEmail("p2@test.com");
+        u2.setName("Ronaldo");
+        u2.setRole(Role.PLAYER);
+        u2.setPosition("Forward");
+
+        UserEntity u3 = new UserEntity(); // Not a player
+        u3.setEmail("p3@test.com");
+        u3.setRole(Role.ADMINISTRADOR_SISTEMA);
+
+        TeamEntity team = new TeamEntity();
+        team.setPlayers(new ArrayList<>());
+        team.getPlayers().add(u2); // Ronaldo already in team
+
+        when(userRepository.findAll()).thenReturn(java.util.List.of(u1, u2, u3));
+        when(teamRepository.findAll()).thenReturn(java.util.List.of(team));
+
+        java.util.List<dependencies.dto.UserResponseDTO> res = playerService.buscarJugadoresDisponibles("Messi", "Forward");
+        
+        assertEquals(1, res.size());
+        assertEquals("Messi", res.get(0).getName());
+    }
+
+    @Test
+    public void testBuscarJugadoresDisponibles_NoFilters() {
+        UserEntity u1 = new UserEntity();
+        u1.setEmail("p1@test.com");
+        u1.setName("Messi");
+        u1.setRole(Role.PLAYER);
+        u1.setPosition("Forward");
+
+        when(userRepository.findAll()).thenReturn(java.util.List.of(u1));
+        when(teamRepository.findAll()).thenReturn(new ArrayList<>());
+
+        java.util.List<dependencies.dto.UserResponseDTO> res = playerService.buscarJugadoresDisponibles(null, null);
+        
+        assertEquals(1, res.size());
+    }
+
+    @Test
+    public void testEnviarInvitacion_Success() {
+        dependencies.dto.InvitationRequestDTO req = new dependencies.dto.InvitationRequestDTO();
+        req.setPlayerEmail("player@test.com");
+        req.setTeamName("Dream Team");
+        req.setCaptainEmail("captain@test.com");
+
+        UserEntity u = new UserEntity();
+        u.setEmail("player@test.com");
+        u.setRole(Role.PLAYER);
+
+        when(userRepository.findByEmail("player@test.com")).thenReturn(Optional.of(u));
+        when(teamRepository.findAll()).thenReturn(new ArrayList<>());
+        when(invitationRepository.findByPlayerEmail("player@test.com")).thenReturn(new ArrayList<>());
+
+        dependencies.dto.InvitationResponseDTO res = playerService.enviarInvitacion(req);
+
+        assertNotNull(res);
+        assertEquals("PENDING", res.getStatus());
+        verify(invitationRepository, times(1)).save(any(InvitationEntity.class));
+    }
+
+    @Test
+    public void testEnviarInvitacion_MissingEmail() {
+        dependencies.dto.InvitationRequestDTO req = new dependencies.dto.InvitationRequestDTO();
+        req.setTeamName("Dream Team");
+
+        assertThrows(BusinessRuleException.class, () -> playerService.enviarInvitacion(req));
+    }
+
+    @Test
+    public void testEnviarInvitacion_MissingTeam() {
+        dependencies.dto.InvitationRequestDTO req = new dependencies.dto.InvitationRequestDTO();
+        req.setPlayerEmail("player@test.com");
+
+        assertThrows(BusinessRuleException.class, () -> playerService.enviarInvitacion(req));
+    }
+
+    @Test
+    public void testEnviarInvitacion_PlayerNotFound() {
+        dependencies.dto.InvitationRequestDTO req = new dependencies.dto.InvitationRequestDTO();
+        req.setPlayerEmail("player@test.com");
+        req.setTeamName("Dream Team");
+
+        when(userRepository.findByEmail("player@test.com")).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> playerService.enviarInvitacion(req));
+    }
+
+    @Test
+    public void testEnviarInvitacion_NotAPlayer() {
+        dependencies.dto.InvitationRequestDTO req = new dependencies.dto.InvitationRequestDTO();
+        req.setPlayerEmail("admin@test.com");
+        req.setTeamName("Dream Team");
+
+        UserEntity u = new UserEntity();
+        u.setEmail("admin@test.com");
+        u.setRole(Role.ADMINISTRADOR_SISTEMA);
+
+        when(userRepository.findByEmail("admin@test.com")).thenReturn(Optional.of(u));
+
+        assertThrows(BusinessRuleException.class, () -> playerService.enviarInvitacion(req));
+    }
+
+    @Test
+    public void testEnviarInvitacion_AlreadyInTeam() {
+        dependencies.dto.InvitationRequestDTO req = new dependencies.dto.InvitationRequestDTO();
+        req.setPlayerEmail("player@test.com");
+        req.setTeamName("Dream Team");
+
+        UserEntity u = new UserEntity();
+        u.setEmail("player@test.com");
+        u.setRole(Role.PLAYER);
+
+        TeamEntity team = new TeamEntity();
+        team.setPlayers(new ArrayList<>());
+        team.getPlayers().add(u);
+
+        when(userRepository.findByEmail("player@test.com")).thenReturn(Optional.of(u));
+        when(teamRepository.findAll()).thenReturn(java.util.List.of(team));
+
+        assertThrows(BusinessRuleException.class, () -> playerService.enviarInvitacion(req));
+    }
+
+    @Test
+    public void testEnviarInvitacion_AlreadyInvited() {
+        dependencies.dto.InvitationRequestDTO req = new dependencies.dto.InvitationRequestDTO();
+        req.setPlayerEmail("player@test.com");
+        req.setTeamName("Dream Team");
+
+        UserEntity u = new UserEntity();
+        u.setEmail("player@test.com");
+        u.setRole(Role.PLAYER);
+
+        InvitationEntity existingInv = new InvitationEntity();
+        existingInv.setTeamName("Dream Team");
+        existingInv.setStatus("PENDING");
+
+        when(userRepository.findByEmail("player@test.com")).thenReturn(Optional.of(u));
+        when(teamRepository.findAll()).thenReturn(new ArrayList<>());
+        when(invitationRepository.findByPlayerEmail("player@test.com")).thenReturn(java.util.List.of(existingInv));
+
+        assertThrows(BusinessRuleException.class, () -> playerService.enviarInvitacion(req));
+    }
 }

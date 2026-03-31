@@ -144,8 +144,11 @@ public final class ModelToEntityMapper {
     }
 
     private static String writeJson(Object value) {
+        if (value == null) {
+            return "{}";
+        }
         try {
-            return OBJECT_MAPPER.writeValueAsString(value != null ? value : new Object());
+            return OBJECT_MAPPER.writeValueAsString(value);
         } catch (JsonProcessingException ex) {
             throw new IllegalStateException("No fue posible serializar el campo del partido", ex);
         }

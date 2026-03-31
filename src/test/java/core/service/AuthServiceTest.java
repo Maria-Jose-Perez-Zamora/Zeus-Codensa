@@ -65,8 +65,9 @@ public class AuthServiceTest {
     }
 
     @Test
-    public void testLogin_NullFields() {
-        LoginRequestDTO request = new LoginRequestDTO(null, "wrong");
+    public void testLogin_UserNotFound_Throws() {
+        when(userRepository.findByEmail("ghost@x.com")).thenReturn(Optional.empty());
+        LoginRequestDTO request = new LoginRequestDTO("ghost@x.com", "pass");
         assertThrows(RuntimeException.class, () -> authService.login(request));
     }
 }

@@ -134,4 +134,57 @@ public class TorneoServiceTest {
         List<TournamentHistoryDTO> res = torneoService.getAllTorneos();
         assertEquals(2, res.size());
     }
+
+    @Test
+    public void testGetTorneoById_Success() {
+        TournamentEntity t = new TournamentEntity();
+        t.setId("abc");
+        t.setTournamentName("Liga Test");
+        t.setStatus("OPEN");
+        when(tournamentRepository.findById("abc")).thenReturn(Optional.of(t));
+
+        TournamentResponseDTO res = torneoService.getTorneoById("abc");
+        assertNotNull(res);
+        assertEquals("Liga Test", res.getTournamentName());
+    }
+
+    @Test
+    public void testGetTorneoById_NotFound_Throws() {
+        when(tournamentRepository.findById("xxx")).thenReturn(Optional.empty());
+        assertThrows(RuntimeException.class, () -> torneoService.getTorneoById("xxx"));
+    }
+
+    @Test
+    public void testCreateTorneo_DuplicateName_Throws() {
+        TournamentRequestDTO req = new TournamentRequestDTO("Liga Verano", "2026-06-01", "2026-08-01", 8, 100.0);
+        doNothing().when(tournamentValidator).validateForCreation(req);
+        TournamentEntity existing = new TournamentEntity();
+        existing.setTournamentName("Liga Verano");
+        when(tournamentRepository.findByTournamentName("Liga Verano")).thenReturn(Optional.of(existing));
+
+        assertThrows(RuntimeException.class, () -> torneoService.createTorneo(req));
+    }
+
+    @Test
+    public void testConfigurarTorneo_NotFound_Throws() {
+        when(tournamentRepository.findById("missing")).thenReturn(Optional.empty());
+        assertThrows(RuntimeException.class,
+                () -> torneoService.configurarTorneo("missing", new TournamentRequestDTO()));
+    }
+
+    @Test
+    public void testConfigurarTorneo_OpenStatus_Success() {
+        TournamentEntity t = new TournamentEntity();
+        t.setId("open1");
+        t.setStatus("OPEN");
+        when(tournamentRepository.findById("open1")).thenReturn(Optional.of(t));
+        TournamentEntity saved = new TournamentEntity();
+        saved.setId("open1");
+        saved.setStatus("OPEN");
+        when(tournamentRepository.save(any(TournamentEntity.class))).thenReturn(saved);
+
+        TournamentRequestDTO config = new TournamentRequestDTO();
+        config.setRules("New rules");
+        assertDoesNotThrow(() -> torneoService.configurarTorneo("open1", config));
+    }
 }
