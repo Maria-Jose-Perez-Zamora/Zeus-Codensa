@@ -1,0 +1,54 @@
+logging:
+  level:
+    root: WARN
+    controller: INFO
+    service: DEBUG
+  file:
+    name: logs/techcup-futbol.log
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+server:
+  port: 8443
+  ssl:
+    enabled: true
+    key-store: classpath:keystore.p12
+    key-store-password: password
+    key-store-type: PKCS12
+    key-alias: tomcat
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/techcuo_db
+    username: techcuo_user
+    password: 1507Ezio.Creed
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID:google-client-id}
+            client-secret: ${GOOGLE_CLIENT_SECRET:google-client-secret}
+            scope:
+              - openid
+              - profile
+              - email
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+
+security:
+  jwt:
+    secret: ${JWT_SECRET:VGhpcyBpcyBhIHZlcnkgc2VjdXJlIGFuZCBsb25nIHNlY3JldCBrZXkgZm9yIEpXVCB2YWxpZGF0aW9u}
+    ttl-ms: ${JWT_TTL_MS:3600000}
+
+app:
+  oauth2:
+    success-redirect-url: ${OAUTH2_SUCCESS_REDIRECT_URL:http://localhost:3000/dashboard}

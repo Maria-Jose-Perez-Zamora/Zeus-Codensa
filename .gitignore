@@ -31,3 +31,42 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### .py ###
+fixer.py
+refactor.py
+translator.py
+translate_swagger.py
+translate_java.py
+refactor_java.py
+rename_fields.py
+rename_remaining_java.py
+fix_recursive.py
+fix_inline.py
+*.py 
+
+## Jira Automation (scripts + dataset con credenciales - NO commitear) ##
+jira-automation/
+
+
+### .txt ###
+spanish_java_full_report.txt
+spanish_non_java_full_report.txt
+front_full_report.txt
+
+### Diagrama de Clases ###
+/diagrama_clases.md
+
+
+## Los diff
+*.patch
+
+
+## los md para la presemtacion 
+database_diagram.md
+sprint_presentation.md
+swagger_testing_guide.md
+defensa_proyecto.md
+sonarqube_guide.md
+
+
