@@ -10,9 +10,9 @@ import java.util.stream.Collectors;
 @Service
 public class StatisticsService {
 
-    private final com.zeuscodensa.techcupfutbol.persistence.repository.MatchRepository matchRepository;
+    private final com.zeuscodensa.techcupfutbol.core.repository.IMatchRepository matchRepository;
 
-    public StatisticsService(com.zeuscodensa.techcupfutbol.persistence.repository.MatchRepository matchRepository) {
+    public StatisticsService(com.zeuscodensa.techcupfutbol.core.repository.IMatchRepository matchRepository) {
         this.matchRepository = matchRepository;
     }
 
@@ -24,7 +24,6 @@ public class StatisticsService {
         Map<String, Integer> totales = new HashMap<>();
 
         matchRepository.findByTournamentName(tournamentName).stream()
-                .map(com.zeuscodensa.techcupfutbol.persistence.mapper.EntityToModelMapper::toMatchModel)
                 .filter(p -> "FINISHED".equals(p.getStatus()))
                 .forEach(p -> p.getGoles().forEach((player, g) ->
                         totales.merge(player, g, Integer::sum)));
@@ -45,7 +44,6 @@ public class StatisticsService {
      */
     public List<Map<String, Object>> getTeamHistory(String tournamentName, String teamName) {
         return matchRepository.findByTournamentName(tournamentName).stream()
-                .map(com.zeuscodensa.techcupfutbol.persistence.mapper.EntityToModelMapper::toMatchModel)
                 .filter(p -> p.getHomeTeam().equals(teamName) || p.getAwayTeam().equals(teamName))
                 .map(p -> {
                     Map<String, Object> info = new LinkedHashMap<>();

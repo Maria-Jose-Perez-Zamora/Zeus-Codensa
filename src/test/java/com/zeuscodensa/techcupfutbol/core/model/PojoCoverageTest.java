@@ -88,7 +88,7 @@ public class PojoCoverageTest {
         Captain c = new Captain(); c.setPosition("MED"); c.setJerseyNumber(1);
         assertEquals("MED", c.getPosition()); assertEquals(1, c.getJerseyNumber());
         Referee a = new Referee(); a.setName("A"); assertEquals("A", a.getName());
-        AdministradorSistema admin = new AdministradorSistema(); admin.setName("Admin"); assertEquals("Admin", admin.getName());
+        SystemAdministrator admin = new SystemAdministrator(); admin.setName("Admin"); assertEquals("Admin", admin.getName());
         TournamentOrganizer org = new TournamentOrganizer(); org.setName("Org"); assertEquals("Org", org.getName());
     }
 

@@ -1,67 +1,59 @@
 package com.zeuscodensa.techcupfutbol.core.service;
 
-import com.zeuscodensa.techcupfutbol.controller.dto.TournamentRequestDTO;
-import com.zeuscodensa.techcupfutbol.controller.dto.TournamentResponseDTO;
-import com.zeuscodensa.techcupfutbol.controller.dto.TournamentHistoryDTO;
 import com.zeuscodensa.techcupfutbol.core.exception.ResourceNotFoundException;
 import com.zeuscodensa.techcupfutbol.core.exception.BusinessRuleException;
 import com.zeuscodensa.techcupfutbol.core.exception.PersistenceAccessException;
 import com.zeuscodensa.techcupfutbol.core.model.Tournament;
 import com.zeuscodensa.techcupfutbol.core.validator.TournamentValidator;
-import com.zeuscodensa.techcupfutbol.controller.mapper.TournamentMapper;
-import com.zeuscodensa.techcupfutbol.persistence.entity.TournamentEntity;
-import com.zeuscodensa.techcupfutbol.persistence.mapper.EntityToModelMapper;
-import com.zeuscodensa.techcupfutbol.persistence.mapper.ModelToEntityMapper;
-import com.zeuscodensa.techcupfutbol.persistence.repository.TournamentRepository;
+import com.zeuscodensa.techcupfutbol.core.repository.ITournamentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class TournamentService {
 
     private static final Logger log = LoggerFactory.getLogger(TournamentService.class);
-    private final TournamentRepository tournamentRepository;
+    private final ITournamentRepository tournamentRepository;
     private final TournamentValidator tournamentValidator;
 
     @Autowired
-    public TournamentService(TournamentRepository tournamentRepository, TournamentValidator tournamentValidator) {
+    public TournamentService(ITournamentRepository tournamentRepository, TournamentValidator tournamentValidator) {
         this.tournamentRepository = tournamentRepository;
         this.tournamentValidator = tournamentValidator;
     }
 
-    public TournamentResponseDTO createTorneo(TournamentRequestDTO request) {
-        log.debug("Ejecutando validaciones para creación de tournament: {}", request.getTournamentName());
-        tournamentValidator.validateForCreation(request);
+    public Tournament createTorneo(Tournament newTournament) {
+        log.debug("Ejecutando validaciones para creación de tournament: {}", newTournament.getTournamentName());
+        tournamentValidator.validateForCreation(newTournament);
         
-        Tournament t = TournamentMapper.toEntity(request);
-
         try {
-            if (tournamentRepository.findByTournamentName(t.getTournamentName()).isPresent()) {
+            if (tournamentRepository.findByTournamentName(newTournament.getTournamentName()).isPresent()) {
                 throw new BusinessRuleException("Ya existe un torneo con ese nombre");
             }
 
-            TournamentEntity saved = tournamentRepository.save(ModelToEntityMapper.toTournamentEntity(t));
+            Tournament saved = tournamentRepository.save(newTournament);
             log.info("Tournament creado exitosamente en DB con ID: {}", saved.getId());
-            return TournamentMapper.toDTO(EntityToModelMapper.toTournamentModel(saved));
-        } catch (DataAccessException ex) {
+            return saved;
+        } catch (Exception ex) {
+            if (ex instanceof BusinessRuleException) {
+                throw (BusinessRuleException) ex;
+            }
             throw new PersistenceAccessException("Error al crear tournament en base de datos", ex);
         }
     }
 
-    public TournamentResponseDTO configurarTorneo(String id, TournamentRequestDTO configInfo) {
+    public Tournament configurarTorneo(String id, Tournament configInfo) {
         log.debug("Buscando tournament con ID: {} para configuración", id);
         Optional<Tournament> torneoOpt;
 
         try {
-            torneoOpt = tournamentRepository.findById(id).map(EntityToModelMapper::toTournamentModel);
-        } catch (DataAccessException ex) {
+            torneoOpt = tournamentRepository.findById(id);
+        } catch (Exception ex) {
             throw new PersistenceAccessException("Error al consultar tournament en base de datos", ex);
         }
 
@@ -84,32 +76,29 @@ public class TournamentService {
         if (configInfo.getSanctions() != null) t.setSanctions(configInfo.getSanctions());
 
         try {
-            TournamentEntity saved = tournamentRepository.save(ModelToEntityMapper.toTournamentEntity(t));
+            Tournament saved = tournamentRepository.save(t);
             log.info("Tournament ID {} configurado exitosamente en DB", id);
-            return TournamentMapper.toDTO(EntityToModelMapper.toTournamentModel(saved));
-        } catch (DataAccessException ex) {
+            return saved;
+        } catch (Exception ex) {
             throw new PersistenceAccessException("Error al actualizar tournament en base de datos", ex);
         }
     }
 
-    public List<TournamentHistoryDTO> getAllTorneos() {
+    public List<Tournament> getAllTorneos() {
         try {
-            return tournamentRepository.findAll().stream()
-                    .map(EntityToModelMapper::toTournamentModel)
-                    .map(TournamentHistoryDTO::new)
-                    .collect(Collectors.toList());
-        } catch (DataAccessException ex) {
+            return tournamentRepository.findAll();
+        } catch (Exception ex) {
             throw new PersistenceAccessException("Error al consultar tournaments en base de datos", ex);
         }
     }
 
-    public TournamentResponseDTO getTorneoById(String id) {
+    public Tournament getTorneoById(String id) {
         log.debug("Buscando tournament con ID: {}", id);
         Optional<Tournament> torneoOpt;
 
         try {
-            torneoOpt = tournamentRepository.findById(id).map(EntityToModelMapper::toTournamentModel);
-        } catch (DataAccessException ex) {
+            torneoOpt = tournamentRepository.findById(id);
+        } catch (Exception ex) {
             throw new PersistenceAccessException("Error al consultar tournament en base de datos", ex);
         }
 
@@ -117,6 +106,6 @@ public class TournamentService {
             throw new ResourceNotFoundException("Tournament no encontrado con ID: " + id);
         }
 
-        return TournamentMapper.toDTO(torneoOpt.get());
+        return torneoOpt.get();
     }
 }

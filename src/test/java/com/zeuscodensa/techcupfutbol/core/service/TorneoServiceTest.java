@@ -1,11 +1,8 @@
 package com.zeuscodensa.techcupfutbol.core.service;
 
-import com.zeuscodensa.techcupfutbol.controller.dto.TournamentRequestDTO;
-import com.zeuscodensa.techcupfutbol.controller.dto.TournamentResponseDTO;
-import com.zeuscodensa.techcupfutbol.controller.dto.TournamentHistoryDTO;
+import com.zeuscodensa.techcupfutbol.core.model.Tournament;
 import com.zeuscodensa.techcupfutbol.core.validator.TournamentValidator;
-import com.zeuscodensa.techcupfutbol.persistence.entity.TournamentEntity;
-import com.zeuscodensa.techcupfutbol.persistence.repository.TournamentRepository;
+import com.zeuscodensa.techcupfutbol.core.repository.ITournamentRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,7 +23,7 @@ import static org.mockito.Mockito.*;
 public class TorneoServiceTest {
 
     @Mock
-    private TournamentRepository tournamentRepository;
+    private ITournamentRepository tournamentRepository;
 
     @Mock
     private TournamentValidator tournamentValidator;
@@ -40,38 +37,43 @@ public class TorneoServiceTest {
 
     @Test
     public void testCreateTorneo() {
-        TournamentRequestDTO req = new TournamentRequestDTO("Liga Verano", "2026-06-01", "2026-08-01", 8, 100.0);
+        Tournament req = new Tournament();
+        req.setTournamentName("Liga Verano");
+        req.setFechaInicio("2026-06-01");
+        req.setFechaFin("2026-08-01");
+        req.setNumeroEquipos(8);
+        req.setCostoInscripcion(100.0);
         
         doNothing().when(tournamentValidator).validateForCreation(req);
         when(tournamentRepository.findByTournamentName("Liga Verano")).thenReturn(Optional.empty());
 
-        TournamentEntity savedEntity = new TournamentEntity();
-        savedEntity.setTournamentName("Liga Verano");
-        savedEntity.setStatus("DRAFT");
-        savedEntity.setNumeroEquipos(8);
-        savedEntity.setCostoInscripcion(100.0);
+        Tournament saved = new Tournament();
+        saved.setTournamentName("Liga Verano");
+        saved.setStatus("DRAFT");
+        saved.setNumeroEquipos(8);
+        saved.setCostoInscripcion(100.0);
         
-        when(tournamentRepository.save(any(TournamentEntity.class))).thenReturn(savedEntity);
+        when(tournamentRepository.save(any(Tournament.class))).thenReturn(saved);
 
-        TournamentResponseDTO res = torneoService.createTorneo(req);
+        Tournament res = torneoService.createTorneo(req);
 
         assertNotNull(res);
         assertEquals("Liga Verano", res.getTournamentName());
         assertEquals("DRAFT", res.getStatus());
-        verify(tournamentRepository, times(1)).save(any(TournamentEntity.class));
+        verify(tournamentRepository, times(1)).save(any(Tournament.class));
     }
 
     @Test
     public void testConfigurarTorneo_Success() {
         String currId = "12345";
-        TournamentEntity t = new TournamentEntity();
+        Tournament t = new Tournament();
         t.setId(currId);
         t.setTournamentName("Liga Invierno");
         t.setStatus("DRAFT");
 
         when(tournamentRepository.findById(currId)).thenReturn(Optional.of(t));
 
-        TournamentRequestDTO configInfo = new TournamentRequestDTO();
+        Tournament configInfo = new Tournament();
         configInfo.setRules("Reglas Oficiales");
         configInfo.setFechaCierreInscripciones("2026-05-30");
         configInfo.setFechaInicioFaseGrupos("2026-06-02");
@@ -79,18 +81,18 @@ public class TorneoServiceTest {
         configInfo.setCanchas(Arrays.asList("Cancha 1", "Cancha Central"));
         configInfo.setSanctions("Roja = 2 Fechas");
 
-        TournamentEntity updatedEntity = new TournamentEntity();
-        updatedEntity.setId(currId);
-        updatedEntity.setTournamentName("Liga Invierno");
-        updatedEntity.setStatus("DRAFT");
-        updatedEntity.setRules("Reglas Oficiales");
-        updatedEntity.setFechaCierreInscripciones("2026-05-30");
-        updatedEntity.setHorariosPartidos(Arrays.asList("18:00", "20:00"));
-        updatedEntity.setCanchas(Arrays.asList("Cancha 1", "Cancha Central"));
+        Tournament updated = new Tournament();
+        updated.setId(currId);
+        updated.setTournamentName("Liga Invierno");
+        updated.setStatus("DRAFT");
+        updated.setRules("Reglas Oficiales");
+        updated.setFechaCierreInscripciones("2026-05-30");
+        updated.setHorariosPartidos(Arrays.asList("18:00", "20:00"));
+        updated.setCanchas(Arrays.asList("Cancha 1", "Cancha Central"));
 
-        when(tournamentRepository.save(any(TournamentEntity.class))).thenReturn(updatedEntity);
+        when(tournamentRepository.save(any(Tournament.class))).thenReturn(updated);
 
-        TournamentResponseDTO res = torneoService.configurarTorneo(currId, configInfo);
+        Tournament res = torneoService.configurarTorneo(currId, configInfo);
 
         assertNotNull(res);
         assertEquals("Reglas Oficiales", res.getRules());
@@ -102,14 +104,14 @@ public class TorneoServiceTest {
     @Test
     public void testConfigurarTorneo_InvalidState_Throws() {
         String currId = "abcde";
-        TournamentEntity t = new TournamentEntity();
+        Tournament t = new Tournament();
         t.setId(currId);
         t.setTournamentName("Liga Bloqueada");
         t.setStatus("EN_PROGRESO");
 
         when(tournamentRepository.findById(currId)).thenReturn(Optional.of(t));
 
-        TournamentRequestDTO configInfo = new TournamentRequestDTO();
+        Tournament configInfo = new Tournament();
         configInfo.setRules("Nuevas reglas");
 
         RuntimeException thrown = assertThrows(RuntimeException.class, 
@@ -119,31 +121,31 @@ public class TorneoServiceTest {
 
     @Test
     public void testGetAllTorneos() {
-        TournamentEntity t1 = new TournamentEntity();
+        Tournament t1 = new Tournament();
         t1.setTournamentName("Liga 1");
         
-        TournamentEntity t2 = new TournamentEntity();
+        Tournament t2 = new Tournament();
         t2.setTournamentName("Liga 2");
 
-        List<TournamentEntity> entityList = new ArrayList<>();
+        List<Tournament> entityList = new ArrayList<>();
         entityList.add(t1);
         entityList.add(t2);
 
         when(tournamentRepository.findAll()).thenReturn(entityList);
 
-        List<TournamentHistoryDTO> res = torneoService.getAllTorneos();
+        List<Tournament> res = torneoService.getAllTorneos();
         assertEquals(2, res.size());
     }
 
     @Test
     public void testGetTorneoById_Success() {
-        TournamentEntity t = new TournamentEntity();
+        Tournament t = new Tournament();
         t.setId("abc");
         t.setTournamentName("Liga Test");
         t.setStatus("OPEN");
         when(tournamentRepository.findById("abc")).thenReturn(Optional.of(t));
 
-        TournamentResponseDTO res = torneoService.getTorneoById("abc");
+        Tournament res = torneoService.getTorneoById("abc");
         assertNotNull(res);
         assertEquals("Liga Test", res.getTournamentName());
     }
@@ -156,9 +158,15 @@ public class TorneoServiceTest {
 
     @Test
     public void testCreateTorneo_DuplicateName_Throws() {
-        TournamentRequestDTO req = new TournamentRequestDTO("Liga Verano", "2026-06-01", "2026-08-01", 8, 100.0);
+        Tournament req = new Tournament();
+        req.setTournamentName("Liga Verano");
+        req.setFechaInicio("2026-06-01");
+        req.setFechaFin("2026-08-01");
+        req.setNumeroEquipos(8);
+        req.setCostoInscripcion(100.0);
+
         doNothing().when(tournamentValidator).validateForCreation(req);
-        TournamentEntity existing = new TournamentEntity();
+        Tournament existing = new Tournament();
         existing.setTournamentName("Liga Verano");
         when(tournamentRepository.findByTournamentName("Liga Verano")).thenReturn(Optional.of(existing));
 
@@ -169,21 +177,21 @@ public class TorneoServiceTest {
     public void testConfigurarTorneo_NotFound_Throws() {
         when(tournamentRepository.findById("missing")).thenReturn(Optional.empty());
         assertThrows(RuntimeException.class,
-                () -> torneoService.configurarTorneo("missing", new TournamentRequestDTO()));
+                () -> torneoService.configurarTorneo("missing", new Tournament()));
     }
 
     @Test
     public void testConfigurarTorneo_OpenStatus_Success() {
-        TournamentEntity t = new TournamentEntity();
+        Tournament t = new Tournament();
         t.setId("open1");
         t.setStatus("OPEN");
         when(tournamentRepository.findById("open1")).thenReturn(Optional.of(t));
-        TournamentEntity saved = new TournamentEntity();
+        Tournament saved = new Tournament();
         saved.setId("open1");
         saved.setStatus("OPEN");
-        when(tournamentRepository.save(any(TournamentEntity.class))).thenReturn(saved);
+        when(tournamentRepository.save(any(Tournament.class))).thenReturn(saved);
 
-        TournamentRequestDTO config = new TournamentRequestDTO();
+        Tournament config = new Tournament();
         config.setRules("New rules");
         assertDoesNotThrow(() -> torneoService.configurarTorneo("open1", config));
     }

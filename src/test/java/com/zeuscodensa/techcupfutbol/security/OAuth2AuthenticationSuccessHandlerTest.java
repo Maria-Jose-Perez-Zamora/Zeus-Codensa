@@ -55,13 +55,7 @@ public class OAuth2AuthenticationSuccessHandlerTest {
     public void testOnAuthenticationSuccess() throws IOException, ServletException {
         when(authentication.getPrincipal()).thenReturn(oAuth2User);
 
-        com.zeuscodensa.techcupfutbol.core.model.Player user = new com.zeuscodensa.techcupfutbol.core.model.Player();
-        user.setName("Test User");
-        user.setEmail("test@gmail.com");
-        user.setRole(Role.PLAYER);
-        LoginResponseDTO loginResponse = new LoginResponseDTO("mocked_token", new UserResponseDTO(user));
-        
-        when(googleOAuth2Service.authenticateExternalUser(oAuth2User)).thenReturn(loginResponse);
+        when(googleOAuth2Service.authenticateExternalUser(oAuth2User)).thenReturn("mocked_token");
         when(request.isSecure()).thenReturn(true);
 
         successHandler.onAuthenticationSuccess(request, response, authentication);

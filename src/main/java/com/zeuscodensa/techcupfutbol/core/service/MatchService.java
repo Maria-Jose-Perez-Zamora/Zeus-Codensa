@@ -1,19 +1,17 @@
 package com.zeuscodensa.techcupfutbol.core.service;
 
-import com.zeuscodensa.techcupfutbol.controller.dto.MatchRequestDTO;
-import com.zeuscodensa.techcupfutbol.controller.dto.MatchResponseDTO;
 import com.zeuscodensa.techcupfutbol.core.exception.ResourceNotFoundException;
 import com.zeuscodensa.techcupfutbol.core.exception.BusinessRuleException;
 import com.zeuscodensa.techcupfutbol.core.model.Match;
 import com.zeuscodensa.techcupfutbol.core.validator.MatchValidator;
-import com.zeuscodensa.techcupfutbol.controller.mapper.MatchMapper;
+import com.zeuscodensa.techcupfutbol.core.repository.IMatchRepository;
+import com.zeuscodensa.techcupfutbol.core.repository.IUserRepository;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class MatchService {
@@ -21,33 +19,29 @@ public class MatchService {
     private static final Logger log = LoggerFactory.getLogger(MatchService.class);
     
     private final MatchValidator matchValidator;
-    private final com.zeuscodensa.techcupfutbol.persistence.repository.MatchRepository matchRepository;
-    private final com.zeuscodensa.techcupfutbol.persistence.repository.UserRepository userRepository;
+    private final IMatchRepository matchRepository;
+    private final IUserRepository userRepository;
 
     public MatchService(MatchValidator matchValidator, 
-                        com.zeuscodensa.techcupfutbol.persistence.repository.MatchRepository matchRepository,
-                        com.zeuscodensa.techcupfutbol.persistence.repository.UserRepository userRepository) {
+                        IMatchRepository matchRepository,
+                        IUserRepository userRepository) {
         this.matchValidator = matchValidator;
         this.matchRepository = matchRepository;
         this.userRepository = userRepository;
     }
 
-    public MatchResponseDTO registrarPartido(MatchRequestDTO request) {
+    public Match registrarPartido(Match nuevoPartido) {
         log.debug("Running validations for match creation");
-        matchValidator.validateForCreation(request);
+        matchValidator.validateForCreation(nuevoPartido);
 
-        Match nuevoPartido = MatchMapper.toEntity(request);
-
-        com.zeuscodensa.techcupfutbol.persistence.entity.MatchEntity savedEntity = matchRepository.save(
-            com.zeuscodensa.techcupfutbol.persistence.mapper.ModelToEntityMapper.toMatchEntity(nuevoPartido)
-        );
+        Match saved = matchRepository.save(nuevoPartido);
         
         log.info("Match successfully registered: home {} vs away {} (Tournament {})", 
-                 request.getHomeTeam(), request.getAwayTeam(), request.getTournamentName());
-        return MatchMapper.toDTO(com.zeuscodensa.techcupfutbol.persistence.mapper.EntityToModelMapper.toMatchModel(savedEntity));
+                 nuevoPartido.getHomeTeam(), nuevoPartido.getAwayTeam(), nuevoPartido.getTournamentName());
+        return saved;
     }
 
-    public MatchResponseDTO actualizarMarcador(String id, Integer homeScore, Integer awayScore) {
+    public Match actualizarMarcador(String id, Integer homeScore, Integer awayScore) {
         if (homeScore == null || awayScore == null || homeScore < 0 || awayScore < 0) {
             log.error("Functional violation: Negative or null scores received");
             throw new BusinessRuleException("Invalid scores");
@@ -58,13 +52,13 @@ public class MatchService {
         match.setAwayScore(awayScore);
         match.setStatus("FINISHED");
 
-        matchRepository.save(com.zeuscodensa.techcupfutbol.persistence.mapper.ModelToEntityMapper.toMatchEntity(match));
+        Match saved = matchRepository.save(match);
 
         log.info("Score updated for ID {} | {} - {}", id, homeScore, awayScore);
-        return MatchMapper.toDTO(match);
+        return saved;
     }
 
-    public MatchResponseDTO registrarAlineacion(String id, String teamName, List<String> players) {
+    public Match registrarAlineacion(String id, String teamName, List<String> players) {
         if (players == null || players.isEmpty()) {
             throw new BusinessRuleException("The lineup cannot be empty");
         }
@@ -78,12 +72,12 @@ public class MatchService {
 
         match.getAlineaciones().put(teamName, players);
         
-        matchRepository.save(com.zeuscodensa.techcupfutbol.persistence.mapper.ModelToEntityMapper.toMatchEntity(match));
+        Match saved = matchRepository.save(match);
         log.info("Lineup successfully registered: {} players for team {}", players.size(), teamName);
-        return MatchMapper.toDTO(match);
+        return saved;
     }
 
-    public MatchResponseDTO registrarTarjetas(String id, Map<String, List<String>> amarillas, Map<String, List<String>> rojas) {
+    public Match registrarTarjetas(String id, Map<String, List<String>> amarillas, Map<String, List<String>> rojas) {
         Match match = findOrThrow(id);
         if (amarillas != null) {
             match.setYellowCards(amarillas);
@@ -92,19 +86,16 @@ public class MatchService {
             match.setRedCards(rojas);
         }
         
-        matchRepository.save(com.zeuscodensa.techcupfutbol.persistence.mapper.ModelToEntityMapper.toMatchEntity(match));
+        Match saved = matchRepository.save(match);
         log.debug("Yellow/red cards saved for ID {}", id);
-        return MatchMapper.toDTO(match);
+        return saved;
     }
 
-    public List<MatchResponseDTO> getMatchesByReferee(String refereeEmail) {
-        return matchRepository.findByRefereeEmail(refereeEmail).stream()
-                .map(com.zeuscodensa.techcupfutbol.persistence.mapper.EntityToModelMapper::toMatchModel)
-                .map(MatchMapper::toDTO)
-                .collect(Collectors.toList());
+    public List<Match> getMatchesByReferee(String refereeEmail) {
+        return matchRepository.findByRefereeEmail(refereeEmail);
     }
 
-    public MatchResponseDTO asignarArbitro(String id, String refereeEmail) {
+    public Match asignarArbitro(String id, String refereeEmail) {
         boolean esArbitro = userRepository.findByEmail(refereeEmail)
                 .map(u -> com.zeuscodensa.techcupfutbol.core.model.Role.REFEREE.equals(u.getRole()))
                 .orElse(false);
@@ -115,21 +106,17 @@ public class MatchService {
 
         Match match = findOrThrow(id);
         match.setRefereeEmail(refereeEmail);
-        matchRepository.save(com.zeuscodensa.techcupfutbol.persistence.mapper.ModelToEntityMapper.toMatchEntity(match));
+        Match saved = matchRepository.save(match);
         log.info("Referee {} successfully assigned to Match ID {}", refereeEmail, id);
-        return MatchMapper.toDTO(match);
+        return saved;
     }
 
-    public List<MatchResponseDTO> getAll() {
-        return matchRepository.findAll().stream()
-                .map(com.zeuscodensa.techcupfutbol.persistence.mapper.EntityToModelMapper::toMatchModel)
-                .map(MatchMapper::toDTO)
-                .collect(Collectors.toList());
+    public List<Match> getAll() {
+        return matchRepository.findAll();
     }
 
     private Match findOrThrow(String id) {
         return matchRepository.findById(id)
-                .map(com.zeuscodensa.techcupfutbol.persistence.mapper.EntityToModelMapper::toMatchModel)
                 .orElseThrow(() -> new ResourceNotFoundException("Match not found with its Base Identifier"));
     }
 }

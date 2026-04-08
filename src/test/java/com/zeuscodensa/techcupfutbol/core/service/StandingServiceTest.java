@@ -1,8 +1,8 @@
 package com.zeuscodensa.techcupfutbol.core.service;
 
+import com.zeuscodensa.techcupfutbol.core.model.Match;
 import com.zeuscodensa.techcupfutbol.core.model.Standing;
-import com.zeuscodensa.techcupfutbol.persistence.entity.MatchEntity;
-import com.zeuscodensa.techcupfutbol.persistence.repository.MatchRepository;
+import com.zeuscodensa.techcupfutbol.core.repository.IMatchRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,7 +20,7 @@ import static org.mockito.Mockito.when;
 public class StandingServiceTest {
 
     @Mock
-    private MatchRepository matchRepository;
+    private IMatchRepository matchRepository;
 
     @InjectMocks
     private StandingService tablaService;
@@ -31,7 +31,7 @@ public class StandingServiceTest {
 
     @Test
     public void testCalcularTabla_Success() {
-        MatchEntity p1 = new MatchEntity();
+        Match p1 = new Match();
         p1.setTournamentName("Liga");
         p1.setHomeTeam("Tigres");
         p1.setAwayTeam("Leones");
@@ -40,7 +40,7 @@ public class StandingServiceTest {
         p1.setStatus("FINISHED");
         p1.setMatchDate("hoy");
         
-        MatchEntity p2 = new MatchEntity();
+        Match p2 = new Match();
         p2.setTournamentName("Liga");
         p2.setHomeTeam("Tigres");
         p2.setAwayTeam("Osos");
@@ -68,7 +68,7 @@ public class StandingServiceTest {
 
     @Test
     public void testCalcularTabla_SkipsNonFinished() {
-        MatchEntity scheduled = new MatchEntity();
+        Match scheduled = new Match();
         scheduled.setTournamentName("Liga");
         scheduled.setHomeTeam("A");
         scheduled.setAwayTeam("B");
@@ -84,7 +84,7 @@ public class StandingServiceTest {
 
     @Test
     public void testCalcularTabla_AwayWin() {
-        MatchEntity p = new MatchEntity();
+        Match p = new Match();
         p.setTournamentName("Liga");
         p.setHomeTeam("Local");
         p.setAwayTeam("Visitante");
@@ -105,13 +105,13 @@ public class StandingServiceTest {
     @Test
     public void testCalcularTabla_SortedByGoalDifferenceWhenEqualPoints() {
         // Team A draws 1-1, Team B draws 0-0 → same 1pt but A has better GD
-        MatchEntity p1 = new MatchEntity();
+        Match p1 = new Match();
         p1.setTournamentName("Liga");
         p1.setHomeTeam("A"); p1.setAwayTeam("X");
         p1.setHomeScore(1); p1.setAwayScore(1);
         p1.setStatus("FINISHED"); p1.setMatchDate("d1");
 
-        MatchEntity p2 = new MatchEntity();
+        Match p2 = new Match();
         p2.setTournamentName("Liga");
         p2.setHomeTeam("B"); p2.setAwayTeam("X");
         p2.setHomeScore(0); p2.setAwayScore(0);

@@ -1,10 +1,10 @@
 package com.zeuscodensa.techcupfutbol.core.service;
 
+import com.zeuscodensa.techcupfutbol.core.model.Player;
 import com.zeuscodensa.techcupfutbol.core.model.Role;
 import com.zeuscodensa.techcupfutbol.core.model.User;
 import com.zeuscodensa.techcupfutbol.core.model.UserType;
-import com.zeuscodensa.techcupfutbol.controller.dto.LoginResponseDTO;
-import com.zeuscodensa.techcupfutbol.controller.dto.UserResponseDTO;
+import com.zeuscodensa.techcupfutbol.core.repository.IUserRepository;
 import com.zeuscodensa.techcupfutbol.security.JwtService;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
@@ -15,14 +15,14 @@ import java.util.Optional;
 public class GoogleOAuth2Service {
 
     private final JwtService jwtService;
-    private final com.zeuscodensa.techcupfutbol.persistence.repository.UserRepository userRepository;
+    private final IUserRepository userRepository;
 
-    public GoogleOAuth2Service(JwtService jwtService, com.zeuscodensa.techcupfutbol.persistence.repository.UserRepository userRepository) {
+    public GoogleOAuth2Service(JwtService jwtService, IUserRepository userRepository) {
         this.jwtService = jwtService;
         this.userRepository = userRepository;
     }
 
-    public LoginResponseDTO authenticateExternalUser(OAuth2User oAuth2User) {
+    public String authenticateExternalUser(OAuth2User oAuth2User) {
         String email = oAuth2User.getAttribute("email");
         String name = oAuth2User.getAttribute("name");
         String photo = oAuth2User.getAttribute("picture");
@@ -35,44 +35,49 @@ public class GoogleOAuth2Service {
             throw new IllegalArgumentException("El email de Google no esta verificado");
         }
 
-        Optional<com.zeuscodensa.techcupfutbol.persistence.entity.UserEntity> existingUserOpt = userRepository.findByEmail(email);
+        Optional<User> existingUserOpt = userRepository.findByEmail(email);
 
-        com.zeuscodensa.techcupfutbol.persistence.entity.UserEntity entity;
+        User user;
         if (existingUserOpt.isPresent()) {
-            entity = existingUserOpt.get();
+            user = existingUserOpt.get();
         } else {
-            entity = createExternalUser(email, name, photo);
+            user = createExternalUser(email, name, photo);
         }
 
-        if (entity.getType() == null) {
-            entity.setType(UserType.EXTERNAL);
+        // Si ya existía pero no tenian estos datos seteados
+        boolean modified = false;
+        if (user.getType() == null) {
+            user.setType(UserType.EXTERNAL);
+            modified = true;
         }
-        if (entity.getRole() == null) {
-            entity.setRole(Role.PLAYER);
+        if (user.getRole() == null) {
+            user.setRole(Role.PLAYER);
+            modified = true;
         }
-
-        if (photo != null && !photo.isBlank()) {
-            entity.setPhoto(photo);
+        if (photo != null && !photo.isBlank() && !photo.equals(user.getPhoto())) {
+            user.setPhoto(photo);
+            modified = true;
         }
-        if (name != null && !name.isBlank()) {
-            entity.setName(name);
+        if (name != null && !name.isBlank() && !name.equals(user.getName())) {
+            user.setName(name);
+            modified = true;
         }
         
-        entity = userRepository.save(entity);
+        if(modified) {
+            user = userRepository.save(user);
+        }
 
-        User user = com.zeuscodensa.techcupfutbol.persistence.mapper.EntityToModelMapper.toUserModel(entity);
-        String token = jwtService.generateToken(user.getEmail(), user.getRole().name());
-        return new LoginResponseDTO(token, new UserResponseDTO(user));
+        return jwtService.generateToken(user.getEmail(), user.getRole().name());
     }
 
-    private com.zeuscodensa.techcupfutbol.persistence.entity.UserEntity createExternalUser(String email, String name, String photo) {
-        com.zeuscodensa.techcupfutbol.persistence.entity.UserEntity entity = new com.zeuscodensa.techcupfutbol.persistence.entity.UserEntity();
-        entity.setEmail(email);
-        entity.setName(name != null && !name.isBlank() ? name : email);
-        entity.setPhoto(photo);
-        entity.setRole(Role.PLAYER);
-        entity.setType(UserType.EXTERNAL);
-        entity.setPassword("OAUTH2");
-        return userRepository.save(entity);
+    private User createExternalUser(String email, String name, String photo) {
+        Player user = new Player();
+        user.setEmail(email);
+        user.setName(name != null && !name.isBlank() ? name : email);
+        user.setPhoto(photo);
+        user.setRole(Role.PLAYER);
+        user.setType(UserType.EXTERNAL);
+        user.setPassword("OAUTH2");
+        return userRepository.save(user);
     }
 }

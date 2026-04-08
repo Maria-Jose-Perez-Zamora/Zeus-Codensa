@@ -1,78 +1,67 @@
 package com.zeuscodensa.techcupfutbol.core.service;
 
-import com.zeuscodensa.techcupfutbol.controller.dto.TeamRequestDTO;
-import com.zeuscodensa.techcupfutbol.controller.dto.TeamResponseDTO;
 import com.zeuscodensa.techcupfutbol.core.exception.BusinessRuleException;
 import com.zeuscodensa.techcupfutbol.core.exception.PersistenceAccessException;
 import com.zeuscodensa.techcupfutbol.core.model.Team;
+import com.zeuscodensa.techcupfutbol.core.model.User;
 import com.zeuscodensa.techcupfutbol.core.validator.TeamValidator;
-import com.zeuscodensa.techcupfutbol.controller.mapper.TeamMapper;
-import com.zeuscodensa.techcupfutbol.persistence.entity.TeamEntity;
-import com.zeuscodensa.techcupfutbol.persistence.entity.UserEntity;
-import com.zeuscodensa.techcupfutbol.persistence.mapper.EntityToModelMapper;
-import com.zeuscodensa.techcupfutbol.persistence.mapper.ModelToEntityMapper;
-import com.zeuscodensa.techcupfutbol.persistence.repository.TeamRepository;
-import com.zeuscodensa.techcupfutbol.persistence.repository.UserRepository;
+import com.zeuscodensa.techcupfutbol.core.repository.ITeamRepository;
+import com.zeuscodensa.techcupfutbol.core.repository.IUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class TeamService {
 
     private static final Logger log = LoggerFactory.getLogger(TeamService.class);
-    private final TeamRepository teamRepository;
-    private final UserRepository userRepository;
+    private final ITeamRepository teamRepository;
+    private final IUserRepository userRepository;
     private final TeamValidator teamValidator;
 
     @Autowired
-    public TeamService(TeamRepository teamRepository, UserRepository userRepository, TeamValidator teamValidator) {
+    public TeamService(ITeamRepository teamRepository, IUserRepository userRepository, TeamValidator teamValidator) {
         this.teamRepository = teamRepository;
         this.userRepository = userRepository;
         this.teamValidator = teamValidator;
     }
 
-    public TeamResponseDTO createTeam(TeamRequestDTO requestDTO) {
-        log.debug("Ejecutando validaciones para creacion de team: {}", requestDTO.getTeamName());
-        teamValidator.validateForCreation(requestDTO);
-
-        Team newTeam = TeamMapper.toEntity(requestDTO);
+    public Team createTeam(Team newTeam, List<String> playerEmails) {
+        log.debug("Ejecutando validaciones para creacion de team: {}", newTeam.getTeamName());
+        teamValidator.validateForCreation(newTeam.getTeamName(), playerEmails);
 
         try {
             if (teamRepository.findByTeamName(newTeam.getTeamName()).isPresent()) {
                 throw new BusinessRuleException("Ya existe un equipo con ese nombre");
             }
 
-            List<UserEntity> foundPlayers = new ArrayList<>();
-            if (requestDTO.getPlayerEmails() != null) {
-                for (String correo : requestDTO.getPlayerEmails()) {
+            List<User> foundPlayers = new ArrayList<>();
+            if (playerEmails != null) {
+                for (String correo : playerEmails) {
                     userRepository.findByEmail(correo).ifPresent(foundPlayers::add);
                 }
             }
+            newTeam.setPlayers(foundPlayers);
 
-            TeamEntity entity = ModelToEntityMapper.toTeamEntity(newTeam);
-            entity.setPlayers(foundPlayers);
-            TeamEntity saved = teamRepository.save(entity);
+            Team saved = teamRepository.save(newTeam);
             log.info("Equipo {} registrado exitosamente en DB", newTeam.getTeamName());
-            return TeamMapper.toDTO(EntityToModelMapper.toTeamModel(saved));
-        } catch (DataAccessException ex) {
+            return saved;
+        } catch (Exception ex) {
+            if (ex instanceof BusinessRuleException) {
+                throw (BusinessRuleException) ex;
+            }
             throw new PersistenceAccessException("Error al crear equipo en base de datos", ex);
         }
     }
 
-    public List<TeamResponseDTO> getAllTeams() {
+    public List<Team> getAllTeams() {
         try {
-            return teamRepository.findAll().stream()
-                    .map(EntityToModelMapper::toTeamModel)
-                    .map(TeamMapper::toDTO)
-                    .collect(Collectors.toList());
-        } catch (DataAccessException ex) {
+            return teamRepository.findAll();
+        } catch (Exception ex) {
             throw new PersistenceAccessException("Error al consultar equipos en base de datos", ex);
         }
     }

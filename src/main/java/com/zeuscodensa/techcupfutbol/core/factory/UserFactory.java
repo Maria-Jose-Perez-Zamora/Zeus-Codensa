@@ -25,7 +25,7 @@ public class UserFactory {
                 user = c;
                 break;
             case ADMINISTRADOR_SISTEMA:
-                user = new AdministradorSistema();
+                user = new SystemAdministrator();
                 break;
             case TOURNAMENT_ORGANIZER:
                 user = new TournamentOrganizer();

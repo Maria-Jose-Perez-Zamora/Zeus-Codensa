@@ -35,7 +35,7 @@ public class UserFactoryTest {
         UserRequestDTO req = new UserRequestDTO();
         req.setRole(Role.ADMINISTRADOR_SISTEMA);
         User user = UserFactory.createUser(req);
-        assertTrue(user instanceof AdministradorSistema);
+        assertTrue(user instanceof SystemAdministrator);
     }
 
     @Test

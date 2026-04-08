@@ -1,50 +1,47 @@
 package com.zeuscodensa.techcupfutbol.core.service;
 
-import com.zeuscodensa.techcupfutbol.controller.dto.LoginRequestDTO;
-import com.zeuscodensa.techcupfutbol.controller.dto.LoginResponseDTO;
-import com.zeuscodensa.techcupfutbol.controller.dto.UserResponseDTO;
 import com.zeuscodensa.techcupfutbol.core.exception.BusinessRuleException;
 import com.zeuscodensa.techcupfutbol.core.model.User;
+import com.zeuscodensa.techcupfutbol.core.repository.IUserRepository;
+import com.zeuscodensa.techcupfutbol.core.repository.ITokenService;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
-import com.zeuscodensa.techcupfutbol.security.JwtService;
 
 @Service
 public class AuthService {
 
     private static final Logger log = LoggerFactory.getLogger(AuthService.class);
     
-    private final JwtService jwtService;
-    private final com.zeuscodensa.techcupfutbol.persistence.repository.UserRepository userRepository;
+    private final ITokenService tokenService;
+    private final IUserRepository userRepository;
 
-    public AuthService(JwtService jwtService, com.zeuscodensa.techcupfutbol.persistence.repository.UserRepository userRepository) {
-        this.jwtService = jwtService;
+    public AuthService(ITokenService tokenService, IUserRepository userRepository) {
+        this.tokenService = tokenService;
         this.userRepository = userRepository;
     }
 
-    public LoginResponseDTO login(LoginRequestDTO request) {
-        log.debug("Authentication request processed for {}", request.getEmail());
+    public String login(String email, String password) {
+        log.debug("Authentication request processed for {}", email);
         
-        if (request.getEmail() == null || request.getPassword() == null) {
+        if (email == null || password == null) {
             log.warn("Faltan crendeciales para completar el flujo de login");
             throw new IllegalArgumentException("Correo y contraseña obligatorios");
         }
 
-        Optional<com.zeuscodensa.techcupfutbol.persistence.entity.UserEntity> userOpt = userRepository.findByEmail(request.getEmail());
+        Optional<User> userOpt = userRepository.findByEmail(email);
 
-        if (userOpt.isEmpty() || !userOpt.get().getPassword().equals(request.getPassword())) {
-            log.error("Credenciales invalidas intentadas contra {}", request.getEmail());
-            // It mimics a normal 400 Bad Request handled globally instead of 401. So BusinessRuleException fits perfectly.
+        if (userOpt.isEmpty() || !userOpt.get().getPassword().equals(password)) {
+            log.error("Credenciales invalidas intentadas contra {}", email);
             throw new BusinessRuleException("Credenciales incorrectas");
         }
 
-        User user = com.zeuscodensa.techcupfutbol.persistence.mapper.EntityToModelMapper.toUserModel(userOpt.get());
-        String token = jwtService.generateToken(user.getEmail(), user.getRole().name());
+        User user = userOpt.get();
+        String token = tokenService.generateToken(user.getEmail(), user.getRole().name());
 
         log.info("Autenticacion exitosa: {} (Rol: {})", user.getEmail(), user.getRole().name());
-        return new LoginResponseDTO(token, new UserResponseDTO(user));
+        return token;
     }
 }

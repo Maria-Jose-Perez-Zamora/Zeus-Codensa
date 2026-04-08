@@ -2,6 +2,8 @@ package com.zeuscodensa.techcupfutbol.controller.api;
 
 import com.zeuscodensa.techcupfutbol.controller.dto.RegistrationRequestDTO;
 import com.zeuscodensa.techcupfutbol.controller.dto.RegistrationResponseDTO;
+import com.zeuscodensa.techcupfutbol.controller.mapper.RegistrationMapper;
+import com.zeuscodensa.techcupfutbol.core.model.Registration;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/registrations")
@@ -29,7 +32,9 @@ public class RegistrationController {
     @Operation(summary = "Register Receipt", description = "Uploads the link/reference of the payment receipt (NEQUI or cash)")
     public ResponseEntity<RegistrationResponseDTO> createInscripcion(@RequestBody RegistrationRequestDTO request) {
         log.info("REST request - createInscripcion para el team: {}", request.getTeamName());
-        return ResponseEntity.ok(inscripcionService.inscribir(request));
+        Registration model = RegistrationMapper.toEntity(request);
+        Registration saved = inscripcionService.inscribir(model);
+        return ResponseEntity.ok(RegistrationMapper.toDTO(saved));
     }
 
     @PutMapping("/{id}/status")
@@ -41,13 +46,16 @@ public class RegistrationController {
             log.warn("Falta el campo 'status' en el body de la petición");
             throw new IllegalArgumentException("Es necesario el campo 'status'");
         }
-        return ResponseEntity.ok(inscripcionService.actualizarEstado(id, nuevoEstado));
+        Registration updated = inscripcionService.actualizarEstado(id, nuevoEstado);
+        return ResponseEntity.ok(RegistrationMapper.toDTO(updated));
     }
 
     @GetMapping
     @Operation(summary = "List Registrations", description = "Lists pending and approved receipts")
     public ResponseEntity<List<RegistrationResponseDTO>> getAll() {
         log.info("REST request - getAll Inscripciones");
-        return ResponseEntity.ok(inscripcionService.getAll());
+        return ResponseEntity.ok(inscripcionService.getAll().stream()
+                .map(RegistrationMapper::toDTO)
+                .collect(Collectors.toList()));
     }
 }

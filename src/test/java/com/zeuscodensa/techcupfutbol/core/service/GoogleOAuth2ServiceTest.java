@@ -2,9 +2,9 @@ package com.zeuscodensa.techcupfutbol.core.service;
 
 import com.zeuscodensa.techcupfutbol.core.model.Role;
 import com.zeuscodensa.techcupfutbol.core.model.UserType;
-import com.zeuscodensa.techcupfutbol.controller.dto.LoginResponseDTO;
-import com.zeuscodensa.techcupfutbol.persistence.entity.UserEntity;
-import com.zeuscodensa.techcupfutbol.persistence.repository.UserRepository;
+import com.zeuscodensa.techcupfutbol.core.model.User;
+import com.zeuscodensa.techcupfutbol.core.model.Player;
+import com.zeuscodensa.techcupfutbol.core.repository.IUserRepository;
 import com.zeuscodensa.techcupfutbol.security.JwtService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,7 +28,7 @@ public class GoogleOAuth2ServiceTest {
     private JwtService jwtService;
 
     @Mock
-    private UserRepository userRepository;
+    private IUserRepository userRepository;
 
     @Mock
     private OAuth2User oAuth2User;
@@ -68,20 +68,19 @@ public class GoogleOAuth2ServiceTest {
         when(oAuth2User.getAttribute("picture")).thenReturn("pic_url");
         when(oAuth2User.getAttribute("email_verified")).thenReturn(true);
 
-        UserEntity existing = new UserEntity();
-        existing.setId(1L);
+        Player existing = new Player();
         existing.setEmail("user@gmail.com");
         existing.setName("Old Name");
         existing.setPhoto("old_pic");
 
         when(userRepository.findByEmail("user@gmail.com")).thenReturn(Optional.of(existing));
-        when(userRepository.save(any(UserEntity.class))).thenAnswer(i -> i.getArgument(0));
+        when(userRepository.save(any(User.class))).thenAnswer(i -> i.getArgument(0));
         when(jwtService.generateToken(eq("user@gmail.com"), anyString())).thenReturn("mocked_token");
 
-        LoginResponseDTO res = googleOAuth2Service.authenticateExternalUser(oAuth2User);
+        String res = googleOAuth2Service.authenticateExternalUser(oAuth2User);
 
         assertNotNull(res);
-        assertEquals("mocked_token", res.getToken());
+        assertEquals("mocked_token", res);
         assertEquals("User", existing.getName());
         assertEquals("pic_url", existing.getPhoto());
         assertEquals(UserType.EXTERNAL, existing.getType());
@@ -97,19 +96,15 @@ public class GoogleOAuth2ServiceTest {
 
         when(userRepository.findByEmail("new@gmail.com")).thenReturn(Optional.empty());
         
-        when(userRepository.save(any(UserEntity.class))).thenAnswer(i -> {
-            UserEntity entity = i.getArgument(0);
-            entity.setId(2L);
-            return entity;
-        });
+        when(userRepository.save(any(User.class))).thenAnswer(i -> i.getArgument(0));
 
         when(jwtService.generateToken(eq("new@gmail.com"), anyString())).thenReturn("mocked_token");
 
-        LoginResponseDTO res = googleOAuth2Service.authenticateExternalUser(oAuth2User);
+        String res = googleOAuth2Service.authenticateExternalUser(oAuth2User);
 
         assertNotNull(res);
-        assertEquals("mocked_token", res.getToken());
-        verify(userRepository, times(2)).save(any(UserEntity.class)); // 1 for creation, 1 at the end
+        assertEquals("mocked_token", res);
+        verify(userRepository, times(1)).save(any(User.class)); 
     }
 
     @Test
@@ -119,17 +114,14 @@ public class GoogleOAuth2ServiceTest {
         when(oAuth2User.getAttribute("picture")).thenReturn("");
         when(oAuth2User.getAttribute("email_verified")).thenReturn(true);
 
-        UserEntity existing = new UserEntity();
-        existing.setId(3L);
+        Player existing = new Player();
         existing.setEmail("user@gmail.com");
-        existing.setType(null);
-        existing.setRole(null);
 
         when(userRepository.findByEmail("user@gmail.com")).thenReturn(Optional.of(existing));
-        when(userRepository.save(any(UserEntity.class))).thenAnswer(i -> i.getArgument(0));
+        when(userRepository.save(any(User.class))).thenAnswer(i -> i.getArgument(0));
         when(jwtService.generateToken(anyString(), anyString())).thenReturn("mocked_token");
 
-        LoginResponseDTO res = googleOAuth2Service.authenticateExternalUser(oAuth2User);
+        String res = googleOAuth2Service.authenticateExternalUser(oAuth2User);
 
         assertNotNull(res);
         assertEquals(UserType.EXTERNAL, existing.getType());

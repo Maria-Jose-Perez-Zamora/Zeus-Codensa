@@ -1,7 +1,7 @@
 package com.zeuscodensa.techcupfutbol.core.service;
 
-import com.zeuscodensa.techcupfutbol.persistence.entity.MatchEntity;
-import com.zeuscodensa.techcupfutbol.persistence.repository.MatchRepository;
+import com.zeuscodensa.techcupfutbol.core.model.Match;
+import com.zeuscodensa.techcupfutbol.core.repository.IMatchRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,7 +21,7 @@ import static org.mockito.Mockito.when;
 public class EstadisticasServiceTest {
 
     @Mock
-    private MatchRepository matchRepository;
+    private IMatchRepository matchRepository;
 
     @InjectMocks
     private StatisticsService estadisticasService;
@@ -32,21 +32,21 @@ public class EstadisticasServiceTest {
 
     @Test
     public void testGetMaximosGoleadores_Ordenados() {
-        MatchEntity p1 = new MatchEntity();
+        Match p1 = new Match();
         p1.setHomeTeam("A");
         p1.setAwayTeam("B");
         p1.setMatchDate("hoy");
         p1.setTournamentName("Liga");
         p1.setStatus("FINISHED");
-        p1.setGoalsJson("{\"user.test1-a@escuelaing.edu.co\":2,\"user.test2-a@escuelaing.edu.co\":1}");
+        p1.setGoles(Map.of("user.test1-a@escuelaing.edu.co", 2, "user.test2-a@escuelaing.edu.co", 1));
 
-        MatchEntity p2 = new MatchEntity();
+        Match p2 = new Match();
         p2.setHomeTeam("A");
         p2.setAwayTeam("C");
         p2.setMatchDate("ayer");
         p2.setTournamentName("Liga");
         p2.setStatus("FINISHED");
-        p2.setGoalsJson("{\"user.test1-a@escuelaing.edu.co\":1}"); // jugador1 acumula 3 en total
+        p2.setGoles(Map.of("user.test1-a@escuelaing.edu.co", 1)); // jugador1 acumula 3 en total
 
         when(matchRepository.findByTournamentName("Liga")).thenReturn(Arrays.asList(p1, p2));
 
@@ -58,7 +58,7 @@ public class EstadisticasServiceTest {
 
     @Test
     public void testGetMaximosGoleadores_SinPartidosFinalizados_RetornaVacio() {
-        MatchEntity p = new MatchEntity();
+        Match p = new Match();
         p.setHomeTeam("A");
         p.setAwayTeam("B");
         p.setMatchDate("hoy");
@@ -73,7 +73,7 @@ public class EstadisticasServiceTest {
 
     @Test
     public void testGetHistorialEquipo_MarcaResultado() {
-        MatchEntity p1 = new MatchEntity();
+        Match p1 = new Match();
         p1.setHomeTeam("Tigres");
         p1.setAwayTeam("Leones");
         p1.setMatchDate("hoy");
@@ -92,7 +92,7 @@ public class EstadisticasServiceTest {
 
     @Test
     public void testGetHistorialEquipo_VisitanteDerrota() {
-        MatchEntity p1 = new MatchEntity();
+        Match p1 = new Match();
         p1.setHomeTeam("Tigres");
         p1.setAwayTeam("Leones");
         p1.setMatchDate("hoy");

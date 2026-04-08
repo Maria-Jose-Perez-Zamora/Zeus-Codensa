@@ -1,5 +1,6 @@
 package com.zeuscodensa.techcupfutbol.controller.api;
 
+import com.zeuscodensa.techcupfutbol.core.model.Match;
 import com.zeuscodensa.techcupfutbol.core.model.Standing;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,8 +11,7 @@ import org.springframework.http.ResponseEntity;
 import com.zeuscodensa.techcupfutbol.core.service.StatisticsService;
 import com.zeuscodensa.techcupfutbol.core.service.BracketService;
 import com.zeuscodensa.techcupfutbol.core.service.StandingService;
-import com.zeuscodensa.techcupfutbol.persistence.entity.MatchEntity;
-import com.zeuscodensa.techcupfutbol.persistence.repository.MatchRepository;
+import com.zeuscodensa.techcupfutbol.core.repository.IMatchRepository;
 
 import java.util.Collections;
 import java.util.List;
@@ -32,7 +32,7 @@ public class ConsultaTorneoControllerTest {
     private StatisticsService estadisticasService;
 
     @Mock
-    private MatchRepository matchRepository;
+    private IMatchRepository matchRepository;
 
     @InjectMocks
     private TournamentQueryController consultaTorneoController;
@@ -65,7 +65,7 @@ public class ConsultaTorneoControllerTest {
 
     @Test
     public void testGetCalendario_ConPartidos_ReturnsLista() {
-        MatchEntity p = new MatchEntity();
+        Match p = new Match();
         p.setId("1");
         p.setHomeTeam("A");
         p.setAwayTeam("B");
@@ -89,7 +89,7 @@ public class ConsultaTorneoControllerTest {
 
     @Test
     public void testGetResultados_ConPartidoFinalizado() {
-        MatchEntity p = new MatchEntity();
+        Match p = new Match();
         p.setId("2");
         p.setHomeTeam("A");
         p.setAwayTeam("B");

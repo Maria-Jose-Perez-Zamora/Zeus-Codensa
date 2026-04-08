@@ -1,12 +1,13 @@
 package com.zeuscodensa.techcupfutbol.core.service;
 
-import com.zeuscodensa.techcupfutbol.persistence.entity.InvitationEntity;
-import com.zeuscodensa.techcupfutbol.persistence.entity.TeamEntity;
-import com.zeuscodensa.techcupfutbol.persistence.entity.UserEntity;
-import com.zeuscodensa.techcupfutbol.persistence.repository.InvitationRepository;
-import com.zeuscodensa.techcupfutbol.persistence.repository.TeamRepository;
-import com.zeuscodensa.techcupfutbol.persistence.repository.UserRepository;
+import com.zeuscodensa.techcupfutbol.core.model.Invitation;
 import com.zeuscodensa.techcupfutbol.core.model.Role;
+import com.zeuscodensa.techcupfutbol.core.model.Team;
+import com.zeuscodensa.techcupfutbol.core.model.User;
+import com.zeuscodensa.techcupfutbol.core.model.Player;
+import com.zeuscodensa.techcupfutbol.core.repository.IInvitationRepository;
+import com.zeuscodensa.techcupfutbol.core.repository.ITeamRepository;
+import com.zeuscodensa.techcupfutbol.core.repository.IUserRepository;
 import com.zeuscodensa.techcupfutbol.core.exception.BusinessRuleException;
 import com.zeuscodensa.techcupfutbol.core.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,13 +27,13 @@ import static org.mockito.Mockito.*;
 public class PlayerServiceTest {
 
     @Mock
-    private UserRepository userRepository;
+    private IUserRepository userRepository;
 
     @Mock
-    private TeamRepository teamRepository;
+    private ITeamRepository teamRepository;
 
     @Mock
-    private InvitationRepository invitationRepository;
+    private IInvitationRepository invitationRepository;
 
     @InjectMocks
     private PlayerService playerService;
@@ -43,17 +44,16 @@ public class PlayerServiceTest {
 
     @Test
     public void testProcessInvitation_Accept_Success() {
-        InvitationEntity inv = new InvitationEntity();
+        Invitation inv = new Invitation();
         inv.setId("inv-123");
         inv.setPlayerEmail("player@test.com");
         inv.setTeamName("Dream Team");
         inv.setStatus("PENDING");
 
-        TeamEntity team = new TeamEntity();
-        team.setTeamName("Dream Team");
+        Team team = new Team("Dream Team");
         team.setPlayers(new ArrayList<>());
 
-        UserEntity player = new UserEntity();
+        Player player = new Player();
         player.setEmail("player@test.com");
 
         when(invitationRepository.findById("inv-123")).thenReturn(Optional.of(inv));
@@ -70,7 +70,7 @@ public class PlayerServiceTest {
 
     @Test
     public void testProcessInvitation_Decline_Success() {
-        InvitationEntity inv = new InvitationEntity();
+        Invitation inv = new Invitation();
         inv.setId("inv-123");
         inv.setPlayerEmail("player@test.com");
         inv.setStatus("PENDING");
@@ -94,20 +94,19 @@ public class PlayerServiceTest {
 
     @Test
     public void testProcessInvitation_AlreadyInTeam() {
-        InvitationEntity inv = new InvitationEntity();
+        Invitation inv = new Invitation();
         inv.setId("inv-123");
         inv.setPlayerEmail("player@test.com");
         inv.setStatus("PENDING");
 
-        TeamEntity otherTeam = new TeamEntity();
-        otherTeam.setTeamName("Other Team");
-        UserEntity player = new UserEntity();
+        Team otherTeam = new Team("Other Team");
+        Player player = new Player();
         player.setEmail("player@test.com");
-        ArrayList<UserEntity> players = new ArrayList<>();
+        ArrayList<User> players = new ArrayList<>();
         players.add(player);
         otherTeam.setPlayers(players);
         
-        ArrayList<TeamEntity> allTeams = new ArrayList<>();
+        ArrayList<Team> allTeams = new ArrayList<>();
         allTeams.add(otherTeam);
 
         when(invitationRepository.findById("inv-123")).thenReturn(Optional.of(inv));
@@ -119,7 +118,7 @@ public class PlayerServiceTest {
 
     @Test
     public void testProcessInvitation_WrongRecipient() {
-        InvitationEntity inv = new InvitationEntity();
+        Invitation inv = new Invitation();
         inv.setId("inv-123");
         inv.setPlayerEmail("player@test.com");
         when(invitationRepository.findById("inv-123")).thenReturn(Optional.of(inv));
@@ -130,7 +129,7 @@ public class PlayerServiceTest {
 
     @Test
     public void testProcessInvitation_AlreadyAnswered() {
-        InvitationEntity inv = new InvitationEntity();
+        Invitation inv = new Invitation();
         inv.setId("inv-123");
         inv.setPlayerEmail("player@test.com");
         inv.setStatus("ACEPTADA");
@@ -142,7 +141,7 @@ public class PlayerServiceTest {
 
     @Test
     public void testProcessInvitation_InvalidStatus() {
-        InvitationEntity inv = new InvitationEntity();
+        Invitation inv = new Invitation();
         inv.setId("inv-123");
         inv.setPlayerEmail("player@test.com");
         inv.setStatus("PENDING");
@@ -154,30 +153,28 @@ public class PlayerServiceTest {
 
     @Test
     public void testBuscarJugadoresDisponibles_AllFilters() {
-        UserEntity u1 = new UserEntity();
+        Player u1 = new Player();
         u1.setEmail("p1@test.com");
         u1.setName("Messi");
         u1.setRole(Role.PLAYER);
-        u1.setPosition("Forward");
 
-        UserEntity u2 = new UserEntity();
+        Player u2 = new Player();
         u2.setEmail("p2@test.com");
         u2.setName("Ronaldo");
         u2.setRole(Role.PLAYER);
-        u2.setPosition("Forward");
 
-        UserEntity u3 = new UserEntity(); // Not a player
+        Player u3 = new Player(); // Not a player
         u3.setEmail("p3@test.com");
         u3.setRole(Role.ADMINISTRADOR_SISTEMA);
 
-        TeamEntity team = new TeamEntity();
+        Team team = new Team("A");
         team.setPlayers(new ArrayList<>());
         team.getPlayers().add(u2); // Ronaldo already in team
 
         when(userRepository.findAll()).thenReturn(java.util.List.of(u1, u2, u3));
         when(teamRepository.findAll()).thenReturn(java.util.List.of(team));
 
-        java.util.List<com.zeuscodensa.techcupfutbol.controller.dto.UserResponseDTO> res = playerService.buscarJugadoresDisponibles("Messi", "Forward");
+        java.util.List<User> res = playerService.buscarJugadoresDisponibles("Messi", null);
         
         assertEquals(1, res.size());
         assertEquals("Messi", res.get(0).getName());
@@ -185,28 +182,27 @@ public class PlayerServiceTest {
 
     @Test
     public void testBuscarJugadoresDisponibles_NoFilters() {
-        UserEntity u1 = new UserEntity();
+        Player u1 = new Player();
         u1.setEmail("p1@test.com");
         u1.setName("Messi");
         u1.setRole(Role.PLAYER);
-        u1.setPosition("Forward");
 
         when(userRepository.findAll()).thenReturn(java.util.List.of(u1));
         when(teamRepository.findAll()).thenReturn(new ArrayList<>());
 
-        java.util.List<com.zeuscodensa.techcupfutbol.controller.dto.UserResponseDTO> res = playerService.buscarJugadoresDisponibles(null, null);
+        java.util.List<User> res = playerService.buscarJugadoresDisponibles(null, null);
         
         assertEquals(1, res.size());
     }
 
     @Test
     public void testEnviarInvitacion_Success() {
-        com.zeuscodensa.techcupfutbol.controller.dto.InvitationRequestDTO req = new com.zeuscodensa.techcupfutbol.controller.dto.InvitationRequestDTO();
+        Invitation req = new Invitation();
         req.setPlayerEmail("player@test.com");
         req.setTeamName("Dream Team");
         req.setCaptainEmail("captain@test.com");
 
-        UserEntity u = new UserEntity();
+        Player u = new Player();
         u.setEmail("player@test.com");
         u.setRole(Role.PLAYER);
 
@@ -214,16 +210,19 @@ public class PlayerServiceTest {
         when(teamRepository.findAll()).thenReturn(new ArrayList<>());
         when(invitationRepository.findByPlayerEmail("player@test.com")).thenReturn(new ArrayList<>());
 
-        com.zeuscodensa.techcupfutbol.controller.dto.InvitationResponseDTO res = playerService.enviarInvitacion(req);
+        // Ensure save returns what was passed in
+        when(invitationRepository.save(any(Invitation.class))).thenAnswer(i -> i.getArgument(0));
+
+        Invitation res = playerService.enviarInvitacion(req);
 
         assertNotNull(res);
         assertEquals("PENDING", res.getStatus());
-        verify(invitationRepository, times(1)).save(any(InvitationEntity.class));
+        verify(invitationRepository, times(1)).save(any(Invitation.class));
     }
 
     @Test
     public void testEnviarInvitacion_MissingEmail() {
-        com.zeuscodensa.techcupfutbol.controller.dto.InvitationRequestDTO req = new com.zeuscodensa.techcupfutbol.controller.dto.InvitationRequestDTO();
+        Invitation req = new Invitation();
         req.setTeamName("Dream Team");
 
         assertThrows(BusinessRuleException.class, () -> playerService.enviarInvitacion(req));
@@ -231,7 +230,7 @@ public class PlayerServiceTest {
 
     @Test
     public void testEnviarInvitacion_MissingTeam() {
-        com.zeuscodensa.techcupfutbol.controller.dto.InvitationRequestDTO req = new com.zeuscodensa.techcupfutbol.controller.dto.InvitationRequestDTO();
+        Invitation req = new Invitation();
         req.setPlayerEmail("player@test.com");
 
         assertThrows(BusinessRuleException.class, () -> playerService.enviarInvitacion(req));
@@ -239,7 +238,7 @@ public class PlayerServiceTest {
 
     @Test
     public void testEnviarInvitacion_PlayerNotFound() {
-        com.zeuscodensa.techcupfutbol.controller.dto.InvitationRequestDTO req = new com.zeuscodensa.techcupfutbol.controller.dto.InvitationRequestDTO();
+        Invitation req = new Invitation();
         req.setPlayerEmail("player@test.com");
         req.setTeamName("Dream Team");
 
@@ -250,11 +249,11 @@ public class PlayerServiceTest {
 
     @Test
     public void testEnviarInvitacion_NotAPlayer() {
-        com.zeuscodensa.techcupfutbol.controller.dto.InvitationRequestDTO req = new com.zeuscodensa.techcupfutbol.controller.dto.InvitationRequestDTO();
+        Invitation req = new Invitation();
         req.setPlayerEmail("admin@test.com");
         req.setTeamName("Dream Team");
 
-        UserEntity u = new UserEntity();
+        Player u = new Player();
         u.setEmail("admin@test.com");
         u.setRole(Role.ADMINISTRADOR_SISTEMA);
 
@@ -265,15 +264,15 @@ public class PlayerServiceTest {
 
     @Test
     public void testEnviarInvitacion_AlreadyInTeam() {
-        com.zeuscodensa.techcupfutbol.controller.dto.InvitationRequestDTO req = new com.zeuscodensa.techcupfutbol.controller.dto.InvitationRequestDTO();
+        Invitation req = new Invitation();
         req.setPlayerEmail("player@test.com");
         req.setTeamName("Dream Team");
 
-        UserEntity u = new UserEntity();
+        Player u = new Player();
         u.setEmail("player@test.com");
         u.setRole(Role.PLAYER);
 
-        TeamEntity team = new TeamEntity();
+        Team team = new Team("Dream Team");
         team.setPlayers(new ArrayList<>());
         team.getPlayers().add(u);
 
@@ -285,15 +284,15 @@ public class PlayerServiceTest {
 
     @Test
     public void testEnviarInvitacion_AlreadyInvited() {
-        com.zeuscodensa.techcupfutbol.controller.dto.InvitationRequestDTO req = new com.zeuscodensa.techcupfutbol.controller.dto.InvitationRequestDTO();
+        Invitation req = new Invitation();
         req.setPlayerEmail("player@test.com");
         req.setTeamName("Dream Team");
 
-        UserEntity u = new UserEntity();
+        Player u = new Player();
         u.setEmail("player@test.com");
         u.setRole(Role.PLAYER);
 
-        InvitationEntity existingInv = new InvitationEntity();
+        Invitation existingInv = new Invitation();
         existingInv.setTeamName("Dream Team");
         existingInv.setStatus("PENDING");
 

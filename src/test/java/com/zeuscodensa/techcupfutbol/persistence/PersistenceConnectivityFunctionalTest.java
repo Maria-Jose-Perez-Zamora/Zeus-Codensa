@@ -10,7 +10,7 @@ import com.zeuscodensa.techcupfutbol.persistence.repository.MatchRepository;
 import com.zeuscodensa.techcupfutbol.persistence.repository.RegistrationRepository;
 import com.zeuscodensa.techcupfutbol.persistence.repository.TeamRepository;
 import com.zeuscodensa.techcupfutbol.persistence.repository.TournamentRepository;
-import com.zeuscodensa.techcupfutbol.persistence.repository.UserRepository;
+import com.zeuscodensa.techcupfutbol.persistence.repository.UserJpaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +30,7 @@ class PersistenceConnectivityFunctionalTest {
     private UserService userService;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserJpaRepository userRepository;
 
     @Autowired
     private TeamRepository teamRepository;
@@ -71,14 +71,14 @@ class PersistenceConnectivityFunctionalTest {
 
     @Test
     void shouldUseRepositoryInjectionInsideUserService() {
-        UserRequestDTO request = new UserRequestDTO();
+        com.zeuscodensa.techcupfutbol.core.model.Player request = new com.zeuscodensa.techcupfutbol.core.model.Player();
         request.setName("Maria");
         request.setEmail("maria.perez-a@escuelaing.edu.co");
         request.setPassword("secreto123");
         request.setRole(Role.PLAYER);
         request.setPosition("Volante");
         request.setJerseyNumber(8);
-        request.setUserType("EXTERNAL");
+        request.setType(com.zeuscodensa.techcupfutbol.core.model.UserType.EXTERNAL);
 
         userService.registerUser(request);
 

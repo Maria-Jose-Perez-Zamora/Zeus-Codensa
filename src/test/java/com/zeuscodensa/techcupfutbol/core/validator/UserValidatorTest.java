@@ -1,9 +1,9 @@
 package com.zeuscodensa.techcupfutbol.core.validator;
 
 import com.zeuscodensa.techcupfutbol.core.model.Role;
-import com.zeuscodensa.techcupfutbol.controller.dto.UserRequestDTO;
-import com.zeuscodensa.techcupfutbol.persistence.entity.UserEntity;
-import com.zeuscodensa.techcupfutbol.persistence.repository.UserRepository;
+import com.zeuscodensa.techcupfutbol.core.model.User;
+import com.zeuscodensa.techcupfutbol.core.model.Player;
+import com.zeuscodensa.techcupfutbol.core.repository.IUserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,123 +20,129 @@ import static org.mockito.Mockito.*;
 public class UserValidatorTest {
 
     @Mock
-    private UserRepository userRepository;
+    private IUserRepository userRepository;
 
     @InjectMocks
     private UserValidator userValidator;
 
-    private UserRequestDTO validRequest;
+    private Player validUser;
 
     @BeforeEach
     public void setUp() {
-        validRequest = new UserRequestDTO();
-        validRequest.setName("Valid Name");
-        validRequest.setEmail("john.doe-a@escuelaing.edu.co");
-        validRequest.setPassword("securePassword");
-        validRequest.setRole(Role.TOURNAMENT_ORGANIZER);
+        validUser = new Player();
+        validUser.setName("Valid Name");
+        validUser.setEmail("john.doe-a@escuelaing.edu.co");
+        validUser.setPassword("securePassword");
+        validUser.setRole(Role.PLAYER);
+        validUser.setPosition("Forward");
+        validUser.setJerseyNumber(10);
     }
 
     @Test
     public void testValidateForRegistration_Success() {
-        when(userRepository.findByEmail(validRequest.getEmail())).thenReturn(Optional.empty());
+        when(userRepository.findByEmail(validUser.getEmail())).thenReturn(Optional.empty());
 
-        assertDoesNotThrow(() -> userValidator.validateForRegistration(validRequest));
+        assertDoesNotThrow(() -> userValidator.validateForRegistration(validUser));
     }
 
     @Test
     public void testValidateForRegistration_NullName() {
-        validRequest.setName(null);
+        validUser.setName(null);
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, 
-                () -> userValidator.validateForRegistration(validRequest));
+                () -> userValidator.validateForRegistration(validUser));
         assertEquals("El name no puede estar vacío", ex.getMessage());
     }
 
     @Test
     public void testValidateForRegistration_EmptyName() {
-        validRequest.setName("   ");
+        validUser.setName("   ");
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, 
-                () -> userValidator.validateForRegistration(validRequest));
+                () -> userValidator.validateForRegistration(validUser));
         assertEquals("El name no puede estar vacío", ex.getMessage());
     }
 
     @Test
     public void testValidateForRegistration_NullEmail() {
-        validRequest.setEmail(null);
+        validUser.setEmail(null);
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, 
-                () -> userValidator.validateForRegistration(validRequest));
+                () -> userValidator.validateForRegistration(validUser));
         assertEquals("Email cannot be empty", ex.getMessage());
     }
 
     @Test
     public void testValidateForRegistration_InvalidEmailFormat() {
-        validRequest.setEmail("invalid.email@gmail.com");
+        validUser.setEmail("invalid.email@gmail.com");
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, 
-                () -> userValidator.validateForRegistration(validRequest));
+                () -> userValidator.validateForRegistration(validUser));
         assertTrue(ex.getMessage().contains("El correo debe ser institucional"));
     }
 
     @Test
     public void testValidateForRegistration_PasswordTooShort() {
-        validRequest.setPassword("12345");
+        validUser.setPassword("12345");
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, 
-                () -> userValidator.validateForRegistration(validRequest));
+                () -> userValidator.validateForRegistration(validUser));
         assertEquals("Password must be at least 6 characters", ex.getMessage());
     }
 
     @Test
     public void testValidateForRegistration_NullRole() {
-        validRequest.setRole(null);
+        validUser.setRole(null);
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, 
-                () -> userValidator.validateForRegistration(validRequest));
+                () -> userValidator.validateForRegistration(validUser));
         assertEquals("El rol del usuario es obligatorio", ex.getMessage());
     }
 
     @Test
     public void testValidateForRegistration_PlayerRoleMissingPosition() {
-        validRequest.setRole(Role.PLAYER);
-        validRequest.setPosition(null);
+        Player player = new Player();
+        player.setName("P"); player.setEmail("p.p-a@escuelaing.edu.co"); player.setPassword("1234567"); player.setRole(Role.PLAYER);
+        player.setPosition(null);
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, 
-                () -> userValidator.validateForRegistration(validRequest));
+                () -> userValidator.validateForRegistration(player));
         assertEquals("La posición es obligatoria para players y capitanes", ex.getMessage());
     }
 
     @Test
     public void testValidateForRegistration_PlayerRoleMissingJerseyNumber() {
-        validRequest.setRole(Role.PLAYER);
-        validRequest.setPosition("Forward");
-        validRequest.setJerseyNumber(null);
+        Player player = new Player();
+        player.setName("P"); player.setEmail("p.p-a@escuelaing.edu.co"); player.setPassword("1234567"); player.setRole(Role.PLAYER);
+        player.setPosition("Forward");
+        player.setJerseyNumber(null);
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, 
-                () -> userValidator.validateForRegistration(validRequest));
+                () -> userValidator.validateForRegistration(player));
         assertEquals("El número de dorsal es obligatorio y debe ser mayor a 0", ex.getMessage());
     }
 
     @Test
     public void testValidateForRegistration_CaptainRoleInvalidJerseyNumber() {
-        validRequest.setRole(Role.CAPTAIN);
-        validRequest.setPosition("Midfielder");
-        validRequest.setJerseyNumber(0);
+        Player player = new Player();
+        player.setName("P"); player.setEmail("p.p-a@escuelaing.edu.co"); player.setPassword("1234567"); player.setRole(Role.CAPTAIN);
+        player.setPosition("Midfielder");
+        player.setJerseyNumber(0);
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, 
-                () -> userValidator.validateForRegistration(validRequest));
+                () -> userValidator.validateForRegistration(player));
         assertEquals("El número de dorsal es obligatorio y debe ser mayor a 0", ex.getMessage());
     }
 
     @Test
     public void testValidateForRegistration_PlayerRoleSuccess() {
-        validRequest.setRole(Role.PLAYER);
-        validRequest.setPosition("Goalkeeper");
-        validRequest.setJerseyNumber(1);
+        Player player = new Player();
+        player.setName("P"); player.setEmail("p.p-a@escuelaing.edu.co"); player.setPassword("1234567"); player.setRole(Role.PLAYER);
+        player.setPosition("Goalkeeper");
+        player.setJerseyNumber(1);
 
-        when(userRepository.findByEmail(validRequest.getEmail())).thenReturn(Optional.empty());
+        when(userRepository.findByEmail(player.getEmail())).thenReturn(Optional.empty());
 
-        assertDoesNotThrow(() -> userValidator.validateForRegistration(validRequest));
+        assertDoesNotThrow(() -> userValidator.validateForRegistration(player));
     }
 
     @Test
     public void testValidateForRegistration_DuplicatedEmail() {
-        when(userRepository.findByEmail(validRequest.getEmail())).thenReturn(Optional.of(new UserEntity()));
+        when(userRepository.findByEmail(validUser.getEmail())).thenReturn(Optional.of(new Player()));
 
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, 
-                () -> userValidator.validateForRegistration(validRequest));
+                () -> userValidator.validateForRegistration(validUser));
         assertEquals("El correo ya se encuentra registrado", ex.getMessage());
     }
 }

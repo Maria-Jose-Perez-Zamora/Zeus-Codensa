@@ -12,9 +12,9 @@ import java.util.stream.Collectors;
 @Service
 public class StandingService {
 
-    private final com.zeuscodensa.techcupfutbol.persistence.repository.MatchRepository matchRepository;
+    private final com.zeuscodensa.techcupfutbol.core.repository.IMatchRepository matchRepository;
 
-    public StandingService(com.zeuscodensa.techcupfutbol.persistence.repository.MatchRepository matchRepository) {
+    public StandingService(com.zeuscodensa.techcupfutbol.core.repository.IMatchRepository matchRepository) {
         this.matchRepository = matchRepository;
     }
 
@@ -23,7 +23,6 @@ public class StandingService {
 
         List<Match> matches = matchRepository.findByTournamentName(tournamentName).stream()
                 .filter(p -> p.getStatus().equals("FINISHED"))
-                .map(com.zeuscodensa.techcupfutbol.persistence.mapper.EntityToModelMapper::toMatchModel)
                 .collect(Collectors.toList());
 
         for (Match p : matches) {

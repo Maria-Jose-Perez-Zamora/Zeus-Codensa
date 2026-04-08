@@ -189,7 +189,7 @@ class PersistenceMapperTest {
         UserEntity ref = new UserEntity(); ref.setRole(Role.REFEREE);
         UserEntity nullRole = new UserEntity(); nullRole.setRole(null);
 
-        assertInstanceOf(com.zeuscodensa.techcupfutbol.core.model.AdministradorSistema.class, EntityToModelMapper.toUserModel(admin));
+        assertInstanceOf(com.zeuscodensa.techcupfutbol.core.model.SystemAdministrator.class, EntityToModelMapper.toUserModel(admin));
         assertInstanceOf(com.zeuscodensa.techcupfutbol.core.model.TournamentOrganizer.class, EntityToModelMapper.toUserModel(org));
         assertInstanceOf(com.zeuscodensa.techcupfutbol.core.model.Referee.class, EntityToModelMapper.toUserModel(ref));
         assertInstanceOf(com.zeuscodensa.techcupfutbol.core.model.Player.class, EntityToModelMapper.toUserModel(nullRole)); // default

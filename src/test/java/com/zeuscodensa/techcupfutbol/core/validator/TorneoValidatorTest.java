@@ -1,8 +1,7 @@
 package com.zeuscodensa.techcupfutbol.core.validator;
 
-import com.zeuscodensa.techcupfutbol.controller.dto.TournamentRequestDTO;
-import com.zeuscodensa.techcupfutbol.persistence.entity.TournamentEntity;
-import com.zeuscodensa.techcupfutbol.persistence.repository.TournamentRepository;
+import com.zeuscodensa.techcupfutbol.core.model.Tournament;
+import com.zeuscodensa.techcupfutbol.core.repository.ITournamentRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,7 +19,7 @@ import static org.mockito.Mockito.when;
 public class TorneoValidatorTest {
 
     @Mock
-    private TournamentRepository tournamentRepository;
+    private ITournamentRepository tournamentRepository;
 
     @InjectMocks
     private TournamentValidator tournamentValidator;
@@ -31,7 +30,7 @@ public class TorneoValidatorTest {
 
     @Test
     public void testValidCreation() {
-        TournamentRequestDTO req = new TournamentRequestDTO();
+        Tournament req = new Tournament();
         req.setTournamentName("Valido");
         req.setNumeroEquipos(8);
         req.setCostoInscripcion(50.0);
@@ -43,21 +42,21 @@ public class TorneoValidatorTest {
 
     @Test
     public void testNullNombreTorneo() {
-        TournamentRequestDTO req = new TournamentRequestDTO();
+        Tournament req = new Tournament();
         req.setTournamentName(null);
         assertThrows(IllegalArgumentException.class, () -> tournamentValidator.validateForCreation(req));
     }
 
     @Test
     public void testEmptyNombreTorneo() {
-        TournamentRequestDTO req = new TournamentRequestDTO();
+        Tournament req = new Tournament();
         req.setTournamentName("   ");
         assertThrows(IllegalArgumentException.class, () -> tournamentValidator.validateForCreation(req));
     }
 
     @Test
     public void testNullEquipos() {
-        TournamentRequestDTO req = new TournamentRequestDTO();
+        Tournament req = new Tournament();
         req.setTournamentName("Valido");
         req.setNumeroEquipos(null);
         assertThrows(IllegalArgumentException.class, () -> tournamentValidator.validateForCreation(req));
@@ -65,7 +64,7 @@ public class TorneoValidatorTest {
 
     @Test
     public void testInvalidEquipos() {
-        TournamentRequestDTO req = new TournamentRequestDTO();
+        Tournament req = new Tournament();
         req.setTournamentName("Valido");
         req.setNumeroEquipos(1);
         assertThrows(IllegalArgumentException.class, () -> tournamentValidator.validateForCreation(req));
@@ -73,7 +72,7 @@ public class TorneoValidatorTest {
 
     @Test
     public void testNullCosto() {
-        TournamentRequestDTO req = new TournamentRequestDTO();
+        Tournament req = new Tournament();
         req.setTournamentName("Valido");
         req.setNumeroEquipos(8);
         req.setCostoInscripcion(null);
@@ -82,7 +81,7 @@ public class TorneoValidatorTest {
 
     @Test
     public void testNegativeCosto() {
-        TournamentRequestDTO req = new TournamentRequestDTO();
+        Tournament req = new Tournament();
         req.setTournamentName("Valido");
         req.setNumeroEquipos(8);
         req.setCostoInscripcion(-10.0);
@@ -91,12 +90,12 @@ public class TorneoValidatorTest {
 
     @Test
     public void testDuplicateTorneo() {
-        TournamentEntity t = new TournamentEntity();
+        Tournament t = new Tournament();
         t.setTournamentName("Valido");
 
         when(tournamentRepository.findByTournamentName("Valido")).thenReturn(Optional.of(t));
 
-        TournamentRequestDTO req = new TournamentRequestDTO();
+        Tournament req = new Tournament();
         req.setTournamentName("Valido");
         req.setNumeroEquipos(8);
         req.setCostoInscripcion(50.0);

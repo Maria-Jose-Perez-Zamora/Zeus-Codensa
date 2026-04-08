@@ -1,10 +1,9 @@
 package com.zeuscodensa.techcupfutbol.core.service;
 
-import com.zeuscodensa.techcupfutbol.controller.dto.LoginRequestDTO;
-import com.zeuscodensa.techcupfutbol.controller.dto.LoginResponseDTO;
+import com.zeuscodensa.techcupfutbol.core.exception.BusinessRuleException;
+import com.zeuscodensa.techcupfutbol.core.model.User;
+import com.zeuscodensa.techcupfutbol.core.repository.IUserRepository;
 import com.zeuscodensa.techcupfutbol.security.JwtService;
-import com.zeuscodensa.techcupfutbol.persistence.entity.UserEntity;
-import com.zeuscodensa.techcupfutbol.persistence.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,7 +24,7 @@ public class AuthServiceTest {
     private JwtService jwtService;
     
     @Mock
-    private UserRepository userRepository;
+    private IUserRepository userRepository;
 
     @InjectMocks
     private AuthService authService;
@@ -36,7 +35,7 @@ public class AuthServiceTest {
 
     @Test
     public void testLogin_Success() {
-        UserEntity u = new UserEntity();
+        com.zeuscodensa.techcupfutbol.core.model.Player u = new com.zeuscodensa.techcupfutbol.core.model.Player();
         u.setEmail("user.test1-a@escuelaing.edu.co");
         u.setPassword("secret");
         u.setRole(com.zeuscodensa.techcupfutbol.core.model.Role.PLAYER);
@@ -44,30 +43,26 @@ public class AuthServiceTest {
         when(userRepository.findByEmail("user.test1-a@escuelaing.edu.co")).thenReturn(Optional.of(u));
         when(jwtService.generateToken(anyString(), anyString())).thenReturn("mockToken");
 
-        LoginRequestDTO request = new LoginRequestDTO("user.test1-a@escuelaing.edu.co", "secret");
-        LoginResponseDTO response = authService.login(request);
+        String responseToken = authService.login("user.test1-a@escuelaing.edu.co", "secret");
 
-        assertNotNull(response);
-        assertEquals("mockToken", response.getToken());
-        assertEquals("user.test1-a@escuelaing.edu.co", response.getUser().getEmail());
+        assertNotNull(responseToken);
+        assertEquals("mockToken", responseToken);
     }
 
     @Test
     public void testLogin_InvalidCredentials() {
-        UserEntity u = new UserEntity();
+        com.zeuscodensa.techcupfutbol.core.model.Player u = new com.zeuscodensa.techcupfutbol.core.model.Player();
         u.setEmail("user.test1-a@escuelaing.edu.co");
         u.setPassword("secret");
         
         when(userRepository.findByEmail("user.test1-a@escuelaing.edu.co")).thenReturn(Optional.of(u));
 
-        LoginRequestDTO request = new LoginRequestDTO("user.test1-a@escuelaing.edu.co", "wrong");
-        assertThrows(RuntimeException.class, () -> authService.login(request));
+        assertThrows(BusinessRuleException.class, () -> authService.login("user.test1-a@escuelaing.edu.co", "wrong"));
     }
 
     @Test
     public void testLogin_UserNotFound_Throws() {
         when(userRepository.findByEmail("ghost@x.com")).thenReturn(Optional.empty());
-        LoginRequestDTO request = new LoginRequestDTO("ghost@x.com", "pass");
-        assertThrows(RuntimeException.class, () -> authService.login(request));
+        assertThrows(BusinessRuleException.class, () -> authService.login("ghost@x.com", "pass"));
     }
 }

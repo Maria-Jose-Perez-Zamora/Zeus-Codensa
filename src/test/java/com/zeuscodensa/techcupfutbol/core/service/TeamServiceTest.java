@@ -1,12 +1,10 @@
 package com.zeuscodensa.techcupfutbol.core.service;
 
-import com.zeuscodensa.techcupfutbol.controller.dto.TeamRequestDTO;
-import com.zeuscodensa.techcupfutbol.controller.dto.TeamResponseDTO;
+import com.zeuscodensa.techcupfutbol.core.model.Team;
+import com.zeuscodensa.techcupfutbol.core.model.Player;
 import com.zeuscodensa.techcupfutbol.core.validator.TeamValidator;
-import com.zeuscodensa.techcupfutbol.persistence.entity.TeamEntity;
-import com.zeuscodensa.techcupfutbol.persistence.entity.UserEntity;
-import com.zeuscodensa.techcupfutbol.persistence.repository.TeamRepository;
-import com.zeuscodensa.techcupfutbol.persistence.repository.UserRepository;
+import com.zeuscodensa.techcupfutbol.core.repository.ITeamRepository;
+import com.zeuscodensa.techcupfutbol.core.repository.IUserRepository;
 import com.zeuscodensa.techcupfutbol.core.model.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,10 +26,10 @@ import static org.mockito.Mockito.*;
 public class TeamServiceTest {
     
     @Mock
-    private TeamRepository teamRepository;
+    private ITeamRepository teamRepository;
 
     @Mock
-    private UserRepository userRepository;
+    private IUserRepository userRepository;
 
     @Mock
     private TeamValidator teamValidator;
@@ -50,52 +48,50 @@ public class TeamServiceTest {
 
     @Test
     public void testCreateTeam_WithPlayers_Success() {
-        TeamRequestDTO request = new TeamRequestDTO("Tigres FC", "tigres.png", "Amarillo", validPlayers);
+        Team newTeam = new Team("Tigres FC");
+        newTeam.setEscudo("tigres.png");
+        newTeam.setColoresUniforme("Amarillo");
         
-        doNothing().when(teamValidator).validateForCreation(request);
+        doNothing().when(teamValidator).validateForCreation("Tigres FC", validPlayers);
         when(teamRepository.findByTeamName("Tigres FC")).thenReturn(Optional.empty());
 
         for (String email : validPlayers) {
-            UserEntity u = new UserEntity();
+            Player u = new Player();
             u.setEmail(email);
             u.setRole(Role.PLAYER);
             when(userRepository.findByEmail(email)).thenReturn(Optional.of(u));
         }
 
-        TeamEntity savedTeam = new TeamEntity();
-        savedTeam.setTeamName("Tigres FC");
-        List<UserEntity> teamPlayers = new ArrayList<>();
+        Team savedTeam = new Team("Tigres FC");
+        List<com.zeuscodensa.techcupfutbol.core.model.User> teamPlayers = new ArrayList<>();
         for(int i=0; i<7; i++) {
-            UserEntity pe = new UserEntity();
+            Player pe = new Player();
             pe.setEmail(validPlayers.get(i));
             teamPlayers.add(pe);
         }
         savedTeam.setPlayers(teamPlayers);
-        when(teamRepository.save(any(TeamEntity.class))).thenReturn(savedTeam);
+        when(teamRepository.save(any(Team.class))).thenReturn(savedTeam);
 
-        TeamResponseDTO response = teamService.createTeam(request);
+        Team response = teamService.createTeam(newTeam, validPlayers);
         
         assertNotNull(response);
         assertEquals("Tigres FC", response.getTeamName());
         assertEquals(7, response.getPlayers().size());
-        verify(teamRepository, times(1)).save(any(TeamEntity.class));
+        verify(teamRepository, times(1)).save(any(Team.class));
     }
 
     @Test
     public void testGetAllTeams() {
-        TeamEntity t1 = new TeamEntity();
-        t1.setTeamName("Equipo A");
-        
-        TeamEntity t2 = new TeamEntity();
-        t2.setTeamName("Equipo B");
+        Team t1 = new Team("Equipo A");
+        Team t2 = new Team("Equipo B");
 
-        List<TeamEntity> entityList = new ArrayList<>();
+        List<Team> entityList = new ArrayList<>();
         entityList.add(t1);
         entityList.add(t2);
 
         when(teamRepository.findAll()).thenReturn(entityList);
         
-        List<TeamResponseDTO> teams = teamService.getAllTeams();
+        List<Team> teams = teamService.getAllTeams();
         assertEquals(2, teams.size());
         verify(teamRepository, times(1)).findAll();
     }

@@ -2,6 +2,8 @@ package com.zeuscodensa.techcupfutbol.controller.api;
 
 import com.zeuscodensa.techcupfutbol.controller.dto.TeamRequestDTO;
 import com.zeuscodensa.techcupfutbol.controller.dto.TeamResponseDTO;
+import com.zeuscodensa.techcupfutbol.controller.mapper.TeamMapper;
+import com.zeuscodensa.techcupfutbol.core.model.Team;
 import com.zeuscodensa.techcupfutbol.core.service.TeamService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/teams")
@@ -28,13 +31,15 @@ public class TeamController {
     @Operation(summary = "Create Team", description = "Creates a new team and associates existing users via email")
     public ResponseEntity<TeamResponseDTO> createTeam(@RequestBody TeamRequestDTO request) {
         log.info("REST request - createTeam: {}", request.getTeamName());
-        return ResponseEntity.ok(teamService.createTeam(request));
+        Team newTeam = TeamMapper.toEntity(request);
+        Team saved = teamService.createTeam(newTeam, request.getPlayerEmails());
+        return ResponseEntity.ok(TeamMapper.toDTO(saved));
     }
 
     @GetMapping
     @Operation(summary = "Get All Teams", description = "Returns the list of all created teams")
     public ResponseEntity<List<TeamResponseDTO>> getAllTeams() {
         log.info("REST request - getAll Teams");
-        return ResponseEntity.ok(teamService.getAllTeams());
+        return ResponseEntity.ok(teamService.getAllTeams().stream().map(TeamMapper::toDTO).collect(Collectors.toList()));
     }
 }

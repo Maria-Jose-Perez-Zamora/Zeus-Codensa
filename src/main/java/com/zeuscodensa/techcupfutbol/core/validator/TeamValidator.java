@@ -1,7 +1,6 @@
 package com.zeuscodensa.techcupfutbol.core.validator;
 
-import com.zeuscodensa.techcupfutbol.controller.dto.TeamRequestDTO;
-import com.zeuscodensa.techcupfutbol.persistence.repository.TeamRepository;
+import com.zeuscodensa.techcupfutbol.core.repository.ITeamRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -9,23 +8,22 @@ import java.util.List;
 @Component
 public class TeamValidator {
 
-    private final TeamRepository teamRepository;
+    private final ITeamRepository teamRepository;
 
-    public TeamValidator(TeamRepository teamRepository) {
+    public TeamValidator(ITeamRepository teamRepository) {
         this.teamRepository = teamRepository;
     }
 
-    public void validateForCreation(TeamRequestDTO request) {
-        if (request.getTeamName() == null || request.getTeamName().trim().isEmpty()) {
+    public void validateForCreation(String teamName, List<String> players) {
+        if (teamName == null || teamName.trim().isEmpty()) {
             throw new IllegalArgumentException("El name del team no puede estar vacío");
         }
         
-        boolean exists = teamRepository.findByTeamName(request.getTeamName()).isPresent();
+        boolean exists = teamRepository.findByTeamName(teamName).isPresent();
         if (exists) {
             throw new IllegalArgumentException("El name del team ya existe");
         }
 
-        List<String> players = request.getPlayerEmails();
         if (players == null || players.size() < 7 || players.size() > 20) {
             throw new IllegalArgumentException("Un team debe tener entre 7 y 20 players inscritos inicialmente");
         }

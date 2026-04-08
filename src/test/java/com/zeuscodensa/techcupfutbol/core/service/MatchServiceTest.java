@@ -2,14 +2,12 @@ package com.zeuscodensa.techcupfutbol.core.service;
 
 import com.zeuscodensa.techcupfutbol.core.exception.BusinessRuleException;
 import com.zeuscodensa.techcupfutbol.core.exception.ResourceNotFoundException;
+import com.zeuscodensa.techcupfutbol.core.model.Match;
 import com.zeuscodensa.techcupfutbol.core.model.Role;
+import com.zeuscodensa.techcupfutbol.core.model.Player;
 import com.zeuscodensa.techcupfutbol.core.validator.MatchValidator;
-import com.zeuscodensa.techcupfutbol.controller.dto.MatchRequestDTO;
-import com.zeuscodensa.techcupfutbol.controller.dto.MatchResponseDTO;
-import com.zeuscodensa.techcupfutbol.persistence.entity.MatchEntity;
-import com.zeuscodensa.techcupfutbol.persistence.entity.UserEntity;
-import com.zeuscodensa.techcupfutbol.persistence.repository.MatchRepository;
-import com.zeuscodensa.techcupfutbol.persistence.repository.UserRepository;
+import com.zeuscodensa.techcupfutbol.core.repository.IMatchRepository;
+import com.zeuscodensa.techcupfutbol.core.repository.IUserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,32 +15,27 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class MatchServiceTest {
 
-    @Mock private MatchRepository matchRepository;
-    @Mock private UserRepository userRepository;
+    @Mock private IMatchRepository matchRepository;
+    @Mock private IUserRepository userRepository;
     @Mock private MatchValidator matchValidator;
 
     @InjectMocks
     private MatchService matchService;
 
-    private MatchEntity sampleEntity;
+    private Match sampleEntity;
 
     @BeforeEach
     public void setUp() {
-        sampleEntity = new MatchEntity();
+        sampleEntity = new Match();
         sampleEntity.setId("m1");
         sampleEntity.setHomeTeam("EqA");
         sampleEntity.setAwayTeam("EqB");
@@ -55,15 +48,15 @@ public class MatchServiceTest {
 
     @Test
     public void testRegistrarPartido_Success() {
-        MatchRequestDTO req = new MatchRequestDTO("EqA", "EqB", "2026-06-01", "Liga");
+        Match req = new Match("EqA", "EqB", "2026-06-01", "Liga");
         doNothing().when(matchValidator).validateForCreation(req);
-        when(matchRepository.save(any(MatchEntity.class))).thenReturn(sampleEntity);
+        when(matchRepository.save(any(Match.class))).thenReturn(sampleEntity);
 
-        MatchResponseDTO res = matchService.registrarPartido(req);
+        Match res = matchService.registrarPartido(req);
 
         assertNotNull(res);
         verify(matchValidator).validateForCreation(req);
-        verify(matchRepository).save(any(MatchEntity.class));
+        verify(matchRepository).save(any(Match.class));
     }
 
     // ── actualizarMarcador ───────────────────────────────────────────────────
@@ -71,12 +64,12 @@ public class MatchServiceTest {
     @Test
     public void testActualizarMarcador_Success() {
         when(matchRepository.findById("m1")).thenReturn(Optional.of(sampleEntity));
-        when(matchRepository.save(any(MatchEntity.class))).thenReturn(sampleEntity);
+        when(matchRepository.save(any(Match.class))).thenReturn(sampleEntity);
 
-        MatchResponseDTO res = matchService.actualizarMarcador("m1", 2, 1);
+        Match res = matchService.actualizarMarcador("m1", 2, 1);
 
         assertNotNull(res);
-        verify(matchRepository).save(any(MatchEntity.class));
+        verify(matchRepository).save(any(Match.class));
     }
 
     @Test
@@ -107,12 +100,12 @@ public class MatchServiceTest {
     @Test
     public void testRegistrarAlineacion_Success() {
         when(matchRepository.findById("m1")).thenReturn(Optional.of(sampleEntity));
-        when(matchRepository.save(any(MatchEntity.class))).thenReturn(sampleEntity);
+        when(matchRepository.save(any(Match.class))).thenReturn(sampleEntity);
 
-        MatchResponseDTO res = matchService.registrarAlineacion("m1", "EqA", Arrays.asList("p1", "p2"));
+        Match res = matchService.registrarAlineacion("m1", "EqA", Arrays.asList("p1", "p2"));
 
         assertNotNull(res);
-        verify(matchRepository).save(any(MatchEntity.class));
+        verify(matchRepository).save(any(Match.class));
     }
 
     @Test
@@ -148,19 +141,19 @@ public class MatchServiceTest {
     @Test
     public void testRegistrarTarjetas_WithBothCards() {
         when(matchRepository.findById("m1")).thenReturn(Optional.of(sampleEntity));
-        when(matchRepository.save(any(MatchEntity.class))).thenReturn(sampleEntity);
+        when(matchRepository.save(any(Match.class))).thenReturn(sampleEntity);
 
         Map<String, List<String>> amarillas = Map.of("EqA", Arrays.asList("p1"));
         Map<String, List<String>> rojas = Map.of("EqB", Arrays.asList("p2"));
 
-        MatchResponseDTO res = matchService.registrarTarjetas("m1", amarillas, rojas);
+        Match res = matchService.registrarTarjetas("m1", amarillas, rojas);
         assertNotNull(res);
     }
 
     @Test
     public void testRegistrarTarjetas_NullCards_Allowed() {
         when(matchRepository.findById("m1")).thenReturn(Optional.of(sampleEntity));
-        when(matchRepository.save(any(MatchEntity.class))).thenReturn(sampleEntity);
+        when(matchRepository.save(any(Match.class))).thenReturn(sampleEntity);
 
         // Both null — should not throw
         assertDoesNotThrow(() -> matchService.registrarTarjetas("m1", null, null));
@@ -181,14 +174,14 @@ public class MatchServiceTest {
         when(matchRepository.findByRefereeEmail("ref@escuelaing.edu.co"))
                 .thenReturn(Collections.singletonList(sampleEntity));
 
-        List<MatchResponseDTO> result = matchService.getMatchesByReferee("ref@escuelaing.edu.co");
+        List<Match> result = matchService.getMatchesByReferee("ref@escuelaing.edu.co");
         assertEquals(1, result.size());
     }
 
     @Test
     public void testGetMatchesByReferee_Empty() {
         when(matchRepository.findByRefereeEmail(anyString())).thenReturn(Collections.emptyList());
-        List<MatchResponseDTO> result = matchService.getMatchesByReferee("nobody@x.com");
+        List<Match> result = matchService.getMatchesByReferee("nobody@x.com");
         assertTrue(result.isEmpty());
     }
 
@@ -196,21 +189,21 @@ public class MatchServiceTest {
 
     @Test
     public void testAsignarArbitro_Success() {
-        UserEntity referee = new UserEntity();
+        com.zeuscodensa.techcupfutbol.core.model.Player referee = new com.zeuscodensa.techcupfutbol.core.model.Player();
         referee.setEmail("ref@escuelaing.edu.co");
         referee.setRole(Role.REFEREE);
 
         when(userRepository.findByEmail("ref@escuelaing.edu.co")).thenReturn(Optional.of(referee));
         when(matchRepository.findById("m1")).thenReturn(Optional.of(sampleEntity));
-        when(matchRepository.save(any(MatchEntity.class))).thenReturn(sampleEntity);
+        when(matchRepository.save(any(Match.class))).thenReturn(sampleEntity);
 
-        MatchResponseDTO res = matchService.asignarArbitro("m1", "ref@escuelaing.edu.co");
+        Match res = matchService.asignarArbitro("m1", "ref@escuelaing.edu.co");
         assertNotNull(res);
     }
 
     @Test
     public void testAsignarArbitro_NotReferee_Throws() {
-        UserEntity player = new UserEntity();
+        Player player = new Player();
         player.setRole(Role.PLAYER);
 
         when(userRepository.findByEmail("player@x.com")).thenReturn(Optional.of(player));
@@ -219,7 +212,7 @@ public class MatchServiceTest {
     }
 
     @Test
-    public void testAsignarArbitro_UserNotFound_Throws() {
+    public void testAsignarArbitro_PlayerNotFound_Throws() {
         when(userRepository.findByEmail("ghost@x.com")).thenReturn(Optional.empty());
         assertThrows(BusinessRuleException.class,
                 () -> matchService.asignarArbitro("m1", "ghost@x.com"));
@@ -227,7 +220,7 @@ public class MatchServiceTest {
 
     @Test
     public void testAsignarArbitro_MatchNotFound_Throws() {
-        UserEntity referee = new UserEntity();
+        Player referee = new Player();
         referee.setRole(Role.REFEREE);
         when(userRepository.findByEmail("ref@x.com")).thenReturn(Optional.of(referee));
         when(matchRepository.findById("bad")).thenReturn(Optional.empty());
@@ -241,14 +234,14 @@ public class MatchServiceTest {
     @Test
     public void testGetAll_ReturnsList() {
         when(matchRepository.findAll()).thenReturn(Arrays.asList(sampleEntity, sampleEntity));
-        List<MatchResponseDTO> result = matchService.getAll();
+        List<Match> result = matchService.getAll();
         assertEquals(2, result.size());
     }
 
     @Test
     public void testGetAll_Empty() {
         when(matchRepository.findAll()).thenReturn(Collections.emptyList());
-        List<MatchResponseDTO> result = matchService.getAll();
+        List<Match> result = matchService.getAll();
         assertTrue(result.isEmpty());
     }
 }

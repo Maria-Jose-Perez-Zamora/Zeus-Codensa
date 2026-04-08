@@ -2,6 +2,7 @@ package com.zeuscodensa.techcupfutbol.controller.api;
 
 import com.zeuscodensa.techcupfutbol.controller.dto.RegistrationRequestDTO;
 import com.zeuscodensa.techcupfutbol.controller.dto.RegistrationResponseDTO;
+import com.zeuscodensa.techcupfutbol.core.model.Registration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -31,10 +32,10 @@ public class InscripcionControllerTest {
     @Test
     public void testCreateInscripcion_Success() {
         RegistrationRequestDTO req = new RegistrationRequestDTO("Eq", "Tor", "url");
-        RegistrationResponseDTO res = new RegistrationResponseDTO();
-        res.setStatus("PENDING");
+        Registration mockedReg = new Registration();
+        mockedReg.setStatus("PENDING");
 
-        when(inscripcionService.inscribir(any())).thenReturn(res);
+        when(inscripcionService.inscribir(any(Registration.class))).thenReturn(mockedReg);
 
         ResponseEntity<?> response = inscripcionController.createInscripcion(req);
         assertEquals(200, response.getStatusCode().value());
@@ -42,10 +43,10 @@ public class InscripcionControllerTest {
 
     @Test
     public void testActualizarEstado_Success() {
-        RegistrationResponseDTO res = new RegistrationResponseDTO();
-        res.setStatus("APPROVED");
+        Registration mockedReg = new Registration();
+        mockedReg.setStatus("APPROVED");
 
-        when(inscripcionService.actualizarEstado("1", "APPROVED")).thenReturn(res);
+        when(inscripcionService.actualizarEstado("1", "APPROVED")).thenReturn(mockedReg);
 
         ResponseEntity<?> response = inscripcionController.actualizarEstado("1", Map.of("status", "APPROVED"));
         assertEquals(200, response.getStatusCode().value());

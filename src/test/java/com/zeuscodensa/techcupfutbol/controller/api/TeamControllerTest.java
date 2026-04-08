@@ -2,6 +2,7 @@ package com.zeuscodensa.techcupfutbol.controller.api;
 
 import com.zeuscodensa.techcupfutbol.controller.dto.TeamRequestDTO;
 import com.zeuscodensa.techcupfutbol.controller.dto.TeamResponseDTO;
+import com.zeuscodensa.techcupfutbol.core.model.Team;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -30,28 +31,29 @@ public class TeamControllerTest {
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        validPlayers = Arrays.asList("user.test1-a@escuelaing.edu.co", "user.test2-a@escuelaing.edu.co", "user.test3-a@escuelaing.edu.co", "user.test4-a@escuelaing.edu.co", "user.test5-a@escuelaing.edu.co");
+        validPlayers = Arrays.asList("user.test1-a@escuelaing.edu.co", "user.test2-a@escuelaing.edu.co");
     }
 
     @Test
     public void testCreateTeam_Success() {
         TeamRequestDTO request = new TeamRequestDTO("FC Zeta", "e.png", "Negro", validPlayers);
-        TeamResponseDTO responseDto = new TeamResponseDTO();
-        responseDto.setTeamName("FC Zeta");
+        Team mockedSavedTeam = new Team("FC Zeta");
+        
+        when(teamService.createTeam(any(Team.class), eq(validPlayers))).thenReturn(mockedSavedTeam);
 
-        when(teamService.createTeam(any(TeamRequestDTO.class))).thenReturn(responseDto);
-
-        ResponseEntity<?> responseEntity = teamController.createTeam(request);
+        ResponseEntity<TeamResponseDTO> responseEntity = teamController.createTeam(request);
 
         assertEquals(200, responseEntity.getStatusCode().value());
-        assertEquals(responseDto, responseEntity.getBody());
+        assertNotNull(responseEntity.getBody());
+        assertEquals("FC Zeta", responseEntity.getBody().getTeamName());
     }
 
     @Test
     public void testCreateTeam_ValidationError() {
         TeamRequestDTO request = new TeamRequestDTO();
+        request.setPlayerEmails(Collections.emptyList());
         
-        when(teamService.createTeam(any(TeamRequestDTO.class)))
+        when(teamService.createTeam(any(Team.class), anyList()))
             .thenThrow(new IllegalArgumentException("Error de validacion"));
 
         RuntimeException thrown = assertThrows(RuntimeException.class, () -> teamController.createTeam(request));
@@ -60,8 +62,7 @@ public class TeamControllerTest {
 
     @Test
     public void testGetAllTeams() {
-        TeamResponseDTO t1 = new TeamResponseDTO();
-        t1.setTeamName("Equipo1");
+        Team t1 = new Team("Equipo1");
         when(teamService.getAllTeams()).thenReturn(Collections.singletonList(t1));
 
         ResponseEntity<List<TeamResponseDTO>> responseEntity = teamController.getAllTeams();

@@ -1,51 +1,53 @@
 package com.zeuscodensa.techcupfutbol.core.validator;
 
-import com.zeuscodensa.techcupfutbol.controller.dto.UserRequestDTO;
+import com.zeuscodensa.techcupfutbol.core.model.Player;
 import com.zeuscodensa.techcupfutbol.core.model.Role;
-import com.zeuscodensa.techcupfutbol.persistence.repository.UserRepository;
+import com.zeuscodensa.techcupfutbol.core.model.User;
+import com.zeuscodensa.techcupfutbol.core.repository.IUserRepository;
 import org.springframework.stereotype.Component;
 
 @Component
 public class UserValidator {
 
-    private final UserRepository userRepository;
+    private final IUserRepository userRepository;
 
-    public UserValidator(UserRepository userRepository) {
+    public UserValidator(IUserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
-    public void validateForRegistration(UserRequestDTO request) {
-        if (request.getName() == null || request.getName().trim().isEmpty()) {
+    public void validateForRegistration(User user) {
+        if (user.getName() == null || user.getName().trim().isEmpty()) {
             throw new IllegalArgumentException("El name no puede estar vacío");
         }
-        if (request.getEmail() == null || request.getEmail().trim().isEmpty()) {
+        if (user.getEmail() == null || user.getEmail().trim().isEmpty()) {
             throw new IllegalArgumentException("Email cannot be empty");
         }
         
         // Permitimos números por si hay colisiones en el AD (ej. juan.perez2-a@...)
         String emailRegex = "^[a-zA-Z0-9]+\\.[a-zA-Z0-9]+\\-[a-zA-Z]@escuelaing\\.edu\\.co$";
-        if (!request.getEmail().matches(emailRegex)) {
+        if (!user.getEmail().matches(emailRegex)) {
             throw new IllegalArgumentException("El correo debe ser institucional (ej. nombre.apellido-a@escuelaing.edu.co)");
         }
-        if (request.getPassword() == null || request.getPassword().length() < 6) {
+        if (user.getPassword() == null || user.getPassword().length() < 6) {
             throw new IllegalArgumentException("Password must be at least 6 characters");
         }
         
-        if (request.getRole() == null) {
+        if (user.getRole() == null) {
             throw new IllegalArgumentException("El rol del usuario es obligatorio");
         }
 
-        if (request.getRole() == Role.PLAYER || request.getRole() == Role.CAPTAIN) {
-            if (request.getPosition() == null || request.getPosition().trim().isEmpty()) {
+        if (user instanceof Player) {
+            Player p = (Player) user;
+            if (p.getPosition() == null || p.getPosition().trim().isEmpty()) {
                 throw new IllegalArgumentException("La posición es obligatoria para players y capitanes");
             }
-            if (request.getJerseyNumber() == null || request.getJerseyNumber() <= 0) {
+            if (p.getJerseyNumber() == null || p.getJerseyNumber() <= 0) {
                 throw new IllegalArgumentException("El número de dorsal es obligatorio y debe ser mayor a 0");
             }
         }
         
         // Check duplicated email
-        boolean exists = userRepository.findByEmail(request.getEmail()).isPresent();
+        boolean exists = userRepository.findByEmail(user.getEmail()).isPresent();
         if (exists) {
             throw new IllegalArgumentException("El correo ya se encuentra registrado");
         }

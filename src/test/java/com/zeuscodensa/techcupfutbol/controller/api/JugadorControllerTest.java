@@ -3,6 +3,7 @@ package com.zeuscodensa.techcupfutbol.controller.api;
 import com.zeuscodensa.techcupfutbol.controller.dto.InvitationRequestDTO;
 import com.zeuscodensa.techcupfutbol.controller.dto.InvitationResponseDTO;
 import com.zeuscodensa.techcupfutbol.controller.dto.UserResponseDTO;
+import com.zeuscodensa.techcupfutbol.core.model.Invitation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -41,8 +42,8 @@ public class JugadorControllerTest {
 
     @Test
     public void testEnviarInvitacion() {
-        InvitationResponseDTO mockRes = new InvitationResponseDTO();
-        when(jugadorService.enviarInvitacion(any(InvitationRequestDTO.class))).thenReturn(mockRes);
+        Invitation mockRes = new Invitation();
+        when(jugadorService.enviarInvitacion(any(Invitation.class))).thenReturn(mockRes);
         ResponseEntity<InvitationResponseDTO> res = controller.enviarInvitacion(new InvitationRequestDTO());
         assertEquals(200, res.getStatusCode().value());
     }

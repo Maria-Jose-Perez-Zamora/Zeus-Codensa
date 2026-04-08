@@ -1,18 +1,15 @@
 package com.zeuscodensa.techcupfutbol.core.service;
 
-import com.zeuscodensa.techcupfutbol.controller.dto.UserResponseDTO;
-import com.zeuscodensa.techcupfutbol.controller.dto.InvitationRequestDTO;
-import com.zeuscodensa.techcupfutbol.controller.dto.InvitationResponseDTO;
 import com.zeuscodensa.techcupfutbol.core.exception.BusinessRuleException;
 import com.zeuscodensa.techcupfutbol.core.exception.ResourceNotFoundException;
+import com.zeuscodensa.techcupfutbol.core.model.Invitation;
+import com.zeuscodensa.techcupfutbol.core.model.Player;
 import com.zeuscodensa.techcupfutbol.core.model.Role;
-import com.zeuscodensa.techcupfutbol.persistence.entity.InvitationEntity;
-import com.zeuscodensa.techcupfutbol.persistence.entity.TeamEntity;
-import com.zeuscodensa.techcupfutbol.persistence.entity.UserEntity;
-import com.zeuscodensa.techcupfutbol.persistence.repository.InvitationRepository;
-import com.zeuscodensa.techcupfutbol.persistence.repository.TeamRepository;
-import com.zeuscodensa.techcupfutbol.persistence.repository.UserRepository;
-import com.zeuscodensa.techcupfutbol.persistence.mapper.EntityToModelMapper;
+import com.zeuscodensa.techcupfutbol.core.model.Team;
+import com.zeuscodensa.techcupfutbol.core.model.User;
+import com.zeuscodensa.techcupfutbol.core.repository.IInvitationRepository;
+import com.zeuscodensa.techcupfutbol.core.repository.ITeamRepository;
+import com.zeuscodensa.techcupfutbol.core.repository.IUserRepository;
 
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
@@ -26,34 +23,33 @@ public class PlayerService {
 
     private static final Logger log = LoggerFactory.getLogger(PlayerService.class);
 
-    private final UserRepository userRepository;
-    private final TeamRepository teamRepository;
-    private final InvitationRepository invitationRepository;
+    private final IUserRepository userRepository;
+    private final ITeamRepository teamRepository;
+    private final IInvitationRepository invitationRepository;
 
-    public PlayerService(UserRepository userRepository, TeamRepository teamRepository, InvitationRepository invitationRepository) {
+    public PlayerService(IUserRepository userRepository, ITeamRepository teamRepository, IInvitationRepository invitationRepository) {
         this.userRepository = userRepository;
         this.teamRepository = teamRepository;
         this.invitationRepository = invitationRepository;
     }
 
-    public List<UserResponseDTO> buscarJugadoresDisponibles(String name, String position) {
+    public List<User> buscarJugadoresDisponibles(String name, String position) {
         log.debug("Procesando la busqueda de players disponibles en BD. Filtros -> Nombre: {}, Posicion: {}", name, position);
         return userRepository.findAll().stream()
                 .filter(u -> u.getRole() == Role.PLAYER)
                 .filter(j -> !estaEnEquipo(j.getEmail()))
                 .filter(j -> name == null || name.isBlank() || j.getName().toLowerCase().contains(name.toLowerCase()))
-                .filter(j -> position == null || position.isBlank() || (j.getPosition() != null && j.getPosition().toLowerCase().contains(position.toLowerCase())))
-                .map(j -> {
-                    UserResponseDTO dto = new UserResponseDTO();
-                    dto.setName(j.getName());
-                    dto.setEmail(j.getEmail());
-                    dto.setRole(j.getRole());
-                    return dto;
+                .filter(j -> {
+                    if (position == null || position.isBlank()) return true;
+                    if (j instanceof Player p) {
+                        return p.getPosition() != null && p.getPosition().toLowerCase().contains(position.toLowerCase());
+                    }
+                    return false;
                 })
                 .collect(Collectors.toList());
     }
 
-    public InvitationResponseDTO enviarInvitacion(InvitationRequestDTO request) {
+    public Invitation enviarInvitacion(Invitation request) {
         if (request.getPlayerEmail() == null || request.getPlayerEmail().isBlank()) {
             throw new BusinessRuleException("Player email is required");
         }
@@ -61,7 +57,7 @@ public class PlayerService {
             throw new BusinessRuleException("Team name is required");
         }
 
-        UserEntity targetPlayer = userRepository.findByEmail(request.getPlayerEmail())
+        User targetPlayer = userRepository.findByEmail(request.getPlayerEmail())
                 .orElseThrow(() -> new ResourceNotFoundException("Player with email " + request.getPlayerEmail() + " does not exist in the system"));
 
         if (targetPlayer.getRole() != Role.PLAYER) {
@@ -81,19 +77,17 @@ public class PlayerService {
             throw new BusinessRuleException("A pending invitation already exists for this player in this team");
         }
 
-        InvitationEntity newInv = new InvitationEntity();
+        Invitation newInv = new Invitation();
         newInv.setId(java.util.UUID.randomUUID().toString());
         newInv.setCaptainEmail(request.getCaptainEmail());
         newInv.setPlayerEmail(request.getPlayerEmail());
         newInv.setTeamName(request.getTeamName());
         newInv.setStatus("PENDING");
 
-        invitationRepository.save(newInv);
-
         log.info("Invitation successfully generated from captain {} to player {} (Team: {})",
                  request.getCaptainEmail(), request.getPlayerEmail(), request.getTeamName());
                  
-        return new InvitationResponseDTO(EntityToModelMapper.toInvitationModel(newInv));
+        return invitationRepository.save(newInv);
     }
 
     private boolean estaEnEquipo(String email) {
@@ -102,7 +96,7 @@ public class PlayerService {
     }
 
     public void processInvitation(String invitationId, String playerEmail, String status) {
-        InvitationEntity inv = invitationRepository.findById(invitationId)
+        Invitation inv = invitationRepository.findById(invitationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Invitación no encontrada"));
 
         if (!inv.getPlayerEmail().equals(playerEmail)) {
@@ -118,10 +112,10 @@ public class PlayerService {
                 throw new BusinessRuleException("El jugador ya pertenece a un equipo.");
             }
 
-            TeamEntity targetTeam = teamRepository.findByTeamName(inv.getTeamName())
+            Team targetTeam = teamRepository.findByTeamName(inv.getTeamName())
                     .orElseThrow(() -> new ResourceNotFoundException("El equipo " + inv.getTeamName() + " ya no existe."));
 
-            UserEntity player = userRepository.findByEmail(playerEmail)
+            User player = userRepository.findByEmail(playerEmail)
                     .orElseThrow(() -> new ResourceNotFoundException("Jugador no encontrado en el sistema"));
 
             if (targetTeam.getPlayers() == null) {
@@ -145,3 +139,4 @@ public class PlayerService {
         }
     }
 }
+

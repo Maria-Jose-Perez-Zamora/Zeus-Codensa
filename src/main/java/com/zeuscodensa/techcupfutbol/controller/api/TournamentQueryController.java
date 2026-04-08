@@ -25,9 +25,9 @@ public class TournamentQueryController {
     private final StandingService tablaService;
     private final BracketService llaveService;
     private final StatisticsService estadisticasService;
-    private final com.zeuscodensa.techcupfutbol.persistence.repository.MatchRepository matchRepository;
+    private final com.zeuscodensa.techcupfutbol.core.repository.IMatchRepository matchRepository;
 
-    public TournamentQueryController(StandingService tablaService, BracketService llaveService, StatisticsService estadisticasService, com.zeuscodensa.techcupfutbol.persistence.repository.MatchRepository matchRepository) {
+    public TournamentQueryController(StandingService tablaService, BracketService llaveService, StatisticsService estadisticasService, com.zeuscodensa.techcupfutbol.core.repository.IMatchRepository matchRepository) {
         this.tablaService = tablaService;
         this.llaveService = llaveService;
         this.estadisticasService = estadisticasService;
@@ -62,7 +62,6 @@ public class TournamentQueryController {
     public ResponseEntity<?> getCalendar(@PathVariable String tournament) {
         log.info("REST request - getCalendar para tournament: {}", tournament);
         List<Map<String, Object>> calendario = matchRepository.findByTournamentName(tournament).stream()
-                .map(com.zeuscodensa.techcupfutbol.persistence.mapper.EntityToModelMapper::toMatchModel)
                 .filter(p -> "SCHEDULED".equals(p.getStatus()))
                 .map(p -> Map.<String, Object>of(
                         "id", p.getId(),
@@ -84,7 +83,6 @@ public class TournamentQueryController {
     public ResponseEntity<?> getResultados(@PathVariable String tournament) {
         log.info("REST request - getResultados Historicos para tournament: {}", tournament);
         List<Map<String, Object>> resultados = matchRepository.findByTournamentName(tournament).stream()
-                .map(com.zeuscodensa.techcupfutbol.persistence.mapper.EntityToModelMapper::toMatchModel)
                 .filter(p -> "FINISHED".equals(p.getStatus()))
                 .map(p -> Map.<String, Object>of(
                         "id", p.getId(),

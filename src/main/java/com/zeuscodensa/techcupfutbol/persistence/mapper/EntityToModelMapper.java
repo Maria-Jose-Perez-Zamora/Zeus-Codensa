@@ -3,7 +3,7 @@ package com.zeuscodensa.techcupfutbol.persistence.mapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zeuscodensa.techcupfutbol.core.model.AdministradorSistema;
+import com.zeuscodensa.techcupfutbol.core.model.SystemAdministrator;
 import com.zeuscodensa.techcupfutbol.core.model.Captain;
 import com.zeuscodensa.techcupfutbol.core.model.Invitation;
 import com.zeuscodensa.techcupfutbol.core.model.Match;
@@ -160,7 +160,7 @@ public final class EntityToModelMapper {
         }
 
         return switch (role) {
-            case ADMINISTRADOR_SISTEMA -> new AdministradorSistema();
+            case ADMINISTRADOR_SISTEMA -> new SystemAdministrator();
             case TOURNAMENT_ORGANIZER -> new TournamentOrganizer();
             case REFEREE -> new Referee();
             case CAPTAIN -> new Captain();

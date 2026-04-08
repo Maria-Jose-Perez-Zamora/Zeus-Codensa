@@ -36,9 +36,9 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
             throws IOException, ServletException {
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
-        LoginResponseDTO loginResponse = googleOAuth2Service.authenticateExternalUser(oAuth2User);
+        String token = googleOAuth2Service.authenticateExternalUser(oAuth2User);
 
-        ResponseCookie authCookie = ResponseCookie.from("AUTH_TOKEN", loginResponse.getToken())
+        ResponseCookie authCookie = ResponseCookie.from("AUTH_TOKEN", token)
                 .httpOnly(true)
                 .secure(request.isSecure())
                 .path("/")
