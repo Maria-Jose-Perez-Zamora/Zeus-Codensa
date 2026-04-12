@@ -4,6 +4,10 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+### SEGURIDAD Y DOCKER (Subtareas Críticas) ###
+.env
+.env.local
+
 ### STS ###
 .apt_generated
 .classpath
@@ -32,7 +36,7 @@ build/
 ### VS Code ###
 .vscode/
 
-### .py ###
+### SCRIPTS Y AUTOMATIZACIÓN ###
 fixer.py
 refactor.py
 translator.py
@@ -43,30 +47,17 @@ rename_fields.py
 rename_remaining_java.py
 fix_recursive.py
 fix_inline.py
-*.py 
-
-## Jira Automation (scripts + dataset con credenciales - NO commitear) ##
+*.py
 jira-automation/
 
-
-### .txt ###
-spanish_java_full_report.txt
-spanish_non_java_full_report.txt
-front_full_report.txt
-
-### Diagrama de Clases ###
+### REPORTES Y DOCUMENTACIÓN ###
+*.txt
 /diagrama_clases.md
-
-
-## Los diff
 *.patch
 
-
-## los md para la presemtacion 
+### ENTREGABLES Y PRESENTACIONES ###
 database_diagram.md
 sprint_presentation.md
 swagger_testing_guide.md
 defensa_proyecto.md
 sonarqube_guide.md
-
-
