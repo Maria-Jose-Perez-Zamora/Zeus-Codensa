@@ -14,15 +14,15 @@ server:
   ssl:
     enabled: true
     key-store: classpath:keystore.p12
-    key-store-password: password
+    key-store-password: ${KEY_STORE_PASSWORD:password}
     key-store-type: PKCS12
     key-alias: tomcat
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/techcuo_db
-    username: techcuo_user
-    password: 1507Ezio.Creed
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/techcuo_db}
+    username: ${DB_USER:techcuo_user}
+    password: ${DB_PASSWORD}
   jpa:
     open-in-view: false
     hibernate:
@@ -36,8 +36,8 @@ spring:
       client:
         registration:
           google:
-            client-id: ${GOOGLE_CLIENT_ID:google-client-id}
-            client-secret: ${GOOGLE_CLIENT_SECRET:google-client-secret}
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
             scope:
               - openid
               - profile
@@ -46,7 +46,7 @@ spring:
 
 security:
   jwt:
-    secret: ${JWT_SECRET:VGhpcyBpcyBhIHZlcnkgc2VjdXJlIGFuZCBsb25nIHNlY3JldCBrZXkgZm9yIEpXVCB2YWxpZGF0aW9u}
+    secret: ${JWT_SECRET}
     ttl-ms: ${JWT_TTL_MS:3600000}
 
 app:
