@@ -1,0 +1,17 @@
+# Excluir binarios y logs
+target/
+*.log
+
+# Excluir configuración local y sensible
+.env
+.idea/
+*.iml
+
+# Excluir Git
+.git/
+.gitignore
+
+# Otros
+node_modules/
+Dockerfile
+docker-compose.yml
