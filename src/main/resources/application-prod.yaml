@@ -1,8 +1,7 @@
 spring:
   datasource:
-    url: ${AZURE_DATABASE_URL}
-    username: ${AZURE_DATABASE_USER}
-    password: ${AZURE_DATABASE_PASSWORD}
-  jpa:
-    hibernate:
-      ddl-auto: none
+    url: ${AZURE_DB_URL}
+    username: ${AZURE_DB_USERNAME}
+    password: ${AZURE_DB_PASSWORD}
+jwt:
+  secret: ${JWT_SECRET_KEY}
