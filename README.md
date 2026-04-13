@@ -35,15 +35,6 @@ El backend sigue una arquitectura basada en capas:
 
 ---
 
-#  Diagrama de Contexto
-
-
-
-
-
-
----
-
 #  Ejecución Local
 
 ## 1) Clonar repositorio
