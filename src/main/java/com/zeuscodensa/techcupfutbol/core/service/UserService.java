@@ -6,6 +6,7 @@ import com.zeuscodensa.techcupfutbol.core.model.User;
 import com.zeuscodensa.techcupfutbol.core.validator.UserValidator;
 import com.zeuscodensa.techcupfutbol.core.repository.IUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder; // NUEVA IMPORTACIÓN
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,11 +20,13 @@ public class UserService {
     private static final Logger log = LoggerFactory.getLogger(UserService.class);
     private final IUserRepository userRepository;
     private final UserValidator userValidator;
+    private final PasswordEncoder passwordEncoder; // NUEVA DEPENDENCIA
 
     @Autowired
-    public UserService(IUserRepository userRepository, UserValidator userValidator) {
+    public UserService(IUserRepository userRepository, UserValidator userValidator, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.userValidator = userValidator;
+        this.passwordEncoder = passwordEncoder; // INYECCIÓN EN CONSTRUCTOR
     }
 
     public User registerUser(User newUser) {
@@ -34,6 +37,12 @@ public class UserService {
             if (userRepository.findByEmail(newUser.getEmail()).isPresent()) {
                 throw new BusinessRuleException("Ya existe un usuario con ese correo");
             }
+
+            //  CIFRADO DE CONTRASEÑA ---
+            // Se transforma el texto plano en un hash seguro antes de guardar
+            String encodedPassword = passwordEncoder.encode(newUser.getPassword());
+            newUser.setPassword(encodedPassword);
+            // ------------------------------------------------
 
             User saved = userRepository.save(newUser);
             log.info("User created successfully in DB: {} with role {}", newUser.getEmail(), newUser.getRole());
