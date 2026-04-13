@@ -174,6 +174,12 @@ http://localhost:8080/swagger-ui.html
 
 ---
 
+## Cobertura jacoco
+
+![alt text](image.png)(cobertura jacoco.png)
+
+---
+
 #  Ambientes Desplegados
 
 ## QA
