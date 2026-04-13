@@ -174,15 +174,13 @@ http://localhost:8080/swagger-ui.html
 
 ---
 
-git
 ## Cobertura jacoco
 
-![img.png](cobertura jacoco.png)
+![alt text](image.png)(cobertura jacoco.png)
 
-## Soporte y Contacto
-=======
+---
+
 #  Ambientes Desplegados
->>>>>>> origin/develop
 
 ## QA
 ```bash
