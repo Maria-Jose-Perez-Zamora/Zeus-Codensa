@@ -13,7 +13,6 @@ Backend RESTful para la gestión integral de torneos de fútbol de **TechCup**, 
 
 #  Tabla de Contenido
 - [Arquitectura](#-arquitectura)
-- [Diagrama de Contexto](#-diagrama-de-contexto)
 - [Ejecución Local](#-ejecución-local)
 - [Ejecución con Docker](#-ejecución-con-docker)
 - [Seguridad](#-seguridad-jwt--oauth2)
