@@ -769,6 +769,10 @@ copies of the Software...
 
 ---
 
+## Cobertura jacoco
+
+![img.png](cobertura jacoco.png)
+
 ## Soporte y Contacto
 
 - **Issues**: Reporta bugs en [GitHub Issues](https://github.com/mariajoseperez01/Zeus-Codensa/issues)
