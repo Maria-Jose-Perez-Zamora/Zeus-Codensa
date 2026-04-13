@@ -10,19 +10,30 @@ logging:
     file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
 
 server:
-  port: 8443
+  port: ${PORT:8443}
   ssl:
     enabled: true
     key-store: classpath:keystore.p12
-    key-store-password: password
+<<<<<<< HEAD
+    key-store-password: ${SSL_KEY_PASSWORD:password}
+=======
+    key-store-password: ${KEY_STORE_PASSWORD:password}
+>>>>>>> 8fc0d1b2a104d56a56aefb0c1c62240954ade101
     key-store-type: PKCS12
     key-alias: tomcat
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/techcuo_db
-    username: techcuo_user
-    password: 1507Ezio.Creed
+<<<<<<< HEAD
+    # Se usan variables de entorno para Azure y valores por defecto para local
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/techcuo_db}
+    username: ${DB_USER:techcuo_user}
+    # La contraseña NUNCA debe estar en texto plano en el código
+=======
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/techcuo_db}
+    username: ${DB_USER:techcuo_user}
+>>>>>>> 8fc0d1b2a104d56a56aefb0c1c62240954ade101
+    password: ${DB_PASSWORD}
   jpa:
     open-in-view: false
     hibernate:
@@ -36,8 +47,8 @@ spring:
       client:
         registration:
           google:
-            client-id: ${GOOGLE_CLIENT_ID:google-client-id}
-            client-secret: ${GOOGLE_CLIENT_SECRET:google-client-secret}
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
             scope:
               - openid
               - profile
@@ -46,7 +57,12 @@ spring:
 
 security:
   jwt:
+<<<<<<< HEAD
+    # Se parametrizan los valores de JWT para mayor seguridad
     secret: ${JWT_SECRET:VGhpcyBpcyBhIHZlcnkgc2VjdXJlIGFuZCBsb25nIHNlY3JldCBrZXkgZm9yIEpXVCB2YWxpZGF0aW9u}
+=======
+    secret: ${JWT_SECRET}
+>>>>>>> 8fc0d1b2a104d56a56aefb0c1c62240954ade101
     ttl-ms: ${JWT_TTL_MS:3600000}
 
 app:
