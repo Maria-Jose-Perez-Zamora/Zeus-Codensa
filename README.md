@@ -50,7 +50,7 @@ Implementa funcionalidades de:
 - Inscripciones y control de participantes
 - Registro y actualización de partidos
 - Alineaciones y control disciplinario
-- Documentación automática de API (Swagger/OpenAPI)
+- Documentación automática de API (Swagger/OpenAPI).
 
 ---
 
