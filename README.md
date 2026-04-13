@@ -4,6 +4,11 @@
 [![Java 21](https://img.shields.io/badge/Java-21-orange)](https://www.oracle.com/java/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Latest-336791)](https://www.postgresql.org/)
 [![JWT Authentication](https://img.shields.io/badge/Security-JWT-blue)](https://jwt.io/)
+[![GitHub Actions](https://img.shields.io/badge/Automation-GitHub_Actions-2088FF?logo=github-actions&logoColor=white)](https://github.com/features/actions)
+[![Docker](https://img.shields.io/badge/Container-Docker-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
+[![Azure](https://img.shields.io/badge/Cloud-Azure-0078D4?logo=microsoftazure&logoColor=white)](https://azure.microsoft.com/)
+[![Azure DevOps](https://img.shields.io/badge/CI/CD-Azure_DevOps-0078D7?logo=azuredevops&logoColor=white)](https://azure.microsoft.com/products/devops)
+[![Maven](https://img.shields.io/badge/Build-Maven-C71A36?logo=apachemaven&logoColor=white)](https://maven.apache.org/)
 
 Backend robusto y escalable para la plataforma de gestión de torneos de fútbol **TechCup**, desarrollado con Spring Boot bajo arquitectura MVC y patrones de diseño profesionales.
 
@@ -19,9 +24,12 @@ Backend robusto y escalable para la plataforma de gestión de torneos de fútbol
 - [Arquitectura del Sistema](#arquitectura-del-sistema)
 - [Patrones de Diseño Implementados](#patrones-de-diseño-implementados)
 - [API Endpoints](#api-endpoints)
+- [Requerimientos Funcionales](#requerimientos-funcionales)
+- [Reglas de Negocio](#reglas-de-negocio)
+- [Campos de Entrada](#campos-de-entrada)
+- [Excepciones y Manejo de Errores](#excepciones-y-manejo-de-errores)
 - [Diagramas UML](#diagramas-uml)
 - [Diagramas de Secuencia](#diagramas-de-secuencia)
-- [Requerimientos Funcionales](#requerimientos-funcionales)
 - [Base de Datos](#base-de-datos)
 - [Seguridad](#seguridad)
 - [Testing](#testing)
@@ -32,7 +40,7 @@ Backend robusto y escalable para la plataforma de gestión de torneos de fútbol
 
 ## Descripción General
 
-**TechCup Football Backend** es una API REST que gestiona la lógica de negocio completa para la organización y ejecución de torneos de fútbol. Este repositorio contiene la lógica de negocio y la infraestructura del lado del servidor para la plataforma TechCup. En Sprint #1, se ha establecido la arquitectura base, los modelos de dominio y la API funcional para la gestión de usuarios y equipos.
+**TechCup Football Backend** es una API REST que gestiona la lógica de negocio completa para la organización y ejecución de torneos de fútbol. Este repositorio contiene la lógica de negocio y la infraestructura del lado del servidor para la plataforma TechCup.
 
 Implementa funcionalidades de:
 
@@ -55,14 +63,13 @@ Implementa funcionalidades de:
 - Autenticación segura con JWT
 - Perfiles de usuario (Jugador, Organizador, Admin)
 - Control de duplicados por correo electrónico
-- Atributos: Nombre, correo, contraseña (hash simulado), posición, número de dorsal y foto
+- Validación de dominios aceptados
 
 #### Gestión de Equipos
 - Creación de equipos con información (nombre, escudo, colores)
-- Asociación de jugadores a equipos
+- Asociación de jugadores a equipos mediante invitaciones
 - Consulta y listado de equipos
-- Un equipo puede contener múltiples jugadores asociados
-- Atributos: Nombre del equipo, escudo, colores representativos y lista de jugadores
+- Códigos únicos para identificación de equipos
 
 #### Gestión de Torneos
 - Creación de torneos con estado BORRADOR
@@ -71,7 +78,7 @@ Implementa funcionalidades de:
 - Consulta de torneos activos e históricos
 
 #### Inscripciones
-- Registro de inscripción de equipos
+- Registro de inscripción de equipos con comprobante de pago
 - Seguimiento de pagos/comprobantes
 - Cambio de estado de inscripción (pendiente → aprobada/rechazada)
 - Auditoría completa del proceso
@@ -356,59 +363,359 @@ El sistema ha sido desarrollado aplicando patrones de diseño profesionales que 
 
 ### Autenticación (Auth)
 
-| Método | Endpoint | Descripción | Requiere Autenticación |
-|--------|----------|-------------|----------------------|
-| `POST` | `/auth/login` | Inicio de sesión | No |
-| `POST` | `/auth/register` | Registro de nuevo usuario | No |
+|                                                                                 | Endpoint | Descripción |
+|--------|----------|-------------|
+|  | `/auth/login` | Inicio de sesión |
+|  | `/auth/register` | Registro de nuevo usuario |
 
 ### Usuarios (Users)
 
-| Método | Endpoint | Descripción | Roles |
-|--------|----------|-------------|-------|
-| `GET` | `/users` | Listar todos los usuarios | ADMIN |
-| `GET` | `/users/{id}` | Obtener usuario por ID | ADMIN, USER |
-| `POST` | `/users` | Crear usuario | ADMIN |
-| `PUT` | `/users/{id}` | Actualizar usuario | ADMIN, OWNER |
+|  | Endpoint | Descripción |
+|--------|----------|-------------|
+|  | `/users` | Listar todos los usuarios |
+|  | `/users/{userId}` | Obtener usuario por código |
+|  | `/users` | Crear usuario |
+|  | `/users/{userId}` | Actualizar usuario |
 
 ### Equipos (Teams)
 
-| Método | Endpoint | Descripción | Roles |
-|--------|----------|-------------|-------|
-| `GET` | `/teams` | Listar todos los equipos | PUBLIC |
-| `GET` | `/teams/{id}` | Obtener equipo por ID | PUBLIC |
-| `POST` | `/teams` | Crear equipo | ORGANIZER, ADMIN |
-| `PUT` | `/teams/{id}` | Actualizar equipo | ORGANIZER, ADMIN |
+|  | Endpoint | Descripción |
+|--------|----------|-------------|
+| | `/teams` | Listar todos los equipos |
+|  | `/teams/{teamCode}` | Obtener equipo por código |
+|  | `/teams` | Crear equipo |
+|  | `/teams/{teamCode}` | Actualizar equipo |
 
 ### Torneos (Tournaments)
 
-| Método | Endpoint | Descripción | Roles |
-|--------|----------|-------------|-------|
-| `GET` | `/tournaments` | Listar todos los torneos | PUBLIC |
-| `POST` | `/tournaments` | Crear torneo | ORGANIZER, ADMIN |
-| `PUT` | `/tournaments/{id}/config` | Configurar torneo | ORGANIZER, ADMIN |
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| | `/tournaments` | Listar todos los torneos |
+|  | `/tournaments/{tournamentCode}` | Obtener torneo por código |
+|  | `/tournaments` | Crear torneo |
+|  | `/tournaments/{tournamentCode}/config` | Configurar torneo |
 
 ### Inscripciones (Inscriptions)
 
-| Método | Endpoint | Descripción | Roles |
-|--------|----------|-------------|-------|
-| `POST` | `/inscriptions` | Registrar inscripción | ORGANIZER |
-| `GET` | `/inscriptions` | Listar inscripciones | ORGANIZER, ADMIN |
-| `PUT` | `/inscriptions/{id}/status` | Cambiar estado | ORGANIZER, ADMIN |
+|  | Endpoint | Descripción |
+|--------|----------|-------------|
+|  | `/inscriptions` | Registrar inscripción |
+|  | `/inscriptions` | Listar inscripciones |
+|  | `/inscriptions/{inscriptionId}/status` | Cambiar estado |
 
 ### Partidos (Matches)
 
-| Método | Endpoint | Descripción | Roles |
-|--------|----------|-------------|-------|
-| `POST` | `/matches` | Crear partido | ORGANIZER, ADMIN |
-| `GET` | `/matches/{id}` | Obtener partido | PUBLIC |
-| `PUT` | `/matches/{id}/score` | Actualizar marcador | ORGANIZER, ADMIN |
-| `POST` | `/matches/{id}/lineup` | Registrar alineación | ORGANIZER, ADMIN |
-| `POST` | `/matches/{id}/cards` | Registrar tarjetas | ORGANIZER, ADMIN |
+|  | Endpoint | Descripción |
+|--------|----------|-------------|
+|  | `/matches` | Crear partido |
+|  | `/matches/{matchCode}` | Obtener partido |
+|  | `/matches/{matchCode}/score` | Actualizar marcador |
+|  | `/matches/{matchCode}/lineup` | Registrar alineación |
+|  | `/matches/{matchCode}/cards` | Registrar tarjetas |
 
 ### Documentación Interactiva
 
 - **Swagger UI**: `http://localhost:8080/api/v1/swagger-ui.html`
 - **OpenAPI JSON**: `http://localhost:8080/api/v1/v3/api-docs`
+
+---
+
+## Requerimientos Funcionales
+
+### RF1: Registro de Usuario
+
+El sistema permite que nuevos usuarios se registren en la plataforma proporcionando su información personal y de contacto. El registro valida que el correo sea único dentro del sistema y que cumple con los dominios aceptados. El usuario puede seleccionar su rol durante el registro.
+
+**Flujo Principal:**
+1. El usuario accede al formulario de registro
+2. Completa los campos requeridos: `fullName`, `emailAddress`, `password`, `userRole`
+3. El sistema valida que el correo no exista previamente
+4. Se crea el usuario y se genera un token de autenticación
+
+**Flujos Alternos:**
+
+**E1 - Correo duplicado**
+- Si el correo ya existe en el sistema, se rechaza el registro
+
+**E2 - Dominio no permitido**
+- Si el dominio del correo no está en la lista de dominios aceptados, se rechaza la solicitud
+
+**E3 - Formato inválido**
+- Si algún campo requerido está vacío o tiene un formato incorrecto, se valida antes de procesar
+
+---
+
+### RF2: Inicio de Sesión
+
+El usuario registrado puede iniciar sesión en la plataforma usando sus credenciales de correo y contraseña. El sistema autentica al usuario y proporciona un token de sesión que permite acceder a todas las funcionalidades según su rol.
+
+**Flujo Principal:**
+1. El usuario accede a la página de inicio de sesión
+2. Ingresa `emailAddress` y `password`
+3. El sistema verifica las credenciales contra los registros existentes
+4. Si son válidas, se genera un token y se otorga acceso a la plataforma
+
+**Flujos Alternos:**
+
+**E1 - Credenciales inválidas**
+- Si el correo no existe o la contraseña es incorrecta, se rechaza el inicio de sesión
+
+**E2 - Token expirado**
+- Si el token anterior ha expirado, se requiere un nuevo inicio de sesión
+
+---
+
+### RF3: Creación de Torneo
+
+Un organizador puede crear un nuevo torneo en la plataforma. El sistema proporciona un código único para identificar el torneo. El torneo se crea en estado BORRADOR para permitir ajustes antes de abrirlo a inscripciones.
+
+**Flujo Principal:**
+1. El organizador accede al módulo de creación de torneos
+2. Completa: `tournamentName`, `description`, `regulationsText`
+3. El sistema genera un `tournamentCode` único
+4. El torneo se crea en estado BORRADOR
+
+**Flujos Alternos:**
+
+**E1 - Nombre duplicado**
+- Si ya existe un torneo con el mismo nombre, se rechaza y se solicita uno diferente
+
+**E2 - Datos incompletos**
+- Si falta información requerida, se valida antes de crear el torneo
+
+---
+
+### RF4: Creación de Equipo
+
+Un usuario puede crear un equipo e invitar a jugadores a unirse. El equipo recibe un código único (`teamCode`) y puede ser configurado con colores y escudo. Los jugadores deben ser invitados por su correo electrónico.
+
+**Flujo Principal:**
+1. El usuario accede a crear equipo
+2. Completa: `teamName`, `shieldUrl`, `primaryColor`, `secondaryColor`
+3. Invita jugadores por correo electrónico
+4. Se genera un `teamCode` único y se crea el equipo
+
+**Flujos Alternos:**
+
+**E1 - Jugador no existe**
+- Si el correo del jugador no está registrado, se genera una invitación
+
+**E2 - Jugador ya en equipo**
+- Si el jugador ya pertenece a otro equipo en el mismo torneo, se rechaza
+
+**E3 - Correo con dominio no permitido**
+- Si el jugador externo (Google) no cumple restricciones, se rechaza
+
+---
+
+### RF5: Inscripción a Torneo
+
+Un equipo puede inscribirse a un torneo disponible. El organizador revisa la inscripción y determina si es aprobada o rechazada. Se requiere un comprobante de pago para completar la inscripción.
+
+**Flujo Principal:**
+1. El capitán del equipo selecciona un torneo y solicita inscripción
+2. Proporciona: `paymentProofUrl`, `teamCode`, `tournamentCode`
+3. La inscripción se crea en estado PENDIENTE
+4. El organizador revisa y aprueba o rechaza
+
+**Flujos Alternos:**
+
+**E1 - Torneo no disponible**
+- Si el torneo ya cerró inscripciones, se rechaza la solicitud
+
+**E2 - Equipo duplicado**
+- Si el equipo ya está inscrito en este torneo, se rechaza
+
+**E3 - Comprobante inválido**
+- Si el comprobante de pago no es válido o está vencido, se rechaza
+
+---
+
+### RF6: Creación de Partido
+
+El organizador crea partidos entre equipos dentro de un torneo. Cada partido incluye fecha, hora, ubicación y equipos participantes. El sistema genera un código único para cada partido.
+
+**Flujo Principal:**
+1. El organizador selecciona un torneo
+2. Completa: `homeTeamCode`, `awayTeamCode`, `matchDate`, `matchTime`, `venue`
+3. El sistema crea el partido en estado PROGRAMADO
+4. Se genera un `matchCode` único
+
+**Flujos Alternos:**
+
+**E1 - Equipos no inscritos**
+- Si alguno de los equipos no está inscrito en el torneo, se rechaza
+
+**E2 - Conflicto de horario**
+- Si algún equipo ya tiene un partido en la misma hora, se rechaza
+
+**E3 - Fecha inválida**
+- Si la fecha del partido es anterior a la actual, se rechaza
+
+---
+
+### RF7: Actualización de Resultado
+
+Tras finalizar un partido, el organizador registra el resultado final. El sistema calcula automáticamente puntos y actualiza la tabla de posiciones del torneo.
+
+**Flujo Principal:**
+1. El organizador accede al partido jugado
+2. Ingresa: `homeTeamGoals`, `awayTeamGoals`
+3. El sistema valida los goles y calcula el resultado
+4. Se actualiza la tabla de posiciones automáticamente
+
+**Flujos Alternos:**
+
+**E1 - Goles negativos**
+- Si se ingresa un número negativo de goles, se rechaza
+
+**E2 - Partido ya cerrado**
+- Si el partido ya fue finalizado, no se permite editar el resultado
+
+---
+
+## Reglas de Negocio
+
+### RN1: Dominios de Correo Aceptados
+
+El sistema acepta cuentas de correo corporativas y educativas. Los dominios permitidos incluyen:
+
+- Instituciones educativas locales: `*.edu.co`
+- Proveedores corporativos: `*.empresa.com.co`
+- Plataformas estándar: `gmail.com`, `outlook.com`
+
+Los administradores pueden agregar dominios a la lista de blancos según necesidad.
+
+### RN2: Restricciones para Usuarios Google
+
+Los usuarios que se registren con cuentas de Google (`google.com`) deben cumplir validaciones adicionales:
+
+- El nombre debe completarse correctamente en su perfil
+- Debe aceptar explícitamente los términos de uso
+- No pueden crear torneos directamente; solo pueden inscribir equipos bajo supervisión de un organizador
+
+### RN3: Códigos Únicos
+
+Todos los identificadores principales (`tournamentCode`, `teamCode`, `matchCode`) deben ser únicos a nivel de sistema. Se generan automáticamente usando algoritmos que producen códigos alfanuméricos de 8 caracteres, legibles y no reutilizables.
+
+### RN4: Estados del Torneo
+
+Transiciones permitidas:
+
+- `BORRADOR` → `ACTIVO` (cuando está listo para inscripciones)
+- `ACTIVO` → `EN CURSO` (cuando inician los partidos)
+- `EN CURSO` → `FINALIZADO` (cuando se juegan todos los partidos)
+
+### RN5: Puntuación en Partidos
+
+Criterios de puntos:
+
+- **Victoria**: 3 puntos
+- **Empate**: 1 punto
+- **Derrota**: 0 puntos
+
+### RN6: Validación de Alineaciones
+
+Cada equipo debe registrar una alineación antes de que el partido inicie. La alineación debe incluir un mínimo de 7 jugadores y un máximo de 11. Si no se registra alineación 15 minutos antes del partido, se considera abandono.
+
+---
+
+## Campos de Entrada
+
+Todos los campos de datos de entrada están especificados en inglés siguiendo estándares de desarrollo.
+
+### Registro de Usuario
+
+| Campo | Tipo | Obligatorio |
+|-------|------|-------------|
+| `fullName` | Text | Sí |
+| `emailAddress` | Email | Sí |
+| `password` | Password | Sí |
+| `userRole` | Enum | Sí |
+
+### Creación de Torneo
+
+| Campo | Tipo | Obligatorio |
+|-------|------|-------------|
+| `tournamentName` | Text | Sí |
+| `description` | Text | No |
+| `regulationsText` | Text | Sí |
+
+### Creación de Equipo
+
+| Campo | Tipo | Obligatorio |
+|-------|------|-------------|
+| `teamName` | Text | Sí |
+| `shieldUrl` | URL | No |
+| `primaryColor` | Hex Color | Sí |
+| `secondaryColor` | Hex Color | No |
+| `playerEmails` | List[Email] | Sí |
+
+### Inscripción a Torneo
+
+| Campo | Tipo | Obligatorio |
+|-------|------|-------------|
+| `teamCode` | Code | Sí |
+| `tournamentCode` | Code | Sí |
+| `paymentProofUrl` | URL | Sí |
+
+### Creación de Partido
+
+| Campo | Tipo | Obligatorio |
+|-------|------|-------------|
+| `homeTeamCode` | Code | Sí |
+| `awayTeamCode` | Code | Sí |
+| `matchDate` | Date | Sí |
+| `matchTime` | Time | Sí |
+| `venue` | Text | Sí |
+
+### Actualización de Resultado
+
+| Campo | Tipo | Obligatorio |
+|-------|------|-------------|
+| `homeTeamGoals` | Integer | Sí |
+| `awayTeamGoals` | Integer | Sí |
+
+---
+
+## Excepciones y Manejo de Errores
+
+### Clasificación de Excepciones
+
+#### Nivel E1 - Críticas (HTTP 400/401)
+
+Errores de validación de entrada, credenciales inválidas o recursos no encontrados. El usuario debe corregir su solicitud.
+
+#### Nivel E2 - Restricciones de Negocio (HTTP 409)
+
+Conflictos con las reglas de negocio o el estado actual de los datos. La solicitud es válida sintácticamente pero viola una regla del dominio.
+
+#### Nivel E3 - Errores del Sistema (HTTP 500)
+
+Fallos inesperados en el servidor, base de datos o servicios externos. El usuario no puede resolver estos errores directamente.
+
+### Tabla de Excepciones por Funcionalidad
+
+| Funcionalidad | Condición de Error | Nivel | HTTP |
+|---|---|---|---|
+| Registro | Correo ya existe | E1 | 400 |
+| Registro | Dominio no permitido | E2 | 409 |
+| Registro | Campo requerido vacío | E1 | 400 |
+| Login | Credenciales inválidas | E1 | 401 |
+| Login | Token expirado | E2 | 401 |
+| Crear Torneo | Nombre duplicado | E2 | 409 |
+| Crear Torneo | Datos incompletos | E1 | 400 |
+| Crear Equipo | Jugador no existe | E1 | 404 |
+| Crear Equipo | Jugador ya en equipo | E2 | 409 |
+| Crear Equipo | Usuario Google restringido | E2 | 403 |
+| Inscribir | Torneo cerrado | E2 | 409 |
+| Inscribir | Equipo duplicado | E2 | 409 |
+| Inscribir | Comprobante inválido | E1 | 400 |
+| Crear Partido | Equipos no inscritos | E1 | 404 |
+| Crear Partido | Conflicto de horario | E2 | 409 |
+| Crear Partido | Fecha inválida | E1 | 400 |
+| Actualizar Resultado | Goles negativos | E1 | 400 |
+| Actualizar Resultado | Partido ya cerrado | E2 | 409 |
 
 ---
 
@@ -420,138 +727,75 @@ El diagrama de clases muestra la estructura completa del dominio, incluyendo tod
 
 ![diagrama de clases1.1.png](docs%2Fimages%2Fdiagrama%20de%20clases1.1.png)
 
+### Diagrama de Clases Base de Datos
+
+![alt text](<DIAGRAMA DE CLASES BASE DE DATOS.png>)
+
 ---
 
 ## Diagramas de Secuencia
 
-Los siguientes diagramas documentan el flujo de interacción entre componentes del sistema para cada funcionalidad implementada en Sprint #1.
+Los siguientes diagramas documentan el flujo de interacción entre componentes del sistema para cada funcionalidad implementada.
 
 ### 1. Inicio de Sesión (Login)
-
-Permite que un usuario ingrese al sistema usando correo y contraseña. El servicio verifica que las credenciales existan y coincidan con un usuario registrado; si son correctas, devuelve un token junto con su rol para controlar permisos en las demás operaciones.
-
----
+![alt text](<docs/images/Diagrama de secuencia 1.png>)
+Permite que un usuario ingrese al sistema usando correo y contraseña. El servicio verifica que las credenciales existan y coincidan; si son correctas, devuelve un token junto con su rol.
 
 ### 2. Registro de Usuario
-
-Registra nuevos usuarios del sistema (por ejemplo, organizadores o administradores) validando campos obligatorios y reglas del dominio. Si la información es válida, el usuario se transforma a entidad, se almacena en memoria y se retorna su representación de respuesta.
-
-
----
+![alt text](<docs/images/Diagrama de secuencia 2.png>)
+Registra nuevos usuarios del sistema validando campos obligatorios y reglas del dominio. Si la información es válida, se almacena el usuario y se retorna su representación de respuesta.
 
 ### 3. Consulta de Usuarios
-
-Obtiene el listado completo de usuarios creados en la aplicación para tareas de administración y seguimiento. La consulta toma los datos almacenados, los transforma a DTO y los entrega en un formato seguro para el cliente.
-
-
----
+![alt text](<docs/images/Diagrama de secuencia 3.png>)
+Obtiene el listado completo de usuarios creados en la aplicación. La consulta toma los datos almacenados y los transforma a DTO.
 
 ### 4. Creación de Equipo
-
-Permite crear un equipo del torneo con su información principal (nombre, escudo y colores) y asociar jugadores existentes usando sus correos. Durante el proceso se valida la solicitud y se construye el equipo con su plantilla inicial.
-
-
----
+![alt text](<docs/images/Diagrama de secuencia 4.png>)
+Permite crear un equipo con su información principal y asociar jugadores existentes usando sus correos. Se valida la solicitud y se construye el equipo.
 
 ### 5. Consulta de Equipos
-
-Retorna todos los equipos registrados para facilitar la visualización de participantes del torneo. La respuesta incluye los datos relevantes del equipo y su estado actual dentro de la información disponible en memoria.
-
-
----
+![alt text](<docs/images/Diagrama de secuencia 5.png>)
+Retorna todos los equipos registrados. La respuesta incluye los datos relevantes del equipo y su estado actual.
 
 ### 6. Creación de Torneo
-
-Inicia un nuevo torneo con su configuración base y lo deja en estado BORRADOR para que pueda ser completado posteriormente. Esta funcionalidad centraliza la creación inicial de la competencia antes de abrir inscripciones o programar partidos.
-
-[Diagrama de Secuencia 6 - Insertar aquí]
-
----
+![alt text](<docs/images/Diagrama de secuencia 6.png>)
+Inicia un nuevo torneo con su configuración base en estado BORRADOR para permitir ajustes posteriores.
 
 ### 7. Configuración de Torneo
-
-Actualiza la información operativa de un torneo existente, como reglamento, fechas, horarios, canchas y sanciones. Solo permite cambios cuando el torneo se encuentra en estados válidos, evitando modificaciones fuera del flujo definido por negocio.
-
-
----
+![alt text](<docs/images/Diagrama de secuencia 7.png>)
+Actualiza la información operativa de un torneo existente. Solo permite cambios cuando el torneo está en estados válidos.
 
 ### 8. Consulta de Torneos
-
-Consulta todos los torneos creados en el sistema para mostrar su información general y estado. Sirve como base para paneles de administración, seguimiento de competencia y selección de torneo en otros procesos.
-
-
----
+![alt text](<docs/images/Diagrama de secuencia 8.png>)
+Consulta todos los torneos creados en el sistema para mostrar su información general y estado.
 
 ### 9. Registro de Inscripción
-
-Registra la inscripción de un equipo al torneo incluyendo datos del pago o comprobante. El sistema valida la solicitud, crea el registro de inscripción y deja trazabilidad del proceso para su posterior revisión por el organizador.
-
-
----
+![alt text](<docs/images/Diagrama de secuencia 9.png>)
+Registra la inscripción de un equipo al torneo incluyendo datos del pago. El sistema valida y deja trazabilidad del proceso.
 
 ### 10. Actualización de Estado de Inscripción
-
-Permite que el organizador cambie el estado de una inscripción (por ejemplo, en revisión, aprobada o rechazada) de acuerdo con el flujo permitido. También valida que el nuevo estado sea correcto y que la inscripción exista antes de aplicar el cambio.
-
-
----
+![alt text](<docs/images/Diagrama de secuencia 10.png>)
+Permite cambiar el estado de una inscripción de acuerdo con el flujo permitido.
 
 ### 11. Consulta de Inscripciones
-
-Muestra todas las inscripciones registradas junto con su estado actual para facilitar control administrativo y toma de decisiones. Esta vista permite identificar rápidamente qué equipos están pendientes, aprobados o rechazados.
-
-
----
+![alt text](<docs/images/Diagrama de secuencia 11.png>)
+Muestra todas las inscripciones registradas junto con su estado actual.
 
 ### 12. Registro de Partido
-
-Crea un partido entre dos equipos dentro del contexto de un torneo, guardando la información inicial necesaria para su gestión. Incluye validaciones de consistencia para asegurar que el encuentro quede correctamente preparado para etapas posteriores.
-
-
----
+![alt text](<docs/images/Diagrama de secuencia 12.png>)
+Crea un partido entre dos equipos dentro de un torneo con información inicial necesaria.
 
 ### 13. Actualización de Marcador
-
-Actualiza los goles o puntos de un partido y consolida el resultado final del encuentro. Además, valida que los marcadores sean válidos y cambia el estado del partido a FINALIZADO cuando corresponde.
-
-
----
+![alt text](<docs/images/Diagrama de secuencia 13.png>)
+Actualiza los goles de un partido y consolida el resultado final.
 
 ### 14. Registro de Alineación
-
-Registra los jugadores que participarán en un partido para un equipo específico (local o visitante). La funcionalidad valida que el equipo pertenezca al encuentro y que la lista de jugadores cumpla condiciones mínimas antes de guardarla.
-
-
----
+![alt text](<docs/images/Diagrama de secuencia 14.png>)
+Registra los jugadores que participarán en un partido para cada equipo.
 
 ### 15. Registro de Tarjetas
-
-Permite registrar eventos disciplinarios de un partido, como tarjetas amarillas o rojas asociadas a un jugador. Este control aporta trazabilidad deportiva y soporta posteriores decisiones arbitrales o sancionatorias.
-
-
----
-
-## Requerimientos Funcionales
-
-### RF1: Registro y Perfil de Jugador
-
-Se implementó la entidad User que permite capturar la información técnica de los jugadores.
-
-- **Atributos**: Nombre, correo, contraseña (hash simulado), posición, número de dorsal y foto
-- **Validación de Negocio**: El UserService garantiza que no existan registros con correos duplicados antes de añadirlos a la memoria
-
-### RF2: Gestión de Equipos
-
-Se implementó la entidad Team para la organización del torneo.
-
-- **Atributos**: Nombre del equipo, escudo, colores representativos y lista de jugadores asociados
-- **Relación**: Un equipo puede contener múltiples objetos de tipo User (Jugadores)
-
-### Validaciones Implementadas
-
-- Inyección de Dependencias (DI): Implementada para desacoplar los controladores de la lógica de negocio
-- POJOs / Entities: Clases planas para la representación fiel de los requerimientos del negocio
-- Validación de entrada en todos los endpoints
+![alt text](<docs/images/Diagrama de secuencia 15.png>)
+Permite registrar eventos disciplinarios de un partido.
 
 ---
 
@@ -567,8 +811,8 @@ Se implementó la entidad Team para la organización del torneo.
 │ email (UQ)   │   N:M   │ name         │
 │ password     ├────────►│ shield       │
 │ name         │         │ colors       │
-│ role         │         └──────────────┘
-│ position     │
+│ role         │         │ teamCode     │
+│ position     │         └──────────────┘
 │ jersey_num   │
 │ photo_url    │
 └──────────────┘
@@ -581,7 +825,7 @@ Se implementó la entidad Team para la organización del torneo.
 │ description  ├────────►│ team_id      │
 │ status       │         │ proof_url    │
 │ rules        │         │ status       │
-│ start_date   │         │ created_at   │
+│ tourneyCode  │         │ created_at   │
 └──────────────┘         └──────────────┘
 
 ┌──────────────┐         ┌──────────────┐
@@ -594,6 +838,7 @@ Se implementó la entidad Team para la organización del torneo.
 │ home_score   │         │ created_at   │
 │ away_score   │         └──────────────┘
 │ status       │
+│ matchCode    │
 └──────────────┘
 
 ┌──────────────┐
@@ -609,12 +854,6 @@ Se implementó la entidad Team para la organización del torneo.
 
 ---
 
-
-## DIAGRAMA DE CLASES DE LA BASE DE DATOS
-
-![alt text](<DIAGRAMA DE CLASES BASE DE DATOS.png>)
-
-
 ## Seguridad
 
 ### Autenticación con JWT
@@ -627,7 +866,7 @@ El sistema implementa autenticación basada en JWT (JSON Web Tokens) con expirac
 1. Cliente envía credenciales
    POST /auth/login
    {
-     "email": "user@example.com",
+     "emailAddress": "user@example.com",
      "password": "password123"
    }
 
@@ -635,7 +874,7 @@ El sistema implementa autenticación basada en JWT (JSON Web Tokens) con expirac
    {
      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
      "expiresIn": 86400,
-     "role": "PLAYER"
+     "userRole": "PLAYER"
    }
 
 3. Cliente incluye JWT en headers
@@ -659,7 +898,9 @@ El sistema implementa autenticación basada en JWT (JSON Web Tokens) con expirac
 - Validación de entrada en todos los endpoints
 - CORS configurado restrictivamente
 - SQL Injection prevenido con JPA/Parameterized Queries
-- Contraseña y credenciales nunca se exponen en respuestas
+- Validación de dominios de correo permitidos
+- Restricciones adicionales para usuarios Google
+- Credenciales nunca se exponen en respuestas
 
 ---
 
@@ -747,7 +988,7 @@ Descargar especificación OpenAPI: `http://localhost:8080/api/v1/v3/api-docs`
 ### Archivos de Prueba
 
 - **Archivo**: `pruebas.http`
-- **Uso**: Ejecutar directamente desde IntelliJ IDEA para validar el flujo End-to-End (Controlador → Servicio → Memoria)
+- **Uso**: Ejecutar directamente desde IntelliJ IDEA para validar el flujo End-to-End (Controlador → Servicio → Base de Datos)
 
 ---
 
@@ -781,4 +1022,5 @@ copies of the Software...
 
 Desarrollado con dedicación por el equipo **Zeus-Codensa** para **TechCup Football Platform**.
 
-**Status**: En Desarrollo (Sprint #3)
+**Status**: En Desarrollo (Sprint #4)
+
