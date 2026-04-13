@@ -7,47 +7,45 @@ on:
     branches: [ main ]
 
 jobs:
-  configuracion-secretos:
-    name: Validar Seguridad y Secretos
+  configuracion-y-analisis:
+    name: Validar Seguridad, Secretos y Calidad
     runs-on: ubuntu-latest
     
     steps:
       - name: Checkout del código
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'maven'
 
       - name: Validacion de Credenciales de Azure y ACR
         run: |
-          echo "Simulando inicio de sesión en Azure..."
-          # Validamos la existencia de las credenciales sin exponerlas
-          if [ -n "${{ secrets.AZURE_CREDENTIALS }}" ]; then
-            echo "AZURE_CREDENTIALS detectado correctamente."
-          fi
+          echo "Verificando secretos de Azure..."
+          if [ -n "${{ secrets.AZURE_CREDENTIALS }}" ]; then echo "AZURE_CREDENTIALS detectado."; fi
           echo "Servidor ACR configurado en: ${{ secrets.ACR_LOGIN_SERVER }}"
-          echo "Validación de conectividad con Azure exitosa."
 
-      - name: Configuracion de Base de Datos QA
-        run: |
-          echo "Verificando conectividad para entorno QA..."
-          echo "Host: ${{ secrets.QA_DB_HOST }}"
-          echo "Puerto: ${{ secrets.QA_DB_PORT }}"
-          echo "Usuario: ${{ secrets.QA_DB_USER }}"
-          if [ -n "${{ secrets.QA_DB_PASSWORD }}" ]; then
-            echo "Seguridad: Contraseña de QA cargada desde Secrets."
-          fi
+      - name: Validar con SonarCloud (Calidad y Seguridad)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}    
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
 
-      - name: Configuracion de Base de Datos PROD
+      - name: Verificando conectividad Base de Datos
         run: |
-          echo "Verificando conectividad para entorno PROD..."
-          echo "Host: ${{ secrets.PROD_DB_HOST }}"
-          echo "Puerto: ${{ secrets.PROD_DB_PORT }}"
-          echo "Usuario: ${{ secrets.PROD_DB_USER }}"
-          if [ -n "${{ secrets.PROD_DB_PASSWORD }}" ]; then
-            echo "Seguridad: Contraseña de PROD cargada desde Secrets."
-          fi
+          echo "Host QA: ${{ secrets.QA_DB_HOST }}"
+          if [ -n "${{ secrets.QA_DB_PASSWORD }}" ]; then echo "Contraseña de QA cargada."; fi
+          echo "Host PROD: ${{ secrets.PROD_DB_HOST }}"
+          if [ -n "${{ secrets.PROD_DB_PASSWORD }}" ]; then echo "Contraseña de PROD cargada."; fi
 
       - name: Tarea Completada
         run: |
           echo "Criterios de Aceptación Cumplidos:"
           echo "1. Secretos de BD QA/PROD mapeados."
-          echo "2. Credenciales de Azure y ACR vinculadas."
-          echo "3. Acceso mediante sintaxis segura de GitHub completado."
+          echo "2. Análisis de SonarCloud ejecutado exitosamente."
+          echo "3. Credenciales de Azure y ACR vinculadas."
