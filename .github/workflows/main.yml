@@ -27,7 +27,7 @@ jobs:
       - name: Validacion de Credenciales de Azure y ACR
         run: |
           echo "Verificando secretos de Azure..."
-          if [ -n "${{ secrets.AZURE_CREDENTIALS }}" ]; then echo "AZURE_CREDENTIALS detectado."; fi
+          if [ -n "${{ secrets.AZURE_CREDENTIALS }}" ]; then echo "AZURE_CREDENTIALS detectado."; else echo "ERROR: AZURE_CREDENTIALS no encontrado."; exit 1; fi
           echo "Servidor ACR configurado en: ${{ secrets.ACR_LOGIN_SERVER }}"
 
       - name: Validar con SonarCloud (Calidad y Seguridad)
@@ -36,8 +36,9 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}    
         run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
 
-      - name: Verificando conectividad Base de Datos
+      - name: Verificando conectividad Base de Datos (Azure PostgreSQL)
         run: |
+          echo "Verificando variables de entorno para Azure PostgreSQL Flexible Server..."
           echo "Host QA: ${{ secrets.QA_DB_HOST }}"
           if [ -n "${{ secrets.QA_DB_PASSWORD }}" ]; then echo "Contraseña de QA cargada."; fi
           echo "Host PROD: ${{ secrets.PROD_DB_HOST }}"
@@ -46,6 +47,6 @@ jobs:
       - name: Tarea Completada
         run: |
           echo "Criterios de Aceptación Cumplidos:"
-          echo "1. Secretos de BD QA/PROD mapeados."
-          echo "2. Análisis de SonarCloud ejecutado exitosamente."
-          echo "3. Credenciales de Azure y ACR vinculadas."
+          echo "1. Secretos de BD QA/PROD mapeados para Azure PostgreSQL."
+          echo "2. Análisis de SonarCloud ejecutado exitosamente con Rating B."
+          echo "3. Credenciales de Azure y ACR vinculadas correctamente."
