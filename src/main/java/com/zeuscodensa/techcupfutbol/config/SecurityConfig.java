@@ -20,12 +20,15 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.zeuscodensa.techcupfutbol.security.JwtAuthFilter;
 import com.zeuscodensa.techcupfutbol.security.OAuth2AuthenticationSuccessHandler;
+
 import jakarta.servlet.http.HttpServletResponse;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
+
+    private static final String TOURNAMENT_ORGANIZER = "TOURNAMENT_ORGANIZER";
 
     private final JwtAuthFilter jwtAuthFilter;
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
@@ -69,12 +72,12 @@ public class SecurityConfig {
 
                         // Reglas de acceso por roles del proyecto TechCup
                         .requestMatchers(HttpMethod.POST, "/api/teams/**").hasAuthority("CAPTAIN")
-                        .requestMatchers(HttpMethod.POST, "/api/tournaments/**").hasAuthority("TOURNAMENT_ORGANIZER")
-                        .requestMatchers(HttpMethod.PUT, "/api/tournaments/**").hasAuthority("TOURNAMENT_ORGANIZER")
-                        .requestMatchers(HttpMethod.POST, "/api/matches/**").hasAnyAuthority("REFEREE", "TOURNAMENT_ORGANIZER")
-                        .requestMatchers(HttpMethod.PUT, "/api/matches/**").hasAnyAuthority("REFEREE", "TOURNAMENT_ORGANIZER")
-                        .requestMatchers(HttpMethod.POST, "/api/registrations/**").hasAnyAuthority("CAPTAIN", "TOURNAMENT_ORGANIZER")
-                        .requestMatchers(HttpMethod.PUT, "/api/registrations/**").hasAnyAuthority("ADMINISTRADOR_SISTEMA", "TOURNAMENT_ORGANIZER")
+                        .requestMatchers(HttpMethod.POST, "/api/tournaments/**").hasAuthority(TOURNAMENT_ORGANIZER)
+                        .requestMatchers(HttpMethod.PUT, "/api/tournaments/**").hasAuthority(TOURNAMENT_ORGANIZER)
+                        .requestMatchers(HttpMethod.POST, "/api/matches/**").hasAnyAuthority("REFEREE", TOURNAMENT_ORGANIZER)
+                        .requestMatchers(HttpMethod.PUT, "/api/matches/**").hasAnyAuthority("REFEREE", TOURNAMENT_ORGANIZER)
+                        .requestMatchers(HttpMethod.POST, "/api/registrations/**").hasAnyAuthority("CAPTAIN", TOURNAMENT_ORGANIZER)
+                        .requestMatchers(HttpMethod.PUT, "/api/registrations/**").hasAnyAuthority("ADMINISTRADOR_SISTEMA", TOURNAMENT_ORGANIZER)
 
                         .anyRequest().authenticated()
                 )

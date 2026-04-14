@@ -10,7 +10,6 @@ import com.zeuscodensa.techcupfutbol.core.repository.ITeamRepository;
 import com.zeuscodensa.techcupfutbol.core.repository.IUserRepository;
 import com.zeuscodensa.techcupfutbol.core.exception.BusinessRuleException;
 import com.zeuscodensa.techcupfutbol.core.exception.ResourceNotFoundException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -37,11 +36,6 @@ public class PlayerServiceTest {
 
     @InjectMocks
     private PlayerService playerService;
-
-    @BeforeEach
-    public void setUp() {
-    }
-
     @Test
     public void testProcessInvitation_Accept_Success() {
         Invitation inv = new Invitation();

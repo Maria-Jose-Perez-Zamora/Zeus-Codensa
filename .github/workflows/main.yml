@@ -27,7 +27,7 @@ jobs:
       - name: Validacion de Credenciales de Azure y ACR
         run: |
           echo "Verificando secretos de Azure..."
-          if [ -n "${{ secrets.AZURE_CREDENTIALS }}" ]; then echo "AZURE_CREDENTIALS detectado."; fi
+          if [ -n "${{ secrets.AZURE_CREDENTIALS }}" ]; then echo "AZURE_CREDENTIALS detectado."; else echo "ERROR: AZURE_CREDENTIALS no encontrado."; exit 1; fi
           echo "Servidor ACR configurado en: ${{ secrets.ACR_LOGIN_SERVER }}"
 
       - name: Compilar, ejecutar tests y generar reporte JaCoCo
@@ -46,14 +46,15 @@ jobs:
         run: |
           mvn -B sonar:sonar \
             -Dsonar.projectKey=Zeus-Codensa_Techcup-Futbol \
-            -Dsonar.organization=zeus-codensa \
+            -Dsonar.organization=maria-jose-perez-zamora \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
             -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
             -Dnet.bytebuddy.experimental=true
 
-      - name: Verificando conectividad Base de Datos
+      - name: Verificando conectividad Base de Datos (Azure PostgreSQL)
         run: |
+          echo "Verificando variables de entorno para Azure PostgreSQL Flexible Server..."
           echo "Host QA: ${{ secrets.QA_DB_HOST }}"
           if [ -n "${{ secrets.QA_DB_PASSWORD }}" ]; then echo "Contraseña de QA cargada."; fi
           echo "Host PROD: ${{ secrets.PROD_DB_HOST }}"
@@ -65,4 +66,5 @@ jobs:
           echo "1. Tests ejecutados con H2 en memoria."
           echo "2. Reporte JaCoCo XML generado en target/site/jacoco/jacoco.xml"
           echo "3. Análisis de SonarCloud ejecutado exitosamente."
-          echo "4. Credenciales de Azure y ACR vinculadas."
+          echo "4. Secretos de BD QA/PROD mapeados para Azure PostgreSQL."
+          echo "5. Credenciales de Azure y ACR vinculadas correctamente."

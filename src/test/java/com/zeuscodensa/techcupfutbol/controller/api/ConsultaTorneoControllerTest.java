@@ -43,6 +43,15 @@ public class ConsultaTorneoControllerTest {
     }
 
     @Test
+    public void testIndex_ReturnsStatusAndMessage() {
+        ResponseEntity<Map<String, String>> res = consultaTorneoController.index();
+        assertEquals(200, res.getStatusCode().value());
+        assertNotNull(res.getBody());
+        assertEquals("Query API is running", res.getBody().get("status"));
+        assertTrue(res.getBody().get("message").contains("/standings"));
+    }
+
+    @Test
     public void testGetTabla_Success() {
         when(tablaService.calcularTabla("Liga")).thenReturn(Collections.emptyList());
         ResponseEntity<?> res = consultaTorneoController.getTabla("Liga");

@@ -6,7 +6,6 @@ import com.zeuscodensa.techcupfutbol.core.model.User;
 import com.zeuscodensa.techcupfutbol.core.model.Player;
 import com.zeuscodensa.techcupfutbol.core.repository.IUserRepository;
 import com.zeuscodensa.techcupfutbol.security.JwtService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -35,11 +34,6 @@ public class GoogleOAuth2ServiceTest {
 
     @InjectMocks
     private GoogleOAuth2Service googleOAuth2Service;
-
-    @BeforeEach
-    public void setUp() {
-    }
-
     @Test
     public void testAuthenticateExternalUser_MissingEmail() {
         when(oAuth2User.getAttribute("email")).thenReturn(null);

@@ -1,5 +1,12 @@
 package com.zeuscodensa.techcupfutbol.core.service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
 import com.zeuscodensa.techcupfutbol.core.exception.BusinessRuleException;
 import com.zeuscodensa.techcupfutbol.core.exception.ResourceNotFoundException;
 import com.zeuscodensa.techcupfutbol.core.model.Invitation;
@@ -11,17 +18,12 @@ import com.zeuscodensa.techcupfutbol.core.repository.IInvitationRepository;
 import com.zeuscodensa.techcupfutbol.core.repository.ITeamRepository;
 import com.zeuscodensa.techcupfutbol.core.repository.IUserRepository;
 
-import org.springframework.stereotype.Service;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Service
 public class PlayerService {
 
     private static final Logger log = LoggerFactory.getLogger(PlayerService.class);
+    private static final String STATUS_PENDING = "PENDING";
+    private static final String STATUS_SENT = "ENVIADA";
 
     private final IUserRepository userRepository;
     private final ITeamRepository teamRepository;
@@ -70,7 +72,8 @@ public class PlayerService {
         }
 
         boolean yaInvitado = invitationRepository.findByPlayerEmail(request.getPlayerEmail()).stream()
-                .anyMatch(i -> i.getTeamName().equals(request.getTeamName()) && ("PENDING".equals(i.getStatus()) || "ENVIADA".equals(i.getStatus())));
+            .anyMatch(i -> i.getTeamName().equals(request.getTeamName())
+                && (STATUS_PENDING.equals(i.getStatus()) || STATUS_SENT.equals(i.getStatus())));
         
         if (yaInvitado) {
             log.warn("Duplicate invitation skipped for {}", request.getPlayerEmail());
@@ -82,7 +85,7 @@ public class PlayerService {
         newInv.setCaptainEmail(request.getCaptainEmail());
         newInv.setPlayerEmail(request.getPlayerEmail());
         newInv.setTeamName(request.getTeamName());
-        newInv.setStatus("PENDING");
+        newInv.setStatus(STATUS_PENDING);
 
         log.info("Invitation successfully generated from captain {} to player {} (Team: {})",
                  request.getCaptainEmail(), request.getPlayerEmail(), request.getTeamName());
@@ -103,7 +106,7 @@ public class PlayerService {
             throw new BusinessRuleException("El jugador no es el destinatario de esta invitación.");
         }
 
-        if (!"PENDING".equals(inv.getStatus()) && !"ENVIADA".equals(inv.getStatus())) {
+        if (!STATUS_PENDING.equals(inv.getStatus()) && !STATUS_SENT.equals(inv.getStatus())) {
             throw new BusinessRuleException("La invitación ya fue respondida o no está pendiente.");
         }
         
