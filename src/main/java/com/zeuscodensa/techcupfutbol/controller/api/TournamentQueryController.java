@@ -52,21 +52,21 @@ public class TournamentQueryController {
     @GetMapping("/{tournament}/standings")
     @Operation(summary = "Standings Table", description = "Generates the general standing table from the active tournament summing wins and draws")
     public ResponseEntity<List<Standing>> getTabla(@PathVariable String tournament) {
-        log.info("REST request - getTabla de posiciones para tournament: {}", tournament);
+        log.info("REST request - getTabla de posiciones");
         return ResponseEntity.ok(tablaService.calcularTabla(tournament));
     }
 
     @GetMapping("/{tournament}/brackets/{phase}")
     @Operation(summary = "Generate Knockout Brackets", description = "Draws quarterfinals, semifinals, or finals")
     public ResponseEntity<Object> getBrackets(@PathVariable String tournament, @PathVariable String phase) {
-        log.info("REST request - getBrackets eliminatorias para tournament: {}, phase: {}", tournament, phase);
+        log.info("REST request - getBrackets eliminatorias");
         return ResponseEntity.ok(llaveService.generarLlaves(tournament, phase));
     }
 
     @GetMapping("/{tournament}/calendar")
     @Operation(summary = "Match Calendar", description = "Returns scheduled matches")
     public ResponseEntity<Object> getCalendar(@PathVariable String tournament) {
-        log.info("REST request - getCalendar para tournament: {}", tournament);
+        log.info("REST request - getCalendar");
         List<Map<String, Object>> calendario = matchRepository.findByTournamentName(tournament).stream()
                 .filter(p -> "SCHEDULED".equals(p.getStatus()))
                 .map(p -> Map.<String, Object>of(
@@ -87,7 +87,7 @@ public class TournamentQueryController {
     @GetMapping("/{tournament}/results")
     @Operation(summary = "Historical Results", description = "All finished matches")
     public ResponseEntity<Object> getResultados(@PathVariable String tournament) {
-        log.info("REST request - getResultados Historicos para tournament: {}", tournament);
+        log.info("REST request - getResultados Historicos");
         List<Map<String, Object>> resultados = matchRepository.findByTournamentName(tournament).stream()
                 .filter(p -> "FINISHED".equals(p.getStatus()))
                 .map(p -> Map.<String, Object>of(
@@ -109,7 +109,7 @@ public class TournamentQueryController {
     @GetMapping("/{tournament}/statistics")
     @Operation(summary = "Global Statistics", description = "Summary of goals for/against per team")
     public ResponseEntity<Object> getEstadisticas(@PathVariable String tournament) {
-        log.info("REST request - getEstadisticas para tournament: {}", tournament);
+        log.info("REST request - getEstadisticas");
         List<Standing> standingTable = tablaService.calcularTabla(tournament);
         if (standingTable.isEmpty()) {
             return ResponseEntity.ok(Map.of(MESSAGE_KEY, "No statistics available for this tournament"));
@@ -120,7 +120,7 @@ public class TournamentQueryController {
     @GetMapping("/{tournament}/scorers")
     @Operation(summary = "Top Scorers Table", description = "All top scorers aggregated across matches")
     public ResponseEntity<Object> getScorers(@PathVariable String tournament) {
-        log.info("REST request - getScorers para tournament: {}", tournament);
+        log.info("REST request - getScorers");
         List<Map<String, Object>> goleadores = estadisticasService.getTopScorers(tournament);
         if (goleadores.isEmpty()) {
             return ResponseEntity.ok(Map.of(MESSAGE_KEY, "No scorers registered for this tournament"));
@@ -131,7 +131,7 @@ public class TournamentQueryController {
     @GetMapping("/{tournament}/history/{team}")
     @Operation(summary = "Club History", description = "Chronological performance of a given team")
     public ResponseEntity<Object> getTeamHistory(@PathVariable String tournament, @PathVariable String team) {
-        log.info("REST request - getTeamHistory para tournament: {}, team: {}", tournament, team);
+        log.info("REST request - getTeamHistory");
         List<Map<String, Object>> historial = estadisticasService.getTeamHistory(tournament, team);
         if (historial.isEmpty()) {
             return ResponseEntity.ok(Map.of(MESSAGE_KEY, "No history available for this team in the tournament"));
