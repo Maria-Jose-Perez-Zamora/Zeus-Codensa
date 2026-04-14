@@ -53,7 +53,10 @@ jira-automation/
 ### REPORTES Y DOCUMENTACIÓN ###
 *.txt
 /diagrama_clases.md
+/diagramas_secuencia.md
 *.patch
+diagrama_uml_techcup.md
+
 
 ### ENTREGABLES Y PRESENTACIONES ###
 database_diagram.md
