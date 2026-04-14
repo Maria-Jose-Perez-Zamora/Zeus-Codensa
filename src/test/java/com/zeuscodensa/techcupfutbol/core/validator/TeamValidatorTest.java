@@ -2,7 +2,6 @@ package com.zeuscodensa.techcupfutbol.core.validator;
 
 import com.zeuscodensa.techcupfutbol.core.model.Team;
 import com.zeuscodensa.techcupfutbol.core.repository.ITeamRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -28,11 +27,6 @@ public class TeamValidatorTest {
 
     @InjectMocks
     private TeamValidator teamValidator;
-
-    @BeforeEach
-    public void setup() {
-    }
-
     private List<String> validPlayers() {
         return Arrays.asList("1", "2", "3", "4", "5", "6", "7");
     }

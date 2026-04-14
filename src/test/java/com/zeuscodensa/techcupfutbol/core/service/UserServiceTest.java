@@ -5,7 +5,6 @@ import com.zeuscodensa.techcupfutbol.core.model.User;
 import com.zeuscodensa.techcupfutbol.core.model.Player;
 import com.zeuscodensa.techcupfutbol.core.validator.UserValidator;
 import com.zeuscodensa.techcupfutbol.core.repository.IUserRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -36,11 +35,6 @@ public class UserServiceTest {
 
     @InjectMocks
     private UserService userService;
-
-    @BeforeEach
-    public void setUp() {
-    }
-
     @Test
     public void testRegisterUser_Success() {
         Player newUser = new Player();

@@ -3,7 +3,6 @@ package com.zeuscodensa.techcupfutbol.core.service;
 import com.zeuscodensa.techcupfutbol.core.model.Match;
 import com.zeuscodensa.techcupfutbol.core.model.Standing;
 import com.zeuscodensa.techcupfutbol.core.repository.IMatchRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -24,11 +23,6 @@ public class StandingServiceTest {
 
     @InjectMocks
     private StandingService tablaService;
-
-    @BeforeEach
-    public void setUp() {
-    }
-
     @Test
     public void testCalcularTabla_Success() {
         Match p1 = new Match();

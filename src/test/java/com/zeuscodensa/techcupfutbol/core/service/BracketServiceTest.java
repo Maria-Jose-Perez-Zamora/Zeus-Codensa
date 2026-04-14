@@ -3,7 +3,6 @@ package com.zeuscodensa.techcupfutbol.core.service;
 import com.zeuscodensa.techcupfutbol.core.model.KnockoutBracket;
 import com.zeuscodensa.techcupfutbol.core.model.Registration;
 import com.zeuscodensa.techcupfutbol.core.repository.IRegistrationRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -25,11 +24,6 @@ public class BracketServiceTest {
 
     @InjectMocks
     private BracketService llaveService;
-
-    @BeforeEach
-    public void setUp() {
-    }
-
     @Test
     public void testGenerarLlaves_Success() {
         Registration i1 = new Registration(); i1.setTeamName("Eq1"); i1.setTournamentName("Liga"); i1.setStatus("APPROVED");

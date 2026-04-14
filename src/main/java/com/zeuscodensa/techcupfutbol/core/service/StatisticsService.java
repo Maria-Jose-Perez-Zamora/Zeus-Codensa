@@ -1,11 +1,14 @@
 package com.zeuscodensa.techcupfutbol.core.service;
 
-import com.zeuscodensa.techcupfutbol.core.model.Match;
-import com.zeuscodensa.techcupfutbol.core.model.Standing;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import com.zeuscodensa.techcupfutbol.core.model.Match;
 
 @Service
 public class StatisticsService {
@@ -45,25 +48,45 @@ public class StatisticsService {
     public List<Map<String, Object>> getTeamHistory(String tournamentName, String teamName) {
         return matchRepository.findByTournamentName(tournamentName).stream()
                 .filter(p -> p.getHomeTeam().equals(teamName) || p.getAwayTeam().equals(teamName))
-                .map(p -> {
-                    Map<String, Object> info = new LinkedHashMap<>();
-                    info.put("id", p.getId());
-                    info.put("opponent", p.getHomeTeam().equals(teamName) ? p.getAwayTeam() : p.getHomeTeam());
-                    info.put("venue", p.getHomeTeam().equals(teamName) ? "HOME" : "AWAY");
-                    info.put("homeScore", p.getHomeScore());
-                    info.put("awayScore", p.getAwayScore());
-                    info.put("status", p.getStatus());
-                    info.put("date", p.getMatchDate());
-
-                    String result = "PENDING";
-                    if ("FINISHED".equals(p.getStatus())) {
-                        int teamGoals = p.getHomeTeam().equals(teamName) ? p.getHomeScore() : p.getAwayScore();
-                        int opponentGoals = p.getHomeTeam().equals(teamName) ? p.getAwayScore() : p.getHomeScore();
-                        result = teamGoals > opponentGoals ? "WIN" : teamGoals == opponentGoals ? "DRAW" : "LOSS";
-                    }
-                    info.put("result", result);
-                    return info;
-                })
+                .map(p -> buildHistoryEntry(p, teamName))
                 .collect(Collectors.toList());
+    }
+
+    private Map<String, Object> buildHistoryEntry(Match match, String teamName) {
+        Map<String, Object> info = new LinkedHashMap<>();
+        info.put("id", match.getId());
+        info.put("opponent", getOpponent(match, teamName));
+        info.put("venue", getVenue(match, teamName));
+        info.put("homeScore", match.getHomeScore());
+        info.put("awayScore", match.getAwayScore());
+        info.put("status", match.getStatus());
+        info.put("date", match.getMatchDate());
+        info.put("result", getResult(match, teamName));
+        return info;
+    }
+
+    private String getOpponent(Match match, String teamName) {
+        return match.getHomeTeam().equals(teamName) ? match.getAwayTeam() : match.getHomeTeam();
+    }
+
+    private String getVenue(Match match, String teamName) {
+        return match.getHomeTeam().equals(teamName) ? "HOME" : "AWAY";
+    }
+
+    private String getResult(Match match, String teamName) {
+        if (!"FINISHED".equals(match.getStatus())) {
+            return "PENDING";
+        }
+
+        int teamGoals = match.getHomeTeam().equals(teamName) ? match.getHomeScore() : match.getAwayScore();
+        int opponentGoals = match.getHomeTeam().equals(teamName) ? match.getAwayScore() : match.getHomeScore();
+
+        if (teamGoals > opponentGoals) {
+            return "WIN";
+        }
+        if (teamGoals == opponentGoals) {
+            return "DRAW";
+        }
+        return "LOSS";
     }
 }

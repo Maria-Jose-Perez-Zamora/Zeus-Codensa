@@ -4,7 +4,6 @@ import com.zeuscodensa.techcupfutbol.core.model.Match;
 import com.zeuscodensa.techcupfutbol.core.model.Tournament;
 import com.zeuscodensa.techcupfutbol.core.repository.IRegistrationRepository;
 import com.zeuscodensa.techcupfutbol.core.repository.ITournamentRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -29,11 +28,6 @@ public class PartidoValidatorTest {
 
     @InjectMocks
     private MatchValidator matchValidator;
-
-    @BeforeEach
-    public void setup() {
-    }
-
     private Match validReq() {
         return new Match("EqA", "EqB", "2026", "T1");
     }

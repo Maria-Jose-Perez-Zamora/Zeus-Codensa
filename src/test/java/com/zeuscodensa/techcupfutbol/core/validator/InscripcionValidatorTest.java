@@ -5,7 +5,6 @@ import com.zeuscodensa.techcupfutbol.core.model.Tournament;
 import com.zeuscodensa.techcupfutbol.core.repository.IRegistrationRepository;
 import com.zeuscodensa.techcupfutbol.core.repository.ITeamRepository;
 import com.zeuscodensa.techcupfutbol.core.repository.ITournamentRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -33,11 +32,6 @@ public class InscripcionValidatorTest {
 
     @InjectMocks
     private RegistrationValidator registrationValidator;
-
-    @BeforeEach
-    public void setup() {
-    }
-
     private void setupValidEnv() {
         when(teamRepository.findByTeamName("EqA")).thenReturn(Optional.of(new Team("EqA")));
         Tournament t = new Tournament(); 
