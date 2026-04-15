@@ -1,4 +1,4 @@
-name: CD PROD - Deploy a Azure App Service PROD
+name: CD PROD - Deploy a Azure Container App PROD
 
 # ZEUS-151: Se dispara cuando CI termina exitosamente en 'main'
 on:
@@ -25,7 +25,7 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # ZEUS-153: Crear tag de versión de producción (v1.3.3) en ACR
+      # ZEUS-153: Crear tag de versión de producción (v1.3.3) en ACR y actualizar Container App
       - name: Taggear imagen como v1.3.3 en ACR
         run: |
           ACR_NAME=$(echo "${{ secrets.ACR_LOGIN_SERVER }}" | cut -d'.' -f1)
@@ -36,43 +36,59 @@ jobs:
             --force
           echo "✅ Imagen publicada con tag: v1.3.3"
 
-      # ZEUS-153: Deploy al App Service PROD usando la imagen versionada
-      - name: Deploy imagen Docker v1.3.3 a App Service PROD
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: ${{ secrets.PROD_WEBAPP_NAME }}
-          images: '${{ secrets.ACR_LOGIN_SERVER }}/techcup-backend:v1.3.3'
-
+      # ZEUS-153: Deploy al Container App PROD usando la imagen versionada
       # ZEUS-154: Inyectar variables de entorno PROD desde GitHub Secrets
-      - name: Inyectar variables de entorno PROD
-        uses: azure/appservice-settings@v1
-        with:
-          app-name: ${{ secrets.PROD_WEBAPP_NAME }}
-          app-settings-json: |
-            [
-              { "name": "SPRING_PROFILES_ACTIVE", "value": "prod"                               },
-              { "name": "DB_HOST",                "value": "${{ secrets.PROD_DB_HOST }}"        },
-              { "name": "DB_PORT",                "value": "5432"                               },
-              { "name": "DB_NAME",                "value": "${{ secrets.PROD_DB_NAME }}"        },
-              { "name": "DB_USER",                "value": "${{ secrets.PROD_DB_USER }}"        },
-              { "name": "DB_PASSWORD",            "value": "${{ secrets.PROD_DB_PASSWORD }}"    },
-              { "name": "JWT_SECRET",             "value": "${{ secrets.JWT_SECRET }}"          },
-              { "name": "GOOGLE_CLIENT_ID",       "value": "${{ secrets.GOOGLE_CLIENT_ID }}"    },
-              { "name": "GOOGLE_CLIENT_SECRET",   "value": "${{ secrets.GOOGLE_CLIENT_SECRET }}"},
-              { "name": "SERVER_PORT",            "value": "8080"                               }
-            ]
+      - name: Deploy imagen Docker v1.3.3 a Container App PROD
+        env:
+          DB_PASSWORD: ${{ secrets.PROD_DB_PASSWORD }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+        run: |
+          # Configurar credenciales del ACR en el Container App PROD
+          az containerapp registry set \
+            --name "${{ secrets.PROD_WEBAPP_NAME }}" \
+            --resource-group "rg-zeus-codensa" \
+            --server "${{ secrets.ACR_LOGIN_SERVER }}" \
+            --username "${{ secrets.ACR_USERNAME }}" \
+            --password "${{ secrets.ACR_PASSWORD }}"
 
-      - name: Esperar que la app inicie (30s)
-        run: sleep 30
+          # Actualizar imagen v1.3.3 y variables de entorno PROD
+          az containerapp update \
+            --name "${{ secrets.PROD_WEBAPP_NAME }}" \
+            --resource-group "rg-zeus-codensa" \
+            --image "${{ secrets.ACR_LOGIN_SERVER }}/techcup-backend:v1.3.3" \
+            --set-env-vars \
+              SPRING_PROFILES_ACTIVE=prod \
+              "DB_HOST=${{ secrets.PROD_DB_HOST }}" \
+              DB_PORT=5432 \
+              "DB_NAME=${{ secrets.PROD_DB_NAME }}" \
+              "DB_USER=${{ secrets.PROD_DB_USER }}" \
+              "DB_PASSWORD=${DB_PASSWORD}" \
+              "JWT_SECRET=${JWT_SECRET}" \
+              "GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}" \
+              "GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}" \
+              SERVER_PORT=8080
+
+          echo "✅ Container App PROD actualizado con imagen v1.3.3"
+
+      - name: Esperar que la app inicie (40s)
+        run: sleep 40
 
       # ZEUS-155: Health check post-deploy con ping a DB
       - name: Health check post-deploy PROD + validación DB
         run: |
-          PROD_URL="https://${{ secrets.PROD_WEBAPP_NAME }}.azurewebsites.net"
+          # Obtener la URL del Container App PROD dinámicamente
+          PROD_FQDN=$(az containerapp show \
+            --name "${{ secrets.PROD_WEBAPP_NAME }}" \
+            --resource-group "rg-zeus-codensa" \
+            --query "properties.configuration.ingress.fqdn" -o tsv)
+          PROD_URL="https://${PROD_FQDN}"
+
           echo "🔍 Verificando: ${PROD_URL}/health"
           HTTP_STATUS="000"
           for i in {1..6}; do
-            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${PROD_URL}/health" || echo "000")
+            HTTP_STATUS=$(curl -k -s -o /dev/null -w "%{http_code}" "${PROD_URL}/health" || echo "000")
             echo "Intento ${i}/6 — HTTP: ${HTTP_STATUS}"
             [ "${HTTP_STATUS}" = "200" ] && break
             sleep 15
@@ -81,7 +97,7 @@ jobs:
             echo "❌ Health check fallido — Status: ${HTTP_STATUS}"
             exit 1
           fi
-          BODY=$(curl -s "${PROD_URL}/health")
+          BODY=$(curl -k -s "${PROD_URL}/health")
           echo "📊 Respuesta: ${BODY}"
           if echo "${BODY}" | grep -q '"db":"OK"'; then
             echo "✅ PROD Health Check OK — App UP + DB conectada"
@@ -90,10 +106,7 @@ jobs:
             exit 1
           fi
 
-      # ZEUS-156: Publicar URL de PROD
-      - name: Publicar URL de PROD en GitHub Summary
-        run: |
-          PROD_URL="https://${{ secrets.PROD_WEBAPP_NAME }}.azurewebsites.net"
+          # ZEUS-156: Publicar URL de PROD en GitHub Summary
           echo "## 🚀 Deploy PROD Exitoso — v1.3.3" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Campo | Valor |" >> $GITHUB_STEP_SUMMARY

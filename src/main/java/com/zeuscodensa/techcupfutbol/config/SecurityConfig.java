@@ -96,9 +96,10 @@ public class SecurityConfig {
                 // Local development
                 "http://localhost:3000", "http://localhost:4200", "http://localhost:5173",
                 "http://127.0.0.1:3000", "http://127.0.0.1:5173",
-                // Azure App Service — QA y PROD (actualizar con la URL real del frontend)
-                "https://techcup-frontend-qa.azurewebsites.net",
-                "https://techcup-frontend.azurewebsites.net"
+                // Azure Container Apps — QA (ZEUS-144~149)
+                "https://techcup-qa.happymushroom-f55d56eb.eastus.azurecontainerapps.io",
+                // Azure Container Apps — PROD (ZEUS-151~156)
+                "https://techcup-prod.happymushroom-f55d56eb.eastus.azurecontainerapps.io"
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
