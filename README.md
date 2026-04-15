@@ -775,15 +775,15 @@ Fallos inesperados en el servidor, base de datos o servicios externos. El usuari
 
 ## Diagramas UML
 
-### Diagrama de Clases
+### Diagrama de Clases — TechCup Definitivo
 
-El diagrama de clases muestra la estructura completa del dominio, incluyendo todas las entidades, sus atributos y relaciones:
+El diagrama de clases muestra la estructura completa del dominio, incluyendo todas las entidades, sus atributos, métodos y relaciones entre capas (Web, Core, Persistencia):
 
-![diagrama de clases1.1.png](docs%2Fimages%2Fdiagrama%20de%20clases1.1.png)
+![Diagrama de Clases TechCup Definitivo](images/DIAGRAMA%20DE%20CLASES%20SVG.svg)
 
-### Diagrama de Clases Base de Datos
+### Diagrama de Clases — Base de Datos
 
-![alt text](<DIAGRAMA DE CLASES BASE DE DATOS.png>)
+![Diagrama de Clases Base de Datos](images/DIAGRAMA%20DE%20CLASES%20BASE%20DE%20DATOS.png)
 
 ---
 
@@ -848,8 +848,68 @@ Actualiza los goles de un partido y consolida el resultado final.
 Registra los jugadores que participarán en un partido para cada equipo.
 
 ### 15. Registro de Tarjetas
-![alt text](<docs/images/Diagrama de secuencia 15.png>)
+![Diagrama de secuencia 15](<docs/images/Diagrama de secuencia 15.png>)
 Permite registrar eventos disciplinarios de un partido.
+
+### 16. Iniciar OAuth2 Google (`GET /api/auth/google/start`)
+![Diagrama de secuencia 16](<docs/images/SECUENCIA OAUTH2.png>)
+Inicia el flujo de autenticación con Google. El controlador redirige al filtro de Spring Security, que construye la URL de autorización de Google y responde con un `302 Redirect` hacia la pantalla de consentimiento de Google.
+
+### 17. Buscar Jugadores Disponibles (`GET /api/players/available`)
+![Diagrama de secuencia 17](<docs/images/SECUENCIA BUSCAR JUGADORES DISPONIBLES.png>)
+Retorna la lista de jugadores sin equipo asignado. Acepta filtros opcionales por nombre y posición. Si no se encuentran jugadores con los criterios dados, retorna lista vacía con `200 OK`.
+
+### 18. Enviar Invitación a Equipo (`POST /api/players/invitations`)
+![Diagrama de secuencia 18](<docs/images/SECUENCIA ENVIAR INVITACION A EQUIPO.png>)
+Permite al capitán de un equipo invitar a un jugador disponible. El sistema valida que el jugador exista, que no tenga equipo asignado y que el equipo destino sea válido. Crea la invitación en estado `PENDING`.
+
+### 19. Procesar Invitación (`PATCH /api/players/invitations/{id}/acceptance`)
+![Diagrama de secuencia 19](<docs/images/SECUENCIA PROCESAR INVITACION.png>)
+Permite al jugador aceptar o rechazar una invitación pendiente. Si el estado es `ACCEPTED`, se actualiza el `teamId` del jugador en la base de datos. Valida que la invitación esté en estado `PENDING` antes de procesarla.
+
+### 20. Detalle de un Torneo (`GET /api/tournaments/query/{id}`)
+![Diagrama de secuencia 20](<docs/images/SECUENCIA DETALLE DE TORNEO.png>)
+Retorna la información completa de un torneo específico. Valida que el `id` tenga formato UUID válido. Retorna `404 Not Found` si el torneo no existe, o `200 OK` con el `TournamentDetailsDTO`.
+
+### 21. Tabla de Posiciones (`GET /api/tournaments/query/{id}/standings`)
+![Diagrama de secuencia 21](<docs/images/SECUENCIA TABLA DE POSICIONES.png>)
+Calcula y retorna la tabla de posiciones del torneo. Consolida todos los partidos terminados, calcula puntos, goles a favor, goles en contra y diferencia de gol, ordenando los equipos de mayor a menor puntuación.
+
+### 22. Brackets Eliminatorios (`GET /api/tournaments/query/{id}/brackets/{phase}`)
+![Diagrama de secuencia 22](<docs/images/SECUENCIA BRACKETS ELIMINATORIOS.png>)
+Retorna la estructura de los cruces eliminatorios para una fase específica (cuartos, semis, final). Valida la fase solicitada y organiza los nodos del bracket con los equipos y resultados correspondientes.
+
+### 23. Calendario Programado (`GET /api/tournaments/query/{id}/calendar`)
+![Diagrama de secuencia 23](<docs/images/SECUENCIA CALENDARIO PROGRAMADO.png>)
+Retorna todos los partidos programados a futuro para el torneo. Los resultados se ordenan cronológicamente y se agrupan por jornada para facilitar su visualización.
+
+### 24. Resultados Históricos (`GET /api/tournaments/query/{id}/results`)
+![Diagrama de secuencia 24](<docs/images/SECUENCIA RESULTADOS HISTORICOS.png>)
+Retorna todos los partidos ya jugados y sus resultados finales. Filtra partidos con estado `COMPLETED` y los mapea a `ResultsDTO` con marcadores y estadísticas del encuentro.
+
+### 25. Estadísticas Globales (`GET /api/tournaments/query/{id}/statistics`)
+![Diagrama de secuencia 25](<docs/images/SECUENCIA ESTADISTICAS GLOBALES.png>)
+Agrega y retorna las estadísticas generales del torneo: número de equipos participantes, total de goles, tarjetas amarillas, tarjetas rojas y promedios por partido.
+
+### 26. Tabla de Goleadores (`GET /api/tournaments/query/{id}/scorers`)
+![Diagrama de secuencia 26](<docs/images/SECUENCIA TABLA DE GOLEADORES.png>)
+Retorna el ranking de goleadores del torneo ordenado descendentemente por cantidad de goles. Agrega los eventos de gol por jugador y retorna la lista de `ScorerDTO`.
+
+### 27. Historial de un Equipo (`GET /api/tournaments/query/{id}/history/{teamId}`)
+![Diagrama de secuencia 27](<docs/images/SECUENCIA HISTORIAL DE UN EQUIPO.png>)
+Retorna el historial completo de un equipo en el torneo: partidos jugados, resultados, rendimiento (Win Rate) y estadística de goles. Retorna `404` si el equipo no tiene participación registrada.
+
+### 28. Asignar Árbitro (`PUT /api/matches/{id}/referee`)
+![Diagrama de secuencia 28](<docs/images/SECUENCIA ASIGNAR ARBITRO.png>)
+Asigna un árbitro a un partido. Valida que el usuario exista y que su rol sea `REFEREE`. Además, valida que el partido no esté en estado `COMPLETED`. En caso de éxito, actualiza el `refereeId` en el partido.
+
+### 29. Partidos de un Árbitro (`GET /api/matches/referee/{refereeEmail}`)
+![Diagrama de secuencia 29](<docs/images/SECUENCIA PARTIDOS DE UN ARBITRO.png>)
+Retorna todos los partidos asignados a un árbitro específico, identificado por su correo electrónico. Valida el formato de la dirección de correo y retorna `404` si el árbitro no existe en el sistema.
+
+### 30. Listar Todos los Partidos (`GET /api/matches`)
+![Diagrama de secuencia 30](<docs/images/SECUENCIA LISTAR TODOS LOS PARTIDOS.png>)
+Retorna el listado completo de todos los partidos registrados en el sistema, sin importar su estado. Si no hay registros, retorna una lista vacía con `200 OK`.
 
 ---
 
