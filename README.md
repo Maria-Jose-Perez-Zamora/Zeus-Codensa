@@ -779,7 +779,7 @@ Fallos inesperados en el servidor, base de datos o servicios externos. El usuari
 
 El diagrama de clases muestra la estructura completa del dominio, incluyendo todas las entidades, sus atributos, métodos y relaciones entre capas (Web, Core, Persistencia):
 
-![Diagrama de Clases TechCup Definitivo](images/DIAGRAMA%20DE%20CLASES%20SVG.svg)
+![Diagrama de Clases](images/DIAGRAMA%20DE%20CLASES%20TECHCUP%20DEFINITIVO.svg)
 
 ### Diagrama de Clases — Base de Datos
 
