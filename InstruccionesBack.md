@@ -166,7 +166,7 @@ http://localhost:8080/swagger-ui.html
 
 ## Cobertura jacoco
 
-![alt text](image.png)(cobertura jacoco.png)
+![alt text](images/image.png)(cobertura jacoco.png)
 
 ---
 

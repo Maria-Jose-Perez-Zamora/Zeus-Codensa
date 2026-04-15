@@ -12,8 +12,8 @@
 
 ## 1. Resumen Ejecutivo
 
-![Proyectos SonarCloud](docs/sonarcloud_01_projects.png)
-![Overview SonarCloud](docs/sonarcloud_02_overview.png)
+![Proyectos SonarCloud](images/sonarcloud_01_projects.png)
+![Overview SonarCloud](images/sonarcloud_02_overview.png)
 
 El análisis estático de código realizado con **SonarCloud** sobre el backend del sistema TechCup Fútbol arroja un resultado **satisfactorio** en todas las dimensiones críticas de calidad de software.
 
@@ -129,8 +129,8 @@ SonarCloud detectó un 11.8% de duplicación en el código base. Este porcentaje
 
 ## 7. Security Hotspot — CSRF en SecurityConfig
 
-![Security Hotspot Ubicación](docs/sonarcloud_03_hotspot_where.png)
-![Security Hotspot Evaluación](docs/sonarcloud_04_hotspot_assess.png)
+![Security Hotspot Ubicación](images/sonarcloud_03_hotspot_where.png)
+![Security Hotspot Evaluación](images/sonarcloud_04_hotspot_assess.png)
 
 ### Descripción del Hotspot
 
@@ -211,7 +211,7 @@ Se excluyeron del análisis las clases que no aportan lógica de negocio:
 
 ### Cobertura de Tests (JaCoCo)
 
-![Reporte de Cobertura JaCoCo](docs/images/cobertura%20jacoco.png)
+![Reporte de Cobertura JaCoCo](images/cobertura%20jacoco.png)
 
 El análisis local con `mvn verify` confirmó:
 

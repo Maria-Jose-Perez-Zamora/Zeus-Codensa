@@ -14,7 +14,7 @@ Arquitectónicamente, Zeus-Codensa separa presentación, negocio y persistencia 
 El diagrama de contexto presenta a Zeus-Codensa como sistema central y su relación con actores externos. Permite delimitar el alcance del servicio y visualizar los flujos principales de entrada (solicitudes) y salida (respuestas y errores), sin entrar al detalle interno de implementación.
 
 
-![Diagrama de contexto](docs/images/DiagramaContexto.png) 
+![Diagrama de contexto](images/DiagramaContexto.png) 
 En el contexto definido se identifican cinco actores principales: Estudiante, Capitán, Árbitro, Administrador y Organizador. El servicio también interactúa con dos sistemas externos: Correo Institucional (autenticación) y NEQUI/Efectivo (validación de comprobantes de pago).
 
 Las interacciones mostradas en el diagrama son:
