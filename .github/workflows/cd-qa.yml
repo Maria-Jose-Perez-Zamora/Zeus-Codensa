@@ -1,0 +1,86 @@
+name: CD QA - Deploy a Azure App Service QA
+
+# ZEUS-145: Se dispara automáticamente cuando el CI termina exitosamente en 'develop'
+on:
+  workflow_run:
+    workflows: ["CI Pipeline - Techcup Futbol"]
+    branches: [ develop ]
+    types: [ completed ]
+
+jobs:
+  # ─────────────────────────────────────────────────────────────────
+  # Deploy automático a QA (ZEUS-144 ~ ZEUS-149)
+  # ─────────────────────────────────────────────────────────────────
+  deploy-qa:
+    name: "🚀 Deploy Automático a QA"
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    environment: qa  # GitHub Environment para QA
+
+    steps:
+      - name: Login a Azure
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # ZEUS-145: Deploy de imagen al App Service QA
+      - name: Deploy imagen Docker a App Service QA
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ secrets.QA_WEBAPP_NAME }}
+          images: '${{ secrets.ACR_LOGIN_SERVER }}/techcup-backend:latest'
+
+      # ZEUS-146: Inyectar variables de entorno QA desde GitHub Secrets
+      - name: Inyectar variables de entorno QA
+        uses: azure/appservice-settings@v1
+        with:
+          app-name: ${{ secrets.QA_WEBAPP_NAME }}
+          app-settings-json: |
+            [
+              { "name": "SPRING_PROFILES_ACTIVE", "value": "dev"                                },
+              { "name": "DB_HOST",                "value": "${{ secrets.QA_DB_HOST }}"          },
+              { "name": "DB_PORT",                "value": "5432"                               },
+              { "name": "DB_NAME",                "value": "${{ secrets.QA_DB_NAME }}"          },
+              { "name": "DB_USER",                "value": "${{ secrets.QA_DB_USER }}"          },
+              { "name": "DB_PASSWORD",            "value": "${{ secrets.QA_DB_PASSWORD }}"      },
+              { "name": "JWT_SECRET",             "value": "${{ secrets.JWT_SECRET }}"          },
+              { "name": "GOOGLE_CLIENT_ID",       "value": "${{ secrets.GOOGLE_CLIENT_ID }}"    },
+              { "name": "GOOGLE_CLIENT_SECRET",   "value": "${{ secrets.GOOGLE_CLIENT_SECRET }}"},
+              { "name": "SERVER_PORT",            "value": "8080"                               }
+            ]
+
+      - name: Esperar que la app inicie (30s)
+        run: sleep 30
+
+      # ZEUS-147 + ZEUS-148: Health check con validación de DB
+      - name: Health check post-deploy QA
+        run: |
+          QA_URL="https://${{ secrets.QA_WEBAPP_NAME }}.azurewebsites.net"
+          echo "🔍 Verificando: ${QA_URL}/health"
+          HTTP_STATUS="000"
+          for i in {1..6}; do
+            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${QA_URL}/health" || echo "000")
+            echo "Intento ${i}/6 — HTTP: ${HTTP_STATUS}"
+            [ "${HTTP_STATUS}" = "200" ] && break
+            sleep 15
+          done
+          if [ "${HTTP_STATUS}" != "200" ]; then
+            echo "❌ Health check fallido — Status: ${HTTP_STATUS}"
+            exit 1
+          fi
+          BODY=$(curl -s "${QA_URL}/health")
+          echo "📊 Respuesta: ${BODY}"
+          echo "✅ QA Health Check OK (HTTP 200)"
+
+      # ZEUS-149: Publicar URL de QA
+      - name: Publicar URL de QA en GitHub Summary
+        run: |
+          QA_URL="https://${{ secrets.QA_WEBAPP_NAME }}.azurewebsites.net"
+          echo "## 🟢 Deploy QA Exitoso — v1.3.3" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Campo | Valor |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| 🌐 URL QA | ${QA_URL} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🏥 Health Check | ${QA_URL}/health |" >> $GITHUB_STEP_SUMMARY
+          echo "| 📦 Versión | v1.3.3 |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🌿 Rama | develop |" >> $GITHUB_STEP_SUMMARY

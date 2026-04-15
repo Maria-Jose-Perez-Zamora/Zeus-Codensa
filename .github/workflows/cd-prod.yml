@@ -1,0 +1,105 @@
+name: CD PROD - Deploy a Azure App Service PROD
+
+# ZEUS-151: Se dispara cuando CI termina exitosamente en 'main'
+on:
+  workflow_run:
+    workflows: ["CI Pipeline - Techcup Futbol"]
+    branches: [ main ]
+    types: [ completed ]
+
+jobs:
+  # ─────────────────────────────────────────────────────────────────
+  # Deploy a PROD con aprobación manual de 3 personas (ZEUS-151~156)
+  # Configurar en GitHub: Settings → Environments → production
+  #   → Required reviewers: [persona1, persona2, persona3]
+  # ─────────────────────────────────────────────────────────────────
+  deploy-prod:
+    name: "🚀 Deploy a PROD (requiere aprobación de 3 personas)"
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    environment: production  # ← ZEUS-152: GitHub Environment con 3 Required Reviewers
+
+    steps:
+      - name: Login a Azure
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # ZEUS-153: Crear tag de versión de producción (v1.3.3) en ACR
+      - name: Taggear imagen como v1.3.3 en ACR
+        run: |
+          ACR_NAME=$(echo "${{ secrets.ACR_LOGIN_SERVER }}" | cut -d'.' -f1)
+          az acr import \
+            --name "${ACR_NAME}" \
+            --source "${{ secrets.ACR_LOGIN_SERVER }}/techcup-backend:latest" \
+            --image "techcup-backend:v1.3.3" \
+            --force
+          echo "✅ Imagen publicada con tag: v1.3.3"
+
+      # ZEUS-153: Deploy al App Service PROD usando la imagen versionada
+      - name: Deploy imagen Docker v1.3.3 a App Service PROD
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ secrets.PROD_WEBAPP_NAME }}
+          images: '${{ secrets.ACR_LOGIN_SERVER }}/techcup-backend:v1.3.3'
+
+      # ZEUS-154: Inyectar variables de entorno PROD desde GitHub Secrets
+      - name: Inyectar variables de entorno PROD
+        uses: azure/appservice-settings@v1
+        with:
+          app-name: ${{ secrets.PROD_WEBAPP_NAME }}
+          app-settings-json: |
+            [
+              { "name": "SPRING_PROFILES_ACTIVE", "value": "prod"                               },
+              { "name": "DB_HOST",                "value": "${{ secrets.PROD_DB_HOST }}"        },
+              { "name": "DB_PORT",                "value": "5432"                               },
+              { "name": "DB_NAME",                "value": "${{ secrets.PROD_DB_NAME }}"        },
+              { "name": "DB_USER",                "value": "${{ secrets.PROD_DB_USER }}"        },
+              { "name": "DB_PASSWORD",            "value": "${{ secrets.PROD_DB_PASSWORD }}"    },
+              { "name": "JWT_SECRET",             "value": "${{ secrets.JWT_SECRET }}"          },
+              { "name": "GOOGLE_CLIENT_ID",       "value": "${{ secrets.GOOGLE_CLIENT_ID }}"    },
+              { "name": "GOOGLE_CLIENT_SECRET",   "value": "${{ secrets.GOOGLE_CLIENT_SECRET }}"},
+              { "name": "SERVER_PORT",            "value": "8080"                               }
+            ]
+
+      - name: Esperar que la app inicie (30s)
+        run: sleep 30
+
+      # ZEUS-155: Health check post-deploy con ping a DB
+      - name: Health check post-deploy PROD + validación DB
+        run: |
+          PROD_URL="https://${{ secrets.PROD_WEBAPP_NAME }}.azurewebsites.net"
+          echo "🔍 Verificando: ${PROD_URL}/health"
+          HTTP_STATUS="000"
+          for i in {1..6}; do
+            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${PROD_URL}/health" || echo "000")
+            echo "Intento ${i}/6 — HTTP: ${HTTP_STATUS}"
+            [ "${HTTP_STATUS}" = "200" ] && break
+            sleep 15
+          done
+          if [ "${HTTP_STATUS}" != "200" ]; then
+            echo "❌ Health check fallido — Status: ${HTTP_STATUS}"
+            exit 1
+          fi
+          BODY=$(curl -s "${PROD_URL}/health")
+          echo "📊 Respuesta: ${BODY}"
+          if echo "${BODY}" | grep -q '"db":"OK"'; then
+            echo "✅ PROD Health Check OK — App UP + DB conectada"
+          else
+            echo "⚠️  App UP pero revisar conectividad de BD"
+            exit 1
+          fi
+
+      # ZEUS-156: Publicar URL de PROD
+      - name: Publicar URL de PROD en GitHub Summary
+        run: |
+          PROD_URL="https://${{ secrets.PROD_WEBAPP_NAME }}.azurewebsites.net"
+          echo "## 🚀 Deploy PROD Exitoso — v1.3.3" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Campo | Valor |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| 🌐 URL PROD | ${PROD_URL} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🏥 Health Check | ${PROD_URL}/health |" >> $GITHUB_STEP_SUMMARY
+          echo "| 📦 Versión | v1.3.3 |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🖼️ Imagen ACR | techcup-backend:v1.3.3 |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🌿 Rama | main |" >> $GITHUB_STEP_SUMMARY

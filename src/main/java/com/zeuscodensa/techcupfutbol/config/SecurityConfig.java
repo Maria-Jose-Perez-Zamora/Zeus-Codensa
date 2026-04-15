@@ -62,6 +62,8 @@ public class SecurityConfig {
                 }))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .authorizeHttpRequests(auth -> auth
+                        // Health check público — requerido por CD workflows (ZEUS-148, ZEUS-155)
+                        .requestMatchers("/health").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/auth/google/**").permitAll()
                         .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
@@ -90,7 +92,14 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:4200", "http://localhost:5173", "http://127.0.0.1:3000", "http://127.0.0.1:5173"));
+        configuration.setAllowedOrigins(Arrays.asList(
+                // Local development
+                "http://localhost:3000", "http://localhost:4200", "http://localhost:5173",
+                "http://127.0.0.1:3000", "http://127.0.0.1:5173",
+                // Azure App Service — QA y PROD (actualizar con la URL real del frontend)
+                "https://techcup-frontend-qa.azurewebsites.net",
+                "https://techcup-frontend.azurewebsites.net"
+        ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
         configuration.setAllowCredentials(true);
