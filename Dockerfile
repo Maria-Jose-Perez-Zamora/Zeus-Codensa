@@ -21,4 +21,4 @@ ENV SERVER_PORT=8080
 COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
 
-ENTRYPOINT ["sh", "-c", "echo 'Iniciando contenedor...' && ls -la && java -jar app.jar || (echo 'ERROR CRÍTICO FATAL EN JAVA' && sleep 60)"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
