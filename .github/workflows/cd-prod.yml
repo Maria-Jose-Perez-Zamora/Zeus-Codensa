@@ -61,15 +61,14 @@ jobs:
             --image "${{ secrets.ACR_LOGIN_SERVER }}/techcup-backend:v1.3.3" \
             --set-env-vars \
               SPRING_PROFILES_ACTIVE=prod \
-              "DB_HOST=${{ secrets.PROD_DB_HOST }}" \
-              DB_PORT=5432 \
-              "DB_NAME=${{ secrets.PROD_DB_NAME }}" \
+              "DB_URL=jdbc:postgresql://${{ secrets.PROD_DB_HOST }}:5432/${{ secrets.PROD_DB_NAME }}?sslmode=require" \
               "DB_USER=${{ secrets.PROD_DB_USER }}" \
               "DB_PASSWORD=${DB_PASSWORD}" \
               "JWT_SECRET=${JWT_SECRET}" \
               "GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}" \
               "GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}" \
-              SERVER_PORT=8080
+              SERVER_PORT=8080 \
+              SERVER_SSL_ENABLED=false
 
           echo "✅ Container App PROD actualizado con imagen v1.3.3"
 
