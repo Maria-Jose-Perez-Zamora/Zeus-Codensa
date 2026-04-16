@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Profile;
 
 @Configuration
 @Profile("!h2")
+@org.springframework.boot.autoconfigure.condition.ConditionalOnProperty(name = "server.ssl.enabled", havingValue = "true")
 public class ServerConfig {
 
     @Bean
