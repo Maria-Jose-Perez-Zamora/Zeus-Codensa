@@ -1,10 +1,11 @@
-name: CI-CD Pipeline - Techcup Futbol
+# ⚠️ LEGACY — Este workflow fue reemplazado por ci.yml (ZEUS-123)
+# Deshabilitado para evitar ejecuciones duplicadas.
+# Ver: .github/workflows/ci.yml
+
+name: CI-CD Pipeline - Techcup Futbol (LEGACY - DESHABILITADO)
 
 on:
-  push:
-    branches: [ main, develop ]
-  pull_request:
-    branches: [ main ]
+  workflow_dispatch:  # Solo manual si se necesita
 
 jobs:
   build-test-sonar:

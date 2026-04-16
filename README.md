@@ -1138,3 +1138,45 @@ Desarrollado con dedicación por el equipo **Zeus-Codensa** para **TechCup Footb
 
 **Status**: En Desarrollo (Sprint #4)
 
+---
+
+## 🚀 Despliegue en Azure — Estado Actual
+
+### Ambientes Desplegados
+
+| Ambiente | URL | Estado |
+|---|---|---|
+| **QA** | `https://techcup-qa.happymushroom-f55d56eb.eastus.azurecontainerapps.io` | 🟡 Configurado |
+| **PROD** | `https://techcup-prod.happymushroom-f55d56eb.eastus.azurecontainerapps.io` | 🟡 Pendiente aprobación |
+
+### Health Check
+
+```bash
+# QA
+curl https://techcup-qa.happymushroom-f55d56eb.eastus.azurecontainerapps.io/health
+# Respuesta esperada: {"status":"UP","version":"1.3.3","db":"OK"}
+
+# PROD
+curl https://techcup-prod.happymushroom-f55d56eb.eastus.azurecontainerapps.io/health
+```
+
+### Infraestructura Azure (rg-zeus-codensa)
+
+| Recurso | Nombre | Región |
+|---|---|---|
+| Resource Group | `rg-zeus-codensa` | East US |
+| Container Registry | `zeuscodensaacr.azurecr.io` | East US |
+| PostgreSQL Flexible Server | `techcup-dbserver.postgres.database.azure.com` | East US |
+| Container App QA | `techcup-qa` | East US |
+| Container App PROD | `techcup-prod` | East US |
+
+### Pipeline CI/CD
+
+| Workflow | Rama | Trigger | Acción |
+|---|---|---|---|
+| `ci.yml` | develop / main | push / PR | Tests + JaCoCo + SonarCloud + Docker → ACR |
+| `cd-qa.yml` | develop | CI exitoso | Deploy automático → Container App QA |
+| `cd-prod.yml` | main | CI exitoso | Deploy manual (3 aprobadores) → Container App PROD |
+
+> **Versión desplegada:** `v1.3.3`
+
