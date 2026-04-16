@@ -1,6 +1,6 @@
 logging:
   level:
-    root: WARN
+    root: INFO
     controller: INFO
     service: DEBUG
   file:
@@ -20,11 +20,10 @@ server:
 
 spring:
   datasource:
-    # Se usan variables de entorno para Azure y valores por defecto para local
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/techcuo_db}
-    username: ${DB_USER:techcuo_user}
-    # La contraseña NUNCA debe estar en texto plano en el código
-    password: ${DB_PASSWORD}
+    # Se usan variables de entorno estandar
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/techcuo_db}
+    username: ${SPRING_DATASOURCE_USERNAME:techcuo_user}
+    password: ${SPRING_DATASOURCE_PASSWORD:password}
   jpa:
     open-in-view: false
     hibernate:
