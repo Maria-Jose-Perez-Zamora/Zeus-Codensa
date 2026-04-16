@@ -27,7 +27,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping
+    @PostMapping("/register")
     @Operation(summary = "Register User", description = "Registers a new user (Player, Organizer, Referee, Captain, or Admin) in the system")
     public ResponseEntity<UserResponseDTO> register(@RequestBody UserRequestDTO request) {
         log.info("REST request - register user: {}", request.getEmail());
