@@ -2,6 +2,7 @@ name: CD PROD - Deploy a Azure Container App PROD
 
 # ZEUS-151: Se dispara cuando CI termina exitosamente en 'main'
 on:
+  workflow_dispatch:
   workflow_run:
     workflows: ["CI Pipeline - Techcup Futbol"]
     branches: [ main ]
