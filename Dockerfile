@@ -17,7 +17,8 @@ ENV DB_HOST=db
 ENV DB_PORT=5432
 ENV SERVER_PORT=8080
 
+# Solo copiamos el jar que acaba en .jar, si hay muchos Docker creará una carpeta, 
 COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["sh", "-c", "echo 'Iniciando contenedor...' && ls -la && java -jar app.jar || (echo 'ERROR CRÍTICO FATAL EN JAVA' && sleep 60)"]
