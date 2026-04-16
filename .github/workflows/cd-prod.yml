@@ -17,7 +17,7 @@ jobs:
   deploy-prod:
     name: "🚀 Deploy a PROD (requiere aprobación de 3 personas)"
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     environment: production  # ← ZEUS-152: GitHub Environment con 3 Required Reviewers
 
     steps:

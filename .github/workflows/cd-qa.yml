@@ -15,7 +15,7 @@ jobs:
   deploy-qa:
     name: "🚀 Deploy Automático a QA (Container App)"
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     environment: qa  # GitHub Environment para QA
 
     steps:
