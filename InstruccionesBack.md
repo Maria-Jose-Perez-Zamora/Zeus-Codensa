@@ -8,7 +8,7 @@
 [![Security](https://img.shields.io/badge/Security-JWT%20%2B%20OAuth2-blue)](#)
 
 Backend RESTful para la gestión integral de torneos de fútbol de **TechCup**, desarrollado con **Spring Boot**, **PostgreSQL**, **JWT**, **OAuth2** y despliegue containerizado con **Docker**...
-
+...
 ---
 
 #  Tabla de Contenido
