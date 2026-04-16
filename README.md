@@ -164,35 +164,33 @@ GRANT ALL PRIVILEGES ON DATABASE techcup_db TO techcup_user;
 
 ### Configurar Propiedades de la Aplicación
 
-Editar `src/main/resources/application.properties`:
+Configura variables de entorno (el proyecto usa `src/main/resources/application.yaml`):
 
-```properties
-# Base de Datos
-spring.datasource.url=jdbc:postgresql://localhost:5432/techcup_db
-spring.datasource.username=techcup_user
-spring.datasource.password=your_secure_password
-spring.datasource.driver-class-name=org.postgresql.Driver
-
-# JPA/Hibernate
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
-
-# Puerto del servidor
-server.port=8080
-server.servlet.context-path=/api/v1
+```bash
+# Base de datos
+DB_URL=jdbc:postgresql://localhost:5432/techcuo_db
+DB_USER=techcuo_user
+DB_PASSWORD=your_secure_password
 
 # JWT
-app.jwt.secret=your_super_secret_key_minimum_256_bits_or_longer_for_security
-app.jwt.expiration=86400000
+JWT_SECRET=your_super_secret_key_minimum_256_bits_or_longer_for_security
+JWT_TTL_MS=3600000
 
-# Logging
-logging.level.root=INFO
-logging.level.com.zeus.techcup=DEBUG
+# OAuth2 Google
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+OAUTH2_SUCCESS_REDIRECT_URL=http://localhost:3000/dashboard
 
-# Documentación API
-springdoc.api-docs.path=/v3/api-docs
-springdoc.swagger-ui.path=/swagger-ui.html
+# SSL / servidor
+PORT=8443
+KEY_STORE_PASSWORD=password
 ```
+
+Notas de configuración reales:
+
+- El backend corre por defecto en `https://localhost:8443`.
+- SSL está habilitado (`server.ssl.enabled=true`).
+- No se usa `server.servlet.context-path`, por lo que las rutas API inician en `/api/...`.
 
 ### Descargar Dependencias
 
@@ -211,7 +209,7 @@ O desde IntelliJ IDEA: Click derecho en la clase main → Run
 ### Acceder a Swagger UI
 
 ```
-http://localhost:8080/api/v1/swagger-ui.html
+https://localhost:8443/swagger-ui/index.html
 ```
 
 ---
@@ -247,38 +245,26 @@ El sistema ha sido desarrollado bajo el patrón de arquitectura MVC utilizando e
 ### Estructura de Carpetas
 
 ```
-src/main/java/
-├── controller/                 # Controladores REST
-│   ├── UserController
-│   ├── TeamController
-│   ├── TournamentController
-│   ├── InscriptionController
-│   └── MatchController
-│
-├── core/                       # Lógica de negocio
-│   ├── model/                  # Entidades del dominio
-│   │   ├── User
-│   │   ├── Team
-│   │   ├── Tournament
-│   │   └── Match
+src/main/java/com/zeuscodensa/techcupfutbol/
+├── config/                     # Configuración (Security, CORS, OpenAPI)
+├── controller/
+│   ├── api/                    # Endpoints REST
+│   ├── dto/                    # DTOs de entrada/salida
+│   ├── handler/                # Manejador global de excepciones
+│   └── mapper/                 # Mapeos DTO <-> dominio
+├── core/
+│   ├── model/                  # Entidades de dominio
+│   ├── repository/             # Interfaces de repositorio de dominio
 │   ├── service/                # Servicios de negocio
-│   │   ├── UserService
-│   │   ├── TeamService
-│   │   ├── TournamentService
-│   │   └── strategy/
-│   ├── factory/                # Factory Method
-│   ├── exception/              # Excepciones personalizadas
-│   └── validator/              # Validadores de dominio
-│
-├── dependencies/               # Configuración e infraestructura
-│   ├── config/                 # Configuración de Spring
-│   │   ├── SecurityConfig
-│   │   ├── JpaConfig
-│   │   └── SwaggerConfig
-│   ├── dto/                    # Data Transfer Objects
-│   ├── mapper/                 # Mapeos Entity ↔ DTO
-│   ├── security/               # Autenticación y JWT
-│   └── util/                   # Utilidades generales
+│   ├── strategy/               # Estrategias (emparejamiento, etc.)
+│   ├── validator/              # Validaciones de reglas
+│   └── enums/                  # Enumeraciones de dominio
+├── persistence/
+│   ├── entity/                 # Entidades JPA
+│   ├── repository/             # Repositorios Spring Data
+│   └── mapper/                 # Mappers persistencia <-> dominio
+├── security/                   # JWT, OAuth2 handlers y utilidades
+└── TechcupFutbolApplication.java
 ```
 
 ---
@@ -304,7 +290,7 @@ El sistema ha sido desarrollado aplicando patrones de diseño profesionales que 
 
 ### 2. Builder Pattern
 
-**Ubicación**: `dependencies/config/SwaggerConfig.java`
+**Ubicación**: `config/SwaggerConfig.java`
 
 **Implementación**: En la configuración de la documentación de la API. Se usa al construir paso a paso la información general del servicio.
 
@@ -363,60 +349,85 @@ El sistema ha sido desarrollado aplicando patrones de diseño profesionales que 
 
 ### Autenticación (Auth)
 
-|                                                                                 | Endpoint | Descripción |
+| Método | Endpoint | Descripción |
 |--------|----------|-------------|
-|  | `/auth/login` | Inicio de sesión |
-|  | `/auth/register` | Registro de nuevo usuario |
+| POST | `/api/auth` | Inicio de sesión (JWT) |
+| GET | `/api/auth/google/start` | Inicio de flujo OAuth2 con Google |
 
 ### Usuarios (Users)
 
-|  | Endpoint | Descripción |
+| Método | Endpoint | Descripción |
 |--------|----------|-------------|
-|  | `/users` | Listar todos los usuarios |
-|  | `/users/{userId}` | Obtener usuario por código |
-|  | `/users` | Crear usuario |
-|  | `/users/{userId}` | Actualizar usuario |
+| POST | `/api/users` | Crear usuario |
+| GET | `/api/users` | Listar usuarios |
 
 ### Equipos (Teams)
 
-|  | Endpoint | Descripción |
+| Método | Endpoint | Descripción |
 |--------|----------|-------------|
-| | `/teams` | Listar todos los equipos |
-|  | `/teams/{teamCode}` | Obtener equipo por código |
-|  | `/teams` | Crear equipo |
-|  | `/teams/{teamCode}` | Actualizar equipo |
+| POST | `/api/teams` | Crear equipo |
+| GET | `/api/teams` | Listar equipos |
 
 ### Torneos (Tournaments)
 
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
-| | `/tournaments` | Listar todos los torneos |
-|  | `/tournaments/{tournamentCode}` | Obtener torneo por código |
-|  | `/tournaments` | Crear torneo |
-|  | `/tournaments/{tournamentCode}/config` | Configurar torneo |
+| POST | `/api/tournaments` | Crear torneo |
+| PUT | `/api/tournaments/{id}` | Configurar torneo |
+| GET | `/api/tournaments/query/all` | Historial/listado de torneos |
+| GET | `/api/tournaments/query/{id}` | Detalle de torneo |
+
+### Consultas de Torneo
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET | `/api/tournaments/query` | Endpoint base de consultas |
+| GET | `/api/tournaments/query/{tournament}/standings` | Tabla de posiciones |
+| GET | `/api/tournaments/query/{tournament}/brackets/{phase}` | Llaves eliminatorias |
+| GET | `/api/tournaments/query/{tournament}/calendar` | Calendario de partidos |
+| GET | `/api/tournaments/query/{tournament}/results` | Resultados históricos |
+| GET | `/api/tournaments/query/{tournament}/statistics` | Estadísticas globales |
+| GET | `/api/tournaments/query/{tournament}/scorers` | Tabla de goleadores |
+| GET | `/api/tournaments/query/{tournament}/history/{team}` | Historial por equipo |
 
 ### Inscripciones (Inscriptions)
 
-|  | Endpoint | Descripción |
+| Método | Endpoint | Descripción |
 |--------|----------|-------------|
-|  | `/inscriptions` | Registrar inscripción |
-|  | `/inscriptions` | Listar inscripciones |
-|  | `/inscriptions/{inscriptionId}/status` | Cambiar estado |
+| POST | `/api/registrations` | Registrar inscripción |
+| PUT | `/api/registrations/{id}/status` | Cambiar estado de inscripción |
+| GET | `/api/registrations` | Listar inscripciones |
+
+### Jugadores e Invitaciones
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET | `/api/players/available` | Buscar jugadores disponibles |
+| POST | `/api/players/invitations` | Enviar invitación |
+| PATCH | `/api/players/invitations/{id}/acceptance?playerEmail=...` | Aceptar/Rechazar invitación |
 
 ### Partidos (Matches)
 
-|  | Endpoint | Descripción |
+| Método | Endpoint | Descripción |
 |--------|----------|-------------|
-|  | `/matches` | Crear partido |
-|  | `/matches/{matchCode}` | Obtener partido |
-|  | `/matches/{matchCode}/score` | Actualizar marcador |
-|  | `/matches/{matchCode}/lineup` | Registrar alineación |
-|  | `/matches/{matchCode}/cards` | Registrar tarjetas |
+| POST | `/api/matches` | Crear partido |
+| PUT | `/api/matches/{id}/score` | Actualizar marcador |
+| PUT | `/api/matches/{id}/lineup` | Registrar alineación |
+| PUT | `/api/matches/{id}/cards` | Registrar tarjetas |
+| PUT | `/api/matches/{id}/referee` | Asignar árbitro |
+| GET | `/api/matches/referee/{refereeEmail}` | Obtener partidos por árbitro |
+| GET | `/api/matches` | Listar partidos |
+
+### Salud del Servicio
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET | `/health` | Health check público (app + conectividad DB) |
 
 ### Documentación Interactiva
 
-- **Swagger UI**: `http://localhost:8080/api/v1/swagger-ui.html`
-- **OpenAPI JSON**: `http://localhost:8080/api/v1/v3/api-docs`
+- **Swagger UI**: `https://localhost:8443/swagger-ui/index.html`
+- **OpenAPI JSON**: `https://localhost:8443/v3/api-docs`
 
 ---
 
@@ -978,7 +989,7 @@ El sistema implementa autenticación basada en JWT (JSON Web Tokens) con expirac
 
 ```
 1. Cliente envía credenciales
-   POST /auth/login
+  POST /api/auth
    {
      "emailAddress": "user@example.com",
      "password": "password123"
@@ -1023,26 +1034,18 @@ El sistema implementa autenticación basada en JWT (JSON Web Tokens) con expirac
 ### Estructura de Tests
 
 ```
-src/test/java/
+src/test/java/com/zeuscodensa/techcupfutbol/
+├── config/
 ├── controller/
-│   ├── UserControllerTest
-│   ├── TeamControllerTest
-│   └── TournamentControllerTest
+│   ├── api/
+│   ├── handler/
+│   └── mapper/
 ├── core/
 │   ├── service/
-│   │   ├── UserServiceTest
-│   │   ├── TeamServiceTest
-│   │   └── TournamentServiceTest
-│   ├── factory/
-│   │   └── UserFactoryTest
+│   ├── strategy/
 │   └── validator/
-│       └── UserValidatorTest
-└── dependencies/
-    ├── mapper/
-    │   ├── UserMapperTest
-    │   └── TeamMapperTest
-    └── security/
-        └── JwtUtilTest
+├── persistence/
+└── security/
 ```
 
 ### Ejecutar Tests
@@ -1095,9 +1098,9 @@ class UserServiceTest {
 
 ### Documentación Interactiva (Swagger)
 
-Acceder a la interfaz Swagger en: `http://localhost:8080/api/v1/swagger-ui.html`
+Acceder a la interfaz Swagger en: `https://localhost:8443/swagger-ui/index.html`
 
-Descargar especificación OpenAPI: `http://localhost:8080/api/v1/v3/api-docs`
+Descargar especificación OpenAPI: `https://localhost:8443/v3/api-docs`
 
 ### Archivos de Prueba
 
