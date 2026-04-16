@@ -47,9 +47,9 @@ jobs:
             --image "${{ secrets.ACR_LOGIN_SERVER }}/techcup-backend:latest" \
             --set-env-vars \
               SPRING_PROFILES_ACTIVE=dev \
-              "DB_URL=jdbc:postgresql://${{ secrets.QA_DB_HOST }}:5432/${{ secrets.QA_DB_NAME }}?sslmode=require" \
-              "DB_USER=${{ secrets.QA_DB_USER }}" \
-              "DB_PASSWORD=${DB_PASSWORD}" \
+              "SPRING_DATASOURCE_URL=jdbc:postgresql://${{ secrets.QA_DB_HOST }}:5432/${{ secrets.QA_DB_NAME }}?sslmode=require" \
+              "SPRING_DATASOURCE_USERNAME=${{ secrets.QA_DB_USER }}" \
+              "SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}" \
               "JWT_SECRET=${JWT_SECRET}" \
               "GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}" \
               "GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}" \
