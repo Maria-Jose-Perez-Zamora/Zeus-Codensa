@@ -14,6 +14,9 @@ import com.zeuscodensa.techcupfutbol.core.service.UserService;
 
 import java.util.Arrays;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -35,12 +38,13 @@ public class UserControllerTest {
     public void testGetAllUsers() {
         com.zeuscodensa.techcupfutbol.core.model.Player u1 = new com.zeuscodensa.techcupfutbol.core.model.Player();
         u1.setName("Carlos");
-        when(userService.getAllUsers()).thenReturn(Arrays.asList(u1));
+        Page<User> page = new PageImpl<>(Arrays.asList(u1));
+        when(userService.getAllUsers(any(PageRequest.class))).thenReturn(page);
 
-        ResponseEntity<List<UserResponseDTO>> responseEntity = userController.getAll();
+        ResponseEntity<Page<UserResponseDTO>> responseEntity = userController.getAll(0, 10);
 
         assertEquals(200, responseEntity.getStatusCode().value());
-        assertEquals(1, responseEntity.getBody().size());
-        assertEquals("Carlos", responseEntity.getBody().get(0).getName());
+        assertEquals(1, responseEntity.getBody().getTotalElements());
+        assertEquals("Carlos", responseEntity.getBody().getContent().get(0).getName());
     }
 }

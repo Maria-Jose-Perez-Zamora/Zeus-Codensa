@@ -16,6 +16,10 @@ import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @RequestMapping("/api/users")
@@ -51,14 +55,57 @@ public class UserController {
         return ResponseEntity.ok(UserMapper.toDTO(updatedUser));
     }
     @GetMapping
-    @Operation(summary = "Get All Users", description = "Returns a list of all registered users")
-    public ResponseEntity<List<UserResponseDTO>> getAll() {
-        log.info("REST request - getAll Usuarios");
+    @PreAuthorize("hasAuthority('ADMINISTRADOR_SISTEMA')")
+    @Operation(summary = "Get All Users Paginated", description = "Returns a paginated list of all registered users (Admin only)")
+    public ResponseEntity<Page<UserResponseDTO>> getAll(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        log.info("REST request - getAll Usuarios paginated");
         
-        List<UserResponseDTO> response = userService.getAllUsers().stream()
-                .map(UserMapper::toDTO)
-                .collect(Collectors.toList());
+        Pageable pageable = PageRequest.of(page, size);
+        Page<UserResponseDTO> response = userService.getAllUsers(pageable)
+                .map(UserMapper::toDTO);
                 
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{email}")
+    @PreAuthorize("hasAuthority('ADMINISTRADOR_SISTEMA')")
+    @Operation(summary = "Get User by Email", description = "Returns user details by email (Admin only)")
+    public ResponseEntity<UserResponseDTO> getUserByEmail(@PathVariable String email) {
+        log.info("REST request - get user by email: {}", email);
+        User user = userService.getUserByEmail(email);
+        return ResponseEntity.ok(UserMapper.toDTO(user));
+    }
+
+    @PostMapping
+    @PreAuthorize("hasAuthority('ADMINISTRADOR_SISTEMA')")
+    @Operation(summary = "Create User", description = "Creates a new user in the system (Admin only)")
+    public ResponseEntity<UserResponseDTO> createUser(@Valid @RequestBody UserRequestDTO request) {
+        log.info("REST request - create user: {}", request.getEmail());
+        User userModel = UserMapper.toEntity(request);
+        User savedUser = userService.registerUser(userModel);
+        return ResponseEntity.ok(UserMapper.toDTO(savedUser));
+    }
+
+    @PutMapping("/{email}")
+    @PreAuthorize("hasAuthority('ADMINISTRADOR_SISTEMA')")
+    @Operation(summary = "Update User by Email", description = "Updates a user's details by email (Admin only)")
+    public ResponseEntity<UserResponseDTO> updateUser(
+            @PathVariable String email, 
+            @Valid @RequestBody UserRequestDTO request) {
+        log.info("REST request - update user by email: {}", email);
+        User updateData = UserMapper.toEntity(request);
+        User updatedUser = userService.updateUser(email, updateData);
+        return ResponseEntity.ok(UserMapper.toDTO(updatedUser));
+    }
+
+    @DeleteMapping("/{email}")
+    @PreAuthorize("hasAuthority('ADMINISTRADOR_SISTEMA')")
+    @Operation(summary = "Delete User", description = "Deletes a user by email (Admin only)")
+    public ResponseEntity<Void> deleteUser(@PathVariable String email) {
+        log.info("REST request - delete user by email: {}", email);
+        userService.deleteUser(email);
+        return ResponseEntity.noContent().build();
     }
 }
