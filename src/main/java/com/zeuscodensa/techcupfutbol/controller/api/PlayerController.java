@@ -64,6 +64,21 @@ public class PlayerController {
         return ResponseEntity.ok(new InvitationResponseDTO(savedInv));
     }
 
+    @GetMapping("/invitations")
+    @Operation(summary = "Get Player Invitations", description = "Returns all pending invitations and requests for the authenticated player")
+    public ResponseEntity<List<InvitationResponseDTO>> getPlayerInvitations(
+            org.springframework.security.core.Authentication authentication) {
+        String playerEmail = authentication != null ? authentication.getName() : null;
+        log.info("REST request - getPlayerInvitations for player: {}", playerEmail);
+        
+        List<InvitationResponseDTO> requests = jugadorService.getInvitationsByPlayer(playerEmail)
+                .stream()
+                .map(InvitationResponseDTO::new)
+                .collect(Collectors.toList());
+                
+        return ResponseEntity.ok(requests);
+    }
+
     @PatchMapping("/invitations/{id}/acceptance")
     @Operation(summary = "Process Invitation", description = "A player accepts or declines an invitation to join a team")
     public ResponseEntity<Void> processInvitation(

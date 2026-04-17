@@ -148,6 +148,12 @@ public class PlayerService {
                 .collect(Collectors.toList());
     }
 
+    public List<Invitation> getInvitationsByPlayer(String playerEmail) {
+        return invitationRepository.findByPlayerEmail(playerEmail).stream()
+                .filter(i -> STATUS_PENDING.equals(i.getStatus()) || STATUS_SENT.equals(i.getStatus()) || "REQUESTED".equals(i.getStatus()))
+                .collect(Collectors.toList());
+    }
+
     public void captainProcessJoinRequest(String invitationId, String captainEmail, String status) {
         Invitation inv = invitationRepository.findById(invitationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Solicitud no encontrada"));
