@@ -47,7 +47,7 @@ public class SecurityConfigTest {
 
         CorsConfiguration cors = source.getCorsConfiguration(new MockHttpServletRequest());
         assertNotNull(cors);
-        assertTrue(cors.getAllowedOrigins().contains("http://localhost:3000"));
+        assertTrue(cors.getAllowedOriginPatterns().contains("http://localhost:3000"));
         assertTrue(cors.getAllowedMethods().contains("POST"));
         assertTrue(cors.getAllowedHeaders().contains("Authorization"));
         assertTrue(cors.getAllowCredentials());
