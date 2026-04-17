@@ -25,16 +25,21 @@ public class AuthServiceTest {
     @Mock
     private IUserRepository userRepository;
 
+    @Mock
+    private org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
+
     @InjectMocks
     private AuthService authService;
+    
     @Test
     public void testLogin_Success() {
         com.zeuscodensa.techcupfutbol.core.model.Player u = new com.zeuscodensa.techcupfutbol.core.model.Player();
         u.setEmail("user.test1-a@escuelaing.edu.co");
-        u.setPassword("secret");
+        u.setPassword("encodedSecret");
         u.setRole(com.zeuscodensa.techcupfutbol.core.model.Role.PLAYER);
         
         when(userRepository.findByEmail("user.test1-a@escuelaing.edu.co")).thenReturn(Optional.of(u));
+        when(passwordEncoder.matches("secret", "encodedSecret")).thenReturn(true);
         when(jwtService.generateToken(anyString(), anyString())).thenReturn("mockToken");
 
         String responseToken = authService.login("user.test1-a@escuelaing.edu.co", "secret");
@@ -47,9 +52,10 @@ public class AuthServiceTest {
     public void testLogin_InvalidCredentials() {
         com.zeuscodensa.techcupfutbol.core.model.Player u = new com.zeuscodensa.techcupfutbol.core.model.Player();
         u.setEmail("user.test1-a@escuelaing.edu.co");
-        u.setPassword("secret");
+        u.setPassword("encodedSecret");
         
         when(userRepository.findByEmail("user.test1-a@escuelaing.edu.co")).thenReturn(Optional.of(u));
+        when(passwordEncoder.matches("wrong", "encodedSecret")).thenReturn(false);
 
         assertThrows(BusinessRuleException.class, () -> authService.login("user.test1-a@escuelaing.edu.co", "wrong"));
     }
