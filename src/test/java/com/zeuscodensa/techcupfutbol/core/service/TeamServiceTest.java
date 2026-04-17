@@ -157,4 +157,16 @@ public class TeamServiceTest {
         teamService.deleteTeam(1L);
         verify(teamRepository, times(1)).deleteById(1L);
     }
+
+    @Test
+    public void testGetTeamById_NotFound() {
+        when(teamRepository.findById(1L)).thenReturn(Optional.empty());
+        assertThrows(com.zeuscodensa.techcupfutbol.core.exception.ResourceNotFoundException.class, () -> teamService.getTeamById(1L));
+    }
+
+    @Test
+    public void testGetAllTeams_Paginated_Exception() {
+        when(teamRepository.findAll(any(Pageable.class))).thenThrow(new RuntimeException("DB Error"));
+        assertThrows(com.zeuscodensa.techcupfutbol.core.exception.PersistenceAccessException.class, () -> teamService.getAllTeams(null, PageRequest.of(0, 10)));
+    }
 }
