@@ -2,6 +2,7 @@ package com.zeuscodensa.techcupfutbol.core.service;
 
 import com.zeuscodensa.techcupfutbol.core.exception.BusinessRuleException;
 import com.zeuscodensa.techcupfutbol.core.exception.PersistenceAccessException;
+import com.zeuscodensa.techcupfutbol.core.exception.ResourceNotFoundException;
 import com.zeuscodensa.techcupfutbol.core.model.Team;
 import com.zeuscodensa.techcupfutbol.core.model.User;
 import com.zeuscodensa.techcupfutbol.core.validator.TeamValidator;
@@ -14,6 +15,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 public class TeamService {
@@ -63,6 +66,42 @@ public class TeamService {
             return teamRepository.findAll();
         } catch (Exception ex) {
             throw new PersistenceAccessException("Error al consultar equipos en base de datos", ex);
+        }
+    }
+
+    public Page<Team> getAllTeams(String nameFilter, Pageable pageable) {
+        try {
+            if (nameFilter != null && !nameFilter.trim().isEmpty()) {
+                return teamRepository.findByTeamNameContainingIgnoreCase(nameFilter.trim(), pageable);
+            }
+            return teamRepository.findAll(pageable);
+        } catch (Exception ex) {
+            throw new PersistenceAccessException("Error al consultar equipos con paginacion y filtros", ex);
+        }
+    }
+
+    public Team getTeamById(Long id) {
+        return teamRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Team no encontrado con id: " + id));
+    }
+
+    public Team updateTeam(Long id, Team updatedTeam) {
+        Team existing = getTeamById(id);
+        existing.setTeamName(updatedTeam.getTeamName());
+        existing.setEscudo(updatedTeam.getEscudo());
+        existing.setColoresUniforme(updatedTeam.getColoresUniforme());
+        try {
+            return teamRepository.save(existing);
+        } catch (Exception ex) {
+            throw new PersistenceAccessException("Error al actualizar equipo", ex);
+        }
+    }
+
+    public void deleteTeam(Long id) {
+        getTeamById(id); // Valida que exista
+        try {
+            teamRepository.deleteById(id);
+        } catch (Exception ex) {
+            throw new PersistenceAccessException("Error al eliminar equipo", ex);
         }
     }
 }
