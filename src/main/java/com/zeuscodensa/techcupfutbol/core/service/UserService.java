@@ -6,7 +6,7 @@ import com.zeuscodensa.techcupfutbol.core.model.User;
 import com.zeuscodensa.techcupfutbol.core.validator.UserValidator;
 import com.zeuscodensa.techcupfutbol.core.repository.IUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder; // NUEVA IMPORTACIÓN
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,13 +20,16 @@ public class UserService {
     private static final Logger log = LoggerFactory.getLogger(UserService.class);
     private final IUserRepository userRepository;
     private final UserValidator userValidator;
-    private final PasswordEncoder passwordEncoder; // NUEVA DEPENDENCIA
+    private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
     @Autowired
-    public UserService(IUserRepository userRepository, UserValidator userValidator, PasswordEncoder passwordEncoder) {
+    public UserService(IUserRepository userRepository, UserValidator userValidator,
+                       PasswordEncoder passwordEncoder, EmailService emailService) {
         this.userRepository = userRepository;
         this.userValidator = userValidator;
-        this.passwordEncoder = passwordEncoder; // INYECCIÓN EN CONSTRUCTOR
+        this.passwordEncoder = passwordEncoder;
+        this.emailService = emailService;
     }
 
     public User registerUser(User newUser) {
@@ -46,6 +49,10 @@ public class UserService {
 
             User saved = userRepository.save(newUser);
             log.info("User created successfully in DB: {} with role {}", newUser.getEmail(), newUser.getRole());
+
+            // Send async welcome email — non-blocking, failure is logged but doesn't break registration
+            emailService.sendWelcomeEmail(saved.getEmail(), saved.getName());
+
             return saved;
         } catch (Exception ex) {
             if (ex instanceof BusinessRuleException) {

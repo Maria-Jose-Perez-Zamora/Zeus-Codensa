@@ -10,7 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.crypto.password.PasswordEncoder; // NUEVA IMPORTACIÓN
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.zeuscodensa.techcupfutbol.core.exception.BusinessRuleException;
 import com.zeuscodensa.techcupfutbol.core.exception.PersistenceAccessException;
@@ -31,7 +31,10 @@ public class UserServiceTest {
     private UserValidator userValidator;
 
     @Mock
-    private PasswordEncoder passwordEncoder; // NUEVA DEPENDENCIA MOCK
+    private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private EmailService emailService;
 
     @InjectMocks
     private UserService userService;
