@@ -62,18 +62,11 @@
 | Paso | Actor | Descripción | Excepciones |
 |------|-------|-------------|-------------|
 | 1 | Cliente | Envía `POST /api/auth/login` con `correo` y `contrasena`. | — |
-| 2 | Sistema (`AuthService`) | Valida que `correo` y `contrasena` no sean nulos ni vacíos. | Campos nulos o vacíos: `400 Bad Request` con `IllegalArgumentException`. |
-| 3 | Sistema | Busca el usuario por correo en `UserRepository`. | — |
-| 4 | Sistema | Si el usuario no existe o la contraseña no coincide, lanza excepción. | Usuario no encontrado o credenciales incorrectas: `400 Bad Request`, `"Credenciales incorrectas"` con `BusinessRuleException`. |
-| 5 | Sistema | Asigna el rol del usuario encontrado. | — |
-| 6 | Sistema (`JWTProvider`) | Genera un JWT firmado (HS256) con el rol como claim. TTL: 1 hora. | — |
-| 7 | Sistema | Retorna `LoginResponseDTO(userId, correo, role, token)` con `200 OK`. | — |
 
 ## Flujo alterno
 
 | Paso | Actor | Descripción | Excepciones |
 |------|-------|-------------|-------------|
-| 1 | Sistema | Un token previamente emitido es usado en una petición posterior y está inválido o expirado. | `401 Unauthorized`. |
 
 
 # RF-002: Registro de Usuario
@@ -155,11 +148,6 @@
 | Paso | Actor | Descripción | Excepciones |
 |------|-------|-------------|-------------|
 | 1 | Cliente | Envía `GET /api/users/all` con header `Authorization: Bearer <token>`. | — |
-| 2 | Sistema (`JWTProvider`) | Valida el token JWT. | Token inválido/expirado: `401 Unauthorized`. |
-| 3 | Sistema (`UserService`) | Ejecuta `getAllUsers()` → llama a `UserRepository.findAll()`. | — |
-| 4 | Sistema | Si la lista está vacía, retorna `[]`. | Lista vacía: `204 No Content`. |
-| 5 | Sistema (`UserMapper`) | Por cada usuario: ejecuta `toDTO(User)` → obtiene `UserResponseDTO`. (Loop) | — |
-| 6 | Sistema | Retorna `200 OK + List<UserResponseDTO>`. | — |
 
 ## Flujo alterno
 
@@ -219,16 +207,6 @@
 | Paso | Actor | Descripción | Excepciones |
 |------|-------|-------------|-------------|
 | 1 | Cliente (Capitán) | Envía `POST /api/teams/create` con `TeamRequestDTO`. | — |
-| 2 | Sistema (`JWTProvider`) | Valida el token JWT. | Token inválido/expirado: `401 Unauthorized`. Sin rol `CAPTAIN`: `403 Forbidden`. |
-| 3 | Sistema (`TeamValidator`) | Ejecuta `validateForCreation(requestDTO)`: valida nombre único, tamaño de lista (7–20), sin correos duplicados. | Datos inválidos: `400 Bad Request` con `BusinessRuleException`. |
-| 4 | Sistema (`TeamMapper`) | Ejecuta `toEntity(requestDTO)` → obtiene objeto `Team`. | — |
-| 5 | Sistema (`UserRepository`) | Por cada correo en `jugadoresCorreos`: ejecuta `findByEmail(correo)`. (Loop) | Usuario no encontrado: `404 Not Found` con `ResourceNotFoundException`. |
-| 6 | Sistema | Si el usuario existe, lo agrega a `foundUsers`. | — |
-| 7 | Sistema | Si `foundUsers` está vacío, lanza excepción. | Lista vacía: `400 Bad Request` con `BusinessRuleException`. |
-| 8 | Sistema | Ejecuta `newTeam.setJugadores(foundUsers)`. | — |
-| 9 | Sistema (`TeamRepository`) | Ejecuta `save(newTeam)`. Retorna el `Team` persistido. | — |
-| 10 | Sistema (`TeamMapper`) | Ejecuta `toDTO(newTeam)` → obtiene `TeamResponseDTO`. | — |
-| 11 | Sistema | Retorna `200 OK + TeamResponseDTO`. | — |
 
 ## Flujo alterno
 
@@ -452,13 +430,6 @@
 | Paso | Actor | Descripción | Excepciones |
 |------|-------|-------------|-------------|
 | 1 | Cliente (Capitán) | Envía `POST /api/inscripciones/create` con `InscripcionRequestDTO`. | — |
-| 2 | Sistema (`JWTProvider`) | Valida el token JWT. | Token inválido/expirado: `401 Unauthorized`. |
-| 3 | Sistema (`InscripcionValidator`) | Ejecuta `validateForInscripcion(request)`: valida existencia del equipo, torneo en estado `OPEN`, sin inscripción duplicada. | Datos inválidos o regla incumplida: `400 Bad Request` con `BusinessRuleException`. |
-| 4 | Sistema (`InscripcionMapper`) | Ejecuta `toEntity(request)` → obtiene objeto `Inscripcion`. | — |
-| 5 | Sistema (`InscripcionRepository`) | Ejecuta `save(nuevaInscripcion)`. | Torneo cerrado o usuario ya inscrito: `400 Bad Request` con `BusinessRuleException`. |
-| 6 | Sistema | Retorna la `Inscripcion` persistida. | — |
-| 7 | Sistema (`InscripcionMapper`) | Ejecuta `toDTO(nuevaInscripcion)` → obtiene `InscripcionResponseDTO`. | — |
-| 8 | Sistema | Retorna `200 OK + InscripcionResponseDTO`. | — |
 
 ## Flujo alterno
 
@@ -525,7 +496,7 @@
 
 | Nombre | Descripción | Tipo de dato | Reglas / Validación | Obligatorio |
 |--------|-------------|--------------|---------------------|-------------|
-| `estado` | Nuevo estado de la inscripción | `Enum` | Estados válidos: `PENDIENTE`, `EN_REVISION`, `APROBADO`, `RECHAZADO`. | Sí |
+| `estado` | Nuevo estado de la inscripción | `Enum` | Estados válidos: `PENDING`, `IN_REVIEW`, `APPROVED`, `REJECTED`. | Sí |
 
 ## Datos de salida
 
@@ -534,14 +505,14 @@
 | `InscripcionResponseDTO` | Inscripción actualizada con el nuevo estado | `Object` | Refleja el estado actualizado. | Sí |
 | `message` | Mensaje de confirmación | `String` | Mensaje de éxito o descripción del error. | Sí |
 
-## Máquina de estados – Inscripción
+## State Machine – Registration
 
 ```
-PENDIENTE → EN_REVISION → APROBADO
-                        → RECHAZADO
+PENDING → IN_REVIEW → APPROVED
+                      → REJECTED
 ```
 
-`APROBADO` y `RECHAZADO` son estados finales. No admiten transiciones posteriores.
+`APPROVED` y `REJECTED` son estados finales. No admiten transiciones posteriores.
 
 ## Flujo básico
 
@@ -596,13 +567,6 @@ PENDIENTE → EN_REVISION → APROBADO
 | Paso | Actor | Descripción | Excepciones |
 |------|-------|-------------|-------------|
 | 1 | Cliente (Organizador / Árbitro) | Envía `POST /api/partidos/create` con `PartidoRequestDTO`. | — |
-| 2 | Sistema (`JWTProvider`) | Valida el token JWT. | Token inválido/expirado: `401 Unauthorized`. |
-| 3 | Sistema (`PartidoValidator`) | Ejecuta `validateForCreation(request)`: valida que `homeTeam != awayTeam`, torneo existente y ambos equipos con inscripción `APPROVED`. | Datos inválidos o regla incumplida: `400 Bad Request` con `BusinessRuleException`. |
-| 4 | Sistema (`PartidoMapper`) | Ejecuta `toEntity(request)` → obtiene objeto `Partido`. | — |
-| 5 | Sistema (`PartidoRepository`) | Ejecuta `save(nuevoPartido)`. | Error en BD: `500 Internal Server Error` con `GenericException`. |
-| 6 | Sistema | Retorna el `Partido` persistido. | — |
-| 7 | Sistema (`PartidoMapper`) | Ejecuta `toDTO(nuevoPartido)` → obtiene `PartidoResponseDTO`. | — |
-| 8 | Sistema | Retorna `200 OK + PartidoResponseDTO`. | — |
 
 ## Flujo alterno
 
@@ -736,15 +700,6 @@ PENDIENTE → EN_REVISION → APROBADO
 | Paso | Actor | Descripción | Excepciones |
 |------|-------|-------------|-------------|
 | 1 | Cliente (Árbitro / Organizador) | Envía `PUT /api/partidos/{id}/tarjetas` con `jugador` y `tipoTarjeta`. | — |
-| 2 | Sistema (`JWTProvider`) | Valida el token JWT. | Token inválido/expirado: `401 Unauthorized`. |
-| 3 | Sistema (`PartidoService`) | Ejecuta `RegistrarTarjeta(id, jugador, tipoTarjeta)` → valida que `tipoTarjeta` sea `AMARILLA` o `ROJA`. | Tipo de tarjeta inválido: `400 Bad Request` con `BusinessRuleException`. |
-| 4 | Sistema (`PartidoRepository`) | Ejecuta `findById(id)`. | Partido no encontrado: `404 Not Found` con `ResourceNotFoundException`. |
-| 5 | Sistema | Valida que el `jugador` pertenezca a uno de los equipos del partido. | Jugador no participa: `400 Bad Request` con `BusinessRuleException`. |
-| 6 | Sistema | Valida que el estado del partido sea `EN_CURSO`. | Partido no en curso: `400 Bad Request` con `BusinessRuleException`. |
-| 7 | Sistema | Ejecuta `agregar evento de tarjeta` al partido. | — |
-| 8 | Sistema (`PartidoRepository`) | Ejecuta `save(partido actualizado)`. Retorna `Partido` persistido. | — |
-| 9 | Sistema (`PartidoMapper`) | Ejecuta `toDTO(partido)` → obtiene `PartidoResponseDTO`. | — |
-| 10 | Sistema | Retorna `200 OK + PartidoResponseDTO`. | — |
 
 ## Flujo alterno
 

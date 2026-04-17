@@ -1,3 +1,5 @@
+
+
 # TechCup Football - Backend API
 
 [![Spring Boot 3.3.4](https://img.shields.io/badge/Spring%20Boot-3.3.4-brightgreen)](https://spring.io/projects/spring-boot)
@@ -35,6 +37,18 @@ Backend robusto y escalable para la plataforma de gestión de torneos de fútbol
 - [Testing](#testing)
 - [Documentación](#documentación)
 - [Licencia](#licencia)
+
+
+### Archivos
+- [manual_identidad.md](docs/design/manual_identidad.md)
+- [Arquitectura_Backend_TechCup_Football.docx](docs/requirements/Arquitectura_Backend_TechCup_Football.docx)
+- [Arquitectura_Backend_TechCup_Football.pdf](docs/requirements/Arquitectura_Backend_TechCup_Football.pdf)
+- [jira_test_scenarios.md](docs/requirements/jira_test_scenarios.md)
+- [requirements.md](docs/requirements/requirements.md)
+- [DocumentoDeArquitectura.md](DocumentoDeArquitectura.md)
+
+
+
 
 ---
 
