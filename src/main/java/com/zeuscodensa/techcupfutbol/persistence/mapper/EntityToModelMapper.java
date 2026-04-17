@@ -61,6 +61,7 @@ public final class EntityToModelMapper {
         }
 
         Team model = new Team();
+        model.setId(entity.getId());
         model.setTeamName(entity.getTeamName());
         model.setEscudo(entity.getEscudo());
         model.setColoresUniforme(entity.getColoresUniforme());
