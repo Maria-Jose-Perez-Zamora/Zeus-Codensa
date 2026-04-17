@@ -86,9 +86,8 @@ public class UserController {
         return ResponseEntity.ok(UserMapper.toDTO(user));
     }
 
-    @PostMapping
-    @PreAuthorize("hasAuthority('ADMINISTRADOR_SISTEMA')")
-    @Operation(summary = "Create User", description = "Creates a new user in the system (Admin only)")
+    @PostMapping("/register")
+    @Operation(summary = "Create User (Public)", description = "Creates a new user in the system (Public registration)")
     public ResponseEntity<UserResponseDTO> createUser(@Valid @RequestBody UserRequestDTO request) {
         log.info("REST request - create user");
         User userModel = UserMapper.toEntity(request);
