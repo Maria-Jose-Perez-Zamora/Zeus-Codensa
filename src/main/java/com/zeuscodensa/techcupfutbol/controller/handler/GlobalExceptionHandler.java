@@ -66,7 +66,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorDTO> handleAllExceptions(Exception ex, WebRequest request) {
         log.error("Internal server error: ", ex);
-        return buildErrorResponse(ex, HttpStatus.INTERNAL_SERVER_ERROR, request);
+        String path = request.getDescription(false).replace("uri=", "");
+        ApiErrorDTO errorResponse = new ApiErrorDTO(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+                "Ha ocurrido un error inesperado en el servidor",
+                path
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     private ResponseEntity<ApiErrorDTO> buildErrorResponse(Exception ex, HttpStatus status, WebRequest request) {

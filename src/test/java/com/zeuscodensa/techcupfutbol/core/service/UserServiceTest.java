@@ -18,6 +18,11 @@ import com.zeuscodensa.techcupfutbol.core.exception.PersistenceAccessException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import com.zeuscodensa.techcupfutbol.core.exception.ResourceNotFoundException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -124,5 +129,108 @@ public class UserServiceTest {
     public void testGetAllUsers_PersistenceError_Throws() {
         when(userRepository.findAll()).thenThrow(new RuntimeException("db error"));
         assertThrows(PersistenceAccessException.class, () -> userService.getAllUsers());
+    }
+
+    @Test
+    public void testGetAllUsersPaginated() {
+        Player u1 = new Player();
+        u1.setName("Ana");
+        Page<User> page = new PageImpl<>(List.of(u1));
+        when(userRepository.findAll(any(Pageable.class))).thenReturn(page);
+
+        Page<User> result = userService.getAllUsers(PageRequest.of(0, 10));
+        assertEquals(1, result.getTotalElements());
+    }
+
+    @Test
+    public void testGetAllUsersPaginated_Throws() {
+        when(userRepository.findAll(any(Pageable.class))).thenThrow(new RuntimeException("db error"));
+        assertThrows(PersistenceAccessException.class, () -> userService.getAllUsers(PageRequest.of(0, 10)));
+    }
+
+    @Test
+    public void testFindByEmail() {
+        Player u1 = new Player();
+        when(userRepository.findByEmail("test@test.com")).thenReturn(Optional.of(u1));
+        assertTrue(userService.findByEmail("test@test.com").isPresent());
+    }
+
+    @Test
+    public void testGetUserByEmail_Success() {
+        Player u1 = new Player();
+        u1.setEmail("test@test.com");
+        when(userRepository.findByEmail("test@test.com")).thenReturn(Optional.of(u1));
+
+        User result = userService.getUserByEmail("test@test.com");
+        assertEquals("test@test.com", result.getEmail());
+    }
+
+    @Test
+    public void testGetUserByEmail_NotFound() {
+        when(userRepository.findByEmail("test@test.com")).thenReturn(Optional.empty());
+        assertThrows(ResourceNotFoundException.class, () -> userService.getUserByEmail("test@test.com"));
+    }
+
+    @Test
+    public void testDeleteUser_Success() {
+        Player u1 = new Player();
+        when(userRepository.findByEmail("test@test.com")).thenReturn(Optional.of(u1));
+        doNothing().when(userRepository).deleteByEmail("test@test.com");
+
+        userService.deleteUser("test@test.com");
+        verify(userRepository, times(1)).deleteByEmail("test@test.com");
+    }
+
+    @Test
+    public void testDeleteUser_NotFound() {
+        when(userRepository.findByEmail("test@test.com")).thenReturn(Optional.empty());
+        assertThrows(ResourceNotFoundException.class, () -> userService.deleteUser("test@test.com"));
+    }
+
+    @Test
+    public void testDeleteUser_Throws() {
+        Player u1 = new Player();
+        when(userRepository.findByEmail("test@test.com")).thenReturn(Optional.of(u1));
+        doThrow(new RuntimeException("db error")).when(userRepository).deleteByEmail("test@test.com");
+
+        assertThrows(PersistenceAccessException.class, () -> userService.deleteUser("test@test.com"));
+    }
+
+    @Test
+    public void testUpdateUser_Success() {
+        Player existing = new Player();
+        existing.setName("Old Name");
+        existing.setEmail("test@test.com");
+
+        Player updateData = new Player();
+        updateData.setName("New Name");
+        updateData.setPhoto("photo.jpg");
+        updateData.setPassword("newpass");
+
+        when(userRepository.findByEmail("test@test.com")).thenReturn(Optional.of(existing));
+        when(passwordEncoder.encode("newpass")).thenReturn("encoded_newpass");
+        when(userRepository.save(existing)).thenReturn(existing);
+
+        User result = userService.updateUser("test@test.com", updateData);
+
+        assertEquals("New Name", result.getName());
+        assertEquals("photo.jpg", result.getPhoto());
+        assertEquals("encoded_newpass", result.getPassword());
+    }
+
+    @Test
+    public void testUpdateUser_NotFound() {
+        when(userRepository.findByEmail("test@test.com")).thenReturn(Optional.empty());
+        assertThrows(BusinessRuleException.class, () -> userService.updateUser("test@test.com", new Player()));
+    }
+
+    @Test
+    public void testUpdateUser_Throws() {
+        Player existing = new Player();
+        existing.setEmail("test@test.com");
+        when(userRepository.findByEmail("test@test.com")).thenReturn(Optional.of(existing));
+        when(userRepository.save(any())).thenThrow(new RuntimeException("db error"));
+
+        assertThrows(PersistenceAccessException.class, () -> userService.updateUser("test@test.com", new Player()));
     }
 }
