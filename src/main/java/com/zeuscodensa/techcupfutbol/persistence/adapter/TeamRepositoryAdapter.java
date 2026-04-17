@@ -11,8 +11,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 @Repository
 public class TeamRepositoryAdapter implements ITeamRepository {
@@ -45,27 +43,5 @@ public class TeamRepositoryAdapter implements ITeamRepository {
         TeamEntity entity = ModelToEntityMapper.toTeamEntity(team);
         TeamEntity savedEntity = teamJpaRepository.save(entity);
         return EntityToModelMapper.toTeamModel(savedEntity);
-    }
-
-    @Override
-    public Page<Team> findAll(Pageable pageable) {
-        return teamJpaRepository.findAll(pageable)
-                .map(EntityToModelMapper::toTeamModel);
-    }
-
-    @Override
-    public Page<Team> findByTeamNameContainingIgnoreCase(String name, Pageable pageable) {
-        return teamJpaRepository.findByTeamNameContainingIgnoreCase(name, pageable)
-                .map(EntityToModelMapper::toTeamModel);
-    }
-
-    @Override
-    public Optional<Team> findById(Long id) {
-        return teamJpaRepository.findById(id).map(EntityToModelMapper::toTeamModel);
-    }
-
-    @Override
-    public void deleteById(Long id) {
-        teamJpaRepository.deleteById(id);
     }
 }

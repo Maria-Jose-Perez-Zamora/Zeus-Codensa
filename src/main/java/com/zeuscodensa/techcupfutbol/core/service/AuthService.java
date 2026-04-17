@@ -4,8 +4,6 @@ import com.zeuscodensa.techcupfutbol.core.exception.BusinessRuleException;
 import com.zeuscodensa.techcupfutbol.core.model.User;
 import com.zeuscodensa.techcupfutbol.core.repository.IUserRepository;
 import com.zeuscodensa.techcupfutbol.core.repository.ITokenService;
-import com.zeuscodensa.techcupfutbol.core.repository.IEmailNotificationPort;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,14 +17,10 @@ public class AuthService {
     
     private final ITokenService tokenService;
     private final IUserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final IEmailNotificationPort emailPort;
 
-    public AuthService(ITokenService tokenService, IUserRepository userRepository, PasswordEncoder passwordEncoder, IEmailNotificationPort emailPort) {
+    public AuthService(ITokenService tokenService, IUserRepository userRepository) {
         this.tokenService = tokenService;
         this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.emailPort = emailPort;
     }
 
     public String login(String email, String password) {
@@ -39,15 +33,13 @@ public class AuthService {
 
         Optional<User> userOpt = userRepository.findByEmail(email);
 
-        if (userOpt.isEmpty() || !passwordEncoder.matches(password, userOpt.get().getPassword())) {
+        if (userOpt.isEmpty() || !userOpt.get().getPassword().equals(password)) {
             log.error("Credenciales invalidas intentadas contra {}", email);
             throw new BusinessRuleException("Credenciales incorrectas");
         }
 
         User user = userOpt.get();
         String token = tokenService.generateToken(user.getEmail(), user.getRole().name());
-
-        emailPort.sendLoginAlertEmail(user.getEmail(), user.getName());
 
         log.info("Autenticacion exitosa: {} (Rol: {})", user.getEmail(), user.getRole().name());
         return token;
