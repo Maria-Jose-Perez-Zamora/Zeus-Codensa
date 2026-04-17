@@ -32,10 +32,18 @@ public class TeamValidatorTest {
     }
 
     @Test
-    public void testValid() {
+    public void testValid_WithPlayers() {
         when(teamRepository.findByTeamName(anyString())).thenReturn(Optional.empty());
         when(teamRepository.existsByPlayersEmail(anyString())).thenReturn(false);
         assertDoesNotThrow(() -> teamValidator.validateForCreation("EqA", validPlayers()));
+    }
+
+    @Test
+    public void testValid_WithoutPlayers() {
+        // Captains can create a team without players and add them later
+        when(teamRepository.findByTeamName(anyString())).thenReturn(Optional.empty());
+        assertDoesNotThrow(() -> teamValidator.validateForCreation("EqB", null));
+        assertDoesNotThrow(() -> teamValidator.validateForCreation("EqC", new ArrayList<>()));
     }
 
     @Test
@@ -51,15 +59,9 @@ public class TeamValidatorTest {
     }
 
     @Test
-    public void testJugadoresNull() {
+    public void testJugadoresMaxCount() {
         when(teamRepository.findByTeamName(anyString())).thenReturn(Optional.empty());
-        assertThrows(IllegalArgumentException.class, () -> teamValidator.validateForCreation("EqA", null));
-    }
-
-    @Test
-    public void testJugadoresCount() {
-        when(teamRepository.findByTeamName(anyString())).thenReturn(Optional.empty());
-        assertThrows(IllegalArgumentException.class, () -> teamValidator.validateForCreation("EqA", Arrays.asList("1", "2")));
+        // More than 20 players should still be rejected
         assertThrows(IllegalArgumentException.class, () -> teamValidator.validateForCreation("EqA", Collections.nCopies(21, "x")));
     }
 
@@ -71,7 +73,6 @@ public class TeamValidatorTest {
 
     @Test
     public void testJugadorYaEnEquipo() {
-        // Only one of the players is mocked to exist, which correctly trips the validator inside the loop
         when(teamRepository.findByTeamName(anyString())).thenReturn(Optional.empty());
         when(teamRepository.existsByPlayersEmail(anyString())).thenReturn(true);
         assertThrows(IllegalArgumentException.class, () -> teamValidator.validateForCreation("EqA", validPlayers()));

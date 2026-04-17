@@ -18,24 +18,28 @@ public class TeamValidator {
         if (teamName == null || teamName.trim().isEmpty()) {
             throw new IllegalArgumentException("El name del team no puede estar vacío");
         }
-        
+
         boolean exists = teamRepository.findByTeamName(teamName).isPresent();
         if (exists) {
             throw new IllegalArgumentException("El name del team ya existe");
         }
 
-        if (players == null || players.size() < 7 || players.size() > 20) {
-            throw new IllegalArgumentException("Un team debe tener entre 7 y 20 players inscritos inicialmente");
-        }
+        // Players can be empty at creation time — captains add them separately via InvitePlayers.
+        // The 7-player minimum is enforced at tournament inscription time (InscripcionValidator).
+        if (players != null && !players.isEmpty()) {
+            if (players.size() > 20) {
+                throw new IllegalArgumentException("Un team no puede tener más de 20 players");
+            }
 
-        long distinctCount = players.stream().distinct().count();
-        if (distinctCount < players.size()) {
-            throw new IllegalArgumentException("Existen correos duplicados en la solicitud del team");
-        }
+            long distinctCount = players.stream().distinct().count();
+            if (distinctCount < players.size()) {
+                throw new IllegalArgumentException("Existen correos duplicados en la solicitud del team");
+            }
 
-        for (String correo : players) {
-            if (teamRepository.existsByPlayersEmail(correo)) {
-                throw new IllegalArgumentException("El player " + correo + " ya pertenece a otro team");
+            for (String correo : players) {
+                if (teamRepository.existsByPlayersEmail(correo)) {
+                    throw new IllegalArgumentException("El player " + correo + " ya pertenece a otro team");
+                }
             }
         }
     }
