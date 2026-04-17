@@ -36,13 +36,13 @@ public class TeamController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @Operation(summary = "Create Team", description = "Creates a new team and associates existing users via email. Solo para ADMIN.")
+    @PreAuthorize("hasAnyAuthority('CAPTAIN', 'ADMINISTRADOR_SISTEMA')")
+    @Operation(summary = "Create Team", description = "Creates a new team and associates existing users via email.")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Operación exitosa"),
         @ApiResponse(responseCode = "400", description = "Petición incorrecta o error de validación"),
         @ApiResponse(responseCode = "401", description = "No autorizado (Token faltante o inválido)"),
-        @ApiResponse(responseCode = "403", description = "Prohibido (Rol incorrecto, se requiere ADMIN)"),
+        @ApiResponse(responseCode = "403", description = "Prohibido (Rol incorrecto, se requiere CAPTAIN o ADMINISTRADOR_SISTEMA)"),
         @ApiResponse(responseCode = "404", description = "Recurso no encontrado"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
@@ -55,8 +55,8 @@ public class TeamController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
-    @Operation(summary = "Get All Teams", description = "Returns the list of all created teams con paginación y filtros. Para ADMIN y USER.")
+    @PreAuthorize("hasAnyAuthority('CAPTAIN', 'TOURNAMENT_ORGANIZER', 'ADMINISTRADOR_SISTEMA')")
+    @Operation(summary = "Get All Teams", description = "Returns the list of all created teams con paginación y filtros.")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Operación exitosa"),
         @ApiResponse(responseCode = "400", description = "Petición incorrecta"),
@@ -74,8 +74,8 @@ public class TeamController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
-    @Operation(summary = "Get Team by ID", description = "Returns a specific team by its ID. Para ADMIN y USER.")
+    @PreAuthorize("hasAnyAuthority('CAPTAIN', 'TOURNAMENT_ORGANIZER', 'ADMINISTRADOR_SISTEMA')")
+    @Operation(summary = "Get Team by ID", description = "Returns a specific team by its ID.")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Operación exitosa"),
         @ApiResponse(responseCode = "400", description = "Petición incorrecta"),
@@ -91,13 +91,13 @@ public class TeamController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @Operation(summary = "Update Team", description = "Updates an existing team. Solo para ADMIN.")
+    @PreAuthorize("hasAnyAuthority('CAPTAIN', 'ADMINISTRADOR_SISTEMA')")
+    @Operation(summary = "Update Team", description = "Updates an existing team.")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Operación exitosa"),
         @ApiResponse(responseCode = "400", description = "Error de validación"),
         @ApiResponse(responseCode = "401", description = "No autorizado"),
-        @ApiResponse(responseCode = "403", description = "Prohibido (Rol incorrecto, se requiere ADMIN)"),
+        @ApiResponse(responseCode = "403", description = "Prohibido (Rol incorrecto, se requiere CAPTAIN o ADMINISTRADOR_SISTEMA)"),
         @ApiResponse(responseCode = "404", description = "Equipo no encontrado"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
@@ -110,13 +110,13 @@ public class TeamController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @Operation(summary = "Delete Team", description = "Deletes a team by its ID. Solo para ADMIN.")
+    @PreAuthorize("hasAnyAuthority('CAPTAIN', 'ADMINISTRADOR_SISTEMA')")
+    @Operation(summary = "Delete Team", description = "Deletes a team by its ID.")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Operación exitosa"),
         @ApiResponse(responseCode = "400", description = "Petición incorrecta"),
         @ApiResponse(responseCode = "401", description = "No autorizado"),
-        @ApiResponse(responseCode = "403", description = "Prohibido (Rol incorrecto, se requiere ADMIN)"),
+        @ApiResponse(responseCode = "403", description = "Prohibido (Rol incorrecto, se requiere CAPTAIN o ADMINISTRADOR_SISTEMA)"),
         @ApiResponse(responseCode = "404", description = "Equipo no encontrado"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })

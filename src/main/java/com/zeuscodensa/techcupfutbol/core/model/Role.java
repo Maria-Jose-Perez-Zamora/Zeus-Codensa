@@ -5,7 +5,5 @@ public enum Role {
     TOURNAMENT_ORGANIZER,
     REFEREE,
     CAPTAIN,
-    PLAYER,
-    ADMIN,
-    USER
+    PLAYER
 }

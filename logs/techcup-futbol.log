@@ -3173,3 +3173,222 @@ java.lang.Exception: Global
 2026-04-17 02:25:42 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
 2026-04-17 02:25:42 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-2 - Shutdown initiated...
 2026-04-17 02:25:42 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-2 - Shutdown completed.
+2026-04-17 02:52:21 [main] INFO  c.z.t.c.SecurityConfigWebMvcTest - Starting SecurityConfigWebMvcTest using Java 21.0.8 with PID 20456 (started by Santiago in C:\Users\Santiago\Desktop\Zeus Codensa\Zeus-Codensa)
+2026-04-17 02:52:22 [main] INFO  c.z.t.c.SecurityConfigWebMvcTest - No active profile set, falling back to 1 default profile: "default"
+2026-04-17 02:52:24 [main] INFO  o.s.b.t.m.w.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
+2026-04-17 02:52:24 [main] INFO  o.s.t.w.s.TestDispatcherServlet - Initializing Servlet ''
+2026-04-17 02:52:24 [main] INFO  o.s.t.w.s.TestDispatcherServlet - Completed initialization in 1 ms
+2026-04-17 02:52:24 [main] INFO  c.z.t.c.SecurityConfigWebMvcTest - Started SecurityConfigWebMvcTest in 3.333 seconds (process running for 7.139)
+2026-04-17 02:52:24 [main] INFO  c.z.t.controller.api.AuthController - REST request - intento de login de usuario: t@x.com
+2026-04-17 02:52:24 [main] INFO  c.z.t.controller.api.AuthController - REST request - register user: user.test1-a@escuelaing.edu.co
+2026-04-17 02:52:24 [main] INFO  c.z.t.controller.api.AuthController - REST request - intento de login de usuario: t
+2026-04-17 02:52:24 [main] INFO  c.z.t.controller.api.AuthController - REST request - register user: t@x.com
+2026-04-17 02:52:24 [main] INFO  c.z.t.c.a.TournamentQueryController - REST request - getTeamHistory
+2026-04-17 02:52:24 [main] INFO  c.z.t.c.a.TournamentQueryController - REST request - getScorers
+2026-04-17 02:52:24 [main] INFO  c.z.t.c.a.TournamentQueryController - REST request - getCalendar
+2026-04-17 02:52:24 [main] INFO  c.z.t.c.a.TournamentQueryController - REST request - getCalendar
+2026-04-17 02:52:24 [main] INFO  c.z.t.c.a.TournamentQueryController - REST request - getTeamHistory
+2026-04-17 02:52:24 [main] INFO  c.z.t.c.a.TournamentQueryController - REST request - getResultados Historicos
+2026-04-17 02:52:24 [main] INFO  c.z.t.c.a.TournamentQueryController - REST request - getScorers
+2026-04-17 02:52:24 [main] INFO  c.z.t.c.a.TournamentQueryController - REST request - getTabla de posiciones
+2026-04-17 02:52:24 [main] INFO  c.z.t.c.a.TournamentQueryController - REST request - getEstadisticas
+2026-04-17 02:52:24 [main] INFO  c.z.t.c.a.TournamentQueryController - REST request - getBrackets eliminatorias
+2026-04-17 02:52:24 [main] INFO  c.z.t.c.a.TournamentQueryController - REST request - getResultados Historicos
+2026-04-17 02:52:24 [main] INFO  c.z.t.c.a.TournamentQueryController - REST request - getEstadisticas
+2026-04-17 02:52:24 [main] INFO  c.z.t.c.api.RegistrationController - REST request - actualizarEstado para inscripción ID: 1
+2026-04-17 02:52:24 [main] INFO  c.z.t.c.api.RegistrationController - REST request - createInscripcion para el team: Eq
+2026-04-17 02:52:24 [main] INFO  c.z.t.c.api.PlayerController - REST request - enviarInvitacion para player: null a team: null
+2026-04-17 02:52:24 [main] INFO  c.z.t.c.api.PlayerController - REST request - buscarDisponibles (name: Juan, posicion: Delantero)
+2026-04-17 02:52:24 [main] INFO  c.z.t.controller.api.MatchController - REST request - asignarArbitro para el match ID: 1
+2026-04-17 02:52:24 [main] INFO  c.z.t.controller.api.MatchController - REST request - asignarArbitro para el match ID: 1
+2026-04-17 02:52:24 [main] INFO  c.z.t.controller.api.MatchController - REST request - registrarAlineacion para el match ID: 1
+2026-04-17 02:52:24 [main] INFO  c.z.t.controller.api.MatchController - REST request - registrarTarjetas para el match ID: 999
+2026-04-17 02:52:24 [main] INFO  c.z.t.controller.api.MatchController - REST request - registrarAlineacion para el match ID: 1
+2026-04-17 02:52:24 [main] INFO  c.z.t.controller.api.MatchController - REST request - registrarPartido
+2026-04-17 02:52:24 [main] INFO  c.z.t.controller.api.MatchController - REST request - registrarTarjetas para el match ID: 1
+2026-04-17 02:52:24 [main] INFO  c.z.t.controller.api.MatchController - REST request - getMisPartidos para el árbitro: user.test4-a@escuelaing.edu.co
+2026-04-17 02:52:24 [main] INFO  c.z.t.controller.api.MatchController - REST request - actualizarMarcador para el match ID: 1
+2026-04-17 02:52:25 [main] INFO  c.z.t.controller.api.TeamController - REST request - getAll Teams paginado y filtrado
+2026-04-17 02:52:25 [main] INFO  c.z.t.controller.api.TeamController - REST request - updateTeam: 1
+2026-04-17 02:52:25 [main] INFO  c.z.t.controller.api.TeamController - REST request - getTeamById: 1
+2026-04-17 02:52:25 [main] INFO  c.z.t.controller.api.TeamController - REST request - createTeam: null
+2026-04-17 02:52:25 [main] INFO  c.z.t.controller.api.TeamController - REST request - deleteTeam: 1
+2026-04-17 02:52:25 [main] INFO  c.z.t.controller.api.TeamController - REST request - createTeam: FC Zeta
+2026-04-17 02:52:25 [main] INFO  c.z.t.c.api.TournamentController - REST request - configurarTorneo ID: 123
+2026-04-17 02:52:25 [main] INFO  c.z.t.c.api.TournamentController - REST request - createTorneo: Liga
+2026-04-17 02:52:25 [main] INFO  c.z.t.c.api.TournamentController - REST request - configurarTorneo ID: invalid
+2026-04-17 02:52:25 [main] INFO  c.z.t.c.api.TournamentController - REST request - getAllTorneos
+2026-04-17 02:52:25 [main] INFO  c.z.t.controller.api.UserController - REST request - get user by email
+2026-04-17 02:52:25 [main] INFO  c.z.t.controller.api.UserController - REST request - getAll Usuarios paginated
+2026-04-17 02:52:25 [main] INFO  c.z.t.controller.api.UserController - REST request - update user by email
+2026-04-17 02:52:25 [main] INFO  c.z.t.controller.api.UserController - REST request - get profile
+2026-04-17 02:52:25 [main] INFO  c.z.t.controller.api.UserController - REST request - update profile
+2026-04-17 02:52:25 [main] INFO  c.z.t.controller.api.UserController - REST request - create user
+2026-04-17 02:52:25 [main] INFO  c.z.t.controller.api.UserController - REST request - delete user by email
+2026-04-17 02:52:25 [main] ERROR c.z.t.c.h.GlobalExceptionHandler - Internal server error: 
+java.lang.Exception: Global
+	at com.zeuscodensa.techcupfutbol.controller.handler.GlobalExceptionHandlerTest.testHandleGlobalException(GlobalExceptionHandlerTest.java:51)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:728)
+	at org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:60)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$ValidatingInvocation.proceed(InvocationInterceptorChain.java:131)
+	at org.junit.jupiter.engine.extension.TimeoutExtension.intercept(TimeoutExtension.java:156)
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestableMethod(TimeoutExtension.java:147)
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestMethod(TimeoutExtension.java:86)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(InterceptingExecutableInvoker.java:103)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.lambda$invoke$0(InterceptingExecutableInvoker.java:93)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:106)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.proceed(InvocationInterceptorChain.java:64)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.chainAndInvoke(InvocationInterceptorChain.java:45)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.invoke(InvocationInterceptorChain.java:37)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:92)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:86)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$7(TestMethodTestDescriptor.java:218)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:214)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:139)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:69)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:151)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:155)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:155)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:198)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:169)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:93)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:58)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:141)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:57)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:103)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:85)
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47)
+	at org.apache.maven.surefire.junitplatform.LazyLauncher.execute(LazyLauncher.java:56)
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.execute(JUnitPlatformProvider.java:184)
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invokeAllTests(JUnitPlatformProvider.java:148)
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invoke(JUnitPlatformProvider.java:122)
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:385)
+	at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:162)
+	at org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507)
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495)
+2026-04-17 02:52:25 [main] WARN  c.z.t.c.h.GlobalExceptionHandler - Invalid argument: Invalid
+2026-04-17 02:52:25 [main] WARN  c.z.t.c.h.GlobalExceptionHandler - Resource not found: Not found
+2026-04-17 02:52:25 [main] WARN  c.z.t.c.h.GlobalExceptionHandler - Business rule violation: Error
+2026-04-17 02:52:25 [main] INFO  c.z.t.core.service.AuthService - Autenticacion exitosa: user.test1-a@escuelaing.edu.co (Rol: PLAYER)
+2026-04-17 02:52:25 [main] ERROR c.z.t.core.service.AuthService - Credenciales invalidas intentadas contra user.test1-a@escuelaing.edu.co
+2026-04-17 02:52:25 [main] ERROR c.z.t.core.service.AuthService - Credenciales invalidas intentadas contra ghost@x.com
+2026-04-17 02:52:25 [main] INFO  c.z.t.c.service.RegistrationService - Estado de inscripción ID 123 actualizado exitosamente a IN_REVIEW en DB
+2026-04-17 02:52:25 [main] INFO  c.z.t.c.service.RegistrationService - Estado de inscripción ID 123 actualizado exitosamente a APPROVED en DB
+2026-04-17 02:52:25 [main] ERROR c.z.t.c.service.RegistrationService - Violación transaccional: No se permite transición de PENDING a MISTERIO
+2026-04-17 02:52:25 [main] INFO  c.z.t.c.service.RegistrationService - Inscripción creada en DB con ID: 123, status PENDING
+2026-04-17 02:52:25 [main] ERROR c.z.t.c.service.RegistrationService - Inscripción no encontrada ID: Inventado-123
+2026-04-17 02:52:25 [main] ERROR c.z.t.core.service.MatchService - Functional violation: Negative or null scores received
+2026-04-17 02:52:25 [main] ERROR c.z.t.core.service.MatchService - Functional violation: Negative or null scores received
+2026-04-17 02:52:25 [main] ERROR c.z.t.core.service.MatchService - Functional violation: Negative or null scores received
+2026-04-17 02:52:25 [main] ERROR c.z.t.core.service.MatchService - Functional violation: Negative or null scores received
+2026-04-17 02:52:25 [main] INFO  c.z.t.core.service.MatchService - Referee ref@escuelaing.edu.co successfully assigned to Match ID m1
+2026-04-17 02:52:25 [main] ERROR c.z.t.core.service.MatchService - Assignment failed: player@x.com lacks the REFEREE role
+2026-04-17 02:52:25 [main] INFO  c.z.t.core.service.MatchService - Lineup successfully registered: 2 players for team EqA
+2026-04-17 02:52:25 [main] ERROR c.z.t.core.service.MatchService - Assignment failed: ghost@x.com lacks the REFEREE role
+2026-04-17 02:52:25 [main] INFO  c.z.t.core.service.MatchService - Match successfully registered: home EqA vs away EqB (Tournament Liga)
+2026-04-17 02:52:25 [main] INFO  c.z.t.core.service.MatchService - Score updated for ID m1 | 2 - 1
+2026-04-17 02:52:25 [main] WARN  c.z.t.core.service.MatchService - Team EqX does not participate in this match
+2026-04-17 02:52:25 [main] WARN  c.z.t.core.service.PlayerService - Player player@test.com is already signed to another team
+2026-04-17 02:52:25 [main] WARN  c.z.t.core.service.PlayerService - Duplicate invitation skipped for player@test.com
+2026-04-17 02:52:25 [main] INFO  c.z.t.core.service.PlayerService - El jugador player@test.com aceptó la invitación al equipo Dream Team
+2026-04-17 02:52:25 [main] INFO  c.z.t.core.service.PlayerService - Invitation successfully generated from captain captain@test.com to player player@test.com (Team: Dream Team)
+2026-04-17 02:52:25 [main] INFO  c.z.t.core.service.PlayerService - El jugador player@test.com declinó la invitación al equipo null
+2026-04-17 02:52:25 [main] INFO  c.z.t.core.service.TeamService - Equipo Tigres FC registrado exitosamente en DB
+2026-04-17 02:52:25 [main] INFO  c.z.t.core.service.TournamentService - Tournament ID 12345 configurado exitosamente en DB
+2026-04-17 02:52:25 [main] INFO  c.z.t.core.service.TournamentService - Tournament creado exitosamente en DB con ID: null
+2026-04-17 02:52:25 [main] ERROR c.z.t.core.service.TournamentService - Tournament no encontrado ID: missing
+2026-04-17 02:52:25 [main] INFO  c.z.t.core.service.TournamentService - Tournament ID open1 configurado exitosamente en DB
+2026-04-17 02:52:25 [main] ERROR c.z.t.core.service.TournamentService - Violación temporal: intento de configurar Tournament en status EN_PROGRESO
+2026-04-17 02:52:25 [main] INFO  c.z.t.core.service.UserService - User created successfully in DB: user.test1-a@escuelaing.edu.co with role PLAYER
+2026-04-17 02:52:26 [main] INFO  c.z.t.p.a.EmailNotificationAdapter - Email de alerta de login enviado a existinguser@escuelaing.edu.co
+2026-04-17 02:52:26 [main] INFO  c.z.t.p.a.EmailNotificationAdapter - Email de bienvenida enviado a newuser@escuelaing.edu.co
+2026-04-17 02:52:26 [main] INFO  c.z.t.p.PersistenceConnectivityFunctionalTest - Starting PersistenceConnectivityFunctionalTest using Java 21.0.8 with PID 20456 (started by Santiago in C:\Users\Santiago\Desktop\Zeus Codensa\Zeus-Codensa)
+2026-04-17 02:52:26 [main] INFO  c.z.t.p.PersistenceConnectivityFunctionalTest - The following 1 profile is active: "test"
+2026-04-17 02:52:27 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-17 02:52:27 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 65 ms. Found 6 JPA repository interfaces.
+2026-04-17 02:52:27 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-04-17 02:52:27 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:techcup_test user=SA
+2026-04-17 02:52:27 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-04-17 02:52:27 [main] INFO  org.flywaydb.core.FlywayExecutor - Database: jdbc:h2:mem:techcup_test (H2 2.2)
+2026-04-17 02:52:27 [main] WARN  o.f.c.i.database.base.Database - Flyway upgrade recommended: H2 2.2.224 is newer than this version of Flyway and support has not been tested. The latest supported version of H2 is 2.2.220.
+2026-04-17 02:52:27 [main] INFO  o.f.c.i.s.JdbcTableSchemaHistory - Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+2026-04-17 02:52:27 [main] INFO  o.f.core.internal.command.DbValidate - Successfully validated 2 migrations (execution time 00:00.036s)
+2026-04-17 02:52:27 [main] INFO  o.f.c.i.s.JdbcTableSchemaHistory - Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+2026-04-17 02:52:28 [main] INFO  o.f.core.internal.command.DbMigrate - Current version of schema "PUBLIC": << Empty Schema >>
+2026-04-17 02:52:28 [main] INFO  o.f.core.internal.command.DbMigrate - Migrating schema "PUBLIC" to version "1 - init"
+2026-04-17 02:52:28 [main] INFO  o.f.core.internal.command.DbMigrate - Migrating schema "PUBLIC" to version "2 - sync missing columns"
+2026-04-17 02:52:28 [main] INFO  o.f.core.internal.command.DbMigrate - Successfully applied 2 migrations to schema "PUBLIC", now at version v2 (execution time 00:00.032s)
+2026-04-17 02:52:28 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-04-17 02:52:28 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.5.3.Final
+2026-04-17 02:52:28 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2026-04-17 02:52:28 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-17 02:52:29 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-17 02:52:29 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-04-17 02:52:30 [main] INFO  c.z.t.p.PersistenceConnectivityFunctionalTest - Started PersistenceConnectivityFunctionalTest in 4.077 seconds (process running for 13.111)
+2026-04-17 02:52:30 [main] INFO  c.z.t.core.service.UserService - User created successfully in DB: maria.perez-a@escuelaing.edu.co with role PLAYER
+2026-04-17 02:52:31 [main] INFO  c.z.t.s.JwtAuthenticationFlowFunctionalTest - Starting JwtAuthenticationFlowFunctionalTest using Java 21.0.8 with PID 20456 (started by Santiago in C:\Users\Santiago\Desktop\Zeus Codensa\Zeus-Codensa)
+2026-04-17 02:52:31 [main] INFO  c.z.t.s.JwtAuthenticationFlowFunctionalTest - The following 1 profile is active: "test"
+2026-04-17 02:52:31 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-17 02:52:31 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 25 ms. Found 6 JPA repository interfaces.
+2026-04-17 02:52:31 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-2 - Starting...
+2026-04-17 02:52:31 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-2 - Added connection conn10: url=jdbc:h2:mem:techcup_test user=SA
+2026-04-17 02:52:31 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-2 - Start completed.
+2026-04-17 02:52:31 [main] INFO  org.flywaydb.core.FlywayExecutor - Database: jdbc:h2:mem:techcup_test (H2 2.2)
+2026-04-17 02:52:31 [main] WARN  o.f.c.i.database.base.Database - Flyway upgrade recommended: H2 2.2.224 is newer than this version of Flyway and support has not been tested. The latest supported version of H2 is 2.2.220.
+2026-04-17 02:52:31 [main] INFO  o.f.core.internal.command.DbValidate - Successfully validated 2 migrations (execution time 00:00.003s)
+2026-04-17 02:52:31 [main] INFO  o.f.core.internal.command.DbMigrate - Current version of schema "PUBLIC": 2
+2026-04-17 02:52:31 [main] INFO  o.f.core.internal.command.DbMigrate - Schema "PUBLIC" is up to date. No migration necessary.
+2026-04-17 02:52:31 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-04-17 02:52:31 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2026-04-17 02:52:31 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-17 02:52:31 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-17 02:52:31 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-04-17 02:52:31 [main] INFO  o.s.b.t.m.w.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
+2026-04-17 02:52:31 [main] INFO  o.s.t.w.s.TestDispatcherServlet - Initializing Servlet ''
+2026-04-17 02:52:31 [main] INFO  o.s.t.w.s.TestDispatcherServlet - Completed initialization in 0 ms
+2026-04-17 02:52:31 [main] INFO  c.z.t.s.JwtAuthenticationFlowFunctionalTest - Started JwtAuthenticationFlowFunctionalTest in 0.822 seconds (process running for 14.573)
+2026-04-17 02:52:32 [main] INFO  c.z.t.controller.api.UserController - REST request - getAll Usuarios paginated
+2026-04-17 02:52:32 [main] WARN  o.s.d.w.c.SpringDataJacksonConfiguration$PageModule$WarningLoggingModifier - Serializing PageImpl instances as-is is not supported, meaning that there is no guarantee about the stability of the resulting JSON structure!
+	For a stable JSON structure, please use Spring Data's PagedModel (globally via @EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO))
+	or Spring HATEOAS and Spring Data's PagedResourcesAssembler as documented in https://docs.spring.io/spring-data/commons/reference/repositories/core-extensions.html#core.web.pageables.
+
+2026-04-17 02:52:32 [main] INFO  o.s.t.c.s.AnnotationConfigContextLoaderUtils - Could not detect default configuration classes for test class [com.zeuscodensa.techcupfutbol.TechcupFutbolApplicationTests]: TechcupFutbolApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-04-17 02:52:32 [main] INFO  o.s.b.t.c.SpringBootTestContextBootstrapper - Found @SpringBootConfiguration com.zeuscodensa.techcupfutbol.TechcupFutbolApplication for test class com.zeuscodensa.techcupfutbol.TechcupFutbolApplicationTests
+2026-04-17 02:52:37 [task-1] ERROR c.z.t.p.a.EmailNotificationAdapter - Fallo enviando email de bienvenida a maria.perez-a@escuelaing.edu.co: Authentication failed
+2026-04-17 02:52:37 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-04-17 02:52:37 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-04-17 02:52:37 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-04-17 02:52:37 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-04-17 02:52:37 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-2 - Shutdown initiated...
+2026-04-17 02:52:37 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-2 - Shutdown completed.
