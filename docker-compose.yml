@@ -22,11 +22,10 @@ services:
     build: .
     container_name: techcup_backend
     ports:
-      - "8081:8080"
+      - "8080:8080"
     env_file: .env # Manejo seguro de variables
     environment:
       - SPRING_PROFILES_ACTIVE=dev
-      - JWT_SECRET=super-secret-key-1234567890-very-long-and-secure
     depends_on:
       db:
         condition: service_healthy
