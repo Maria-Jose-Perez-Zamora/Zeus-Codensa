@@ -67,6 +67,7 @@ jobs:
               "JWT_SECRET=${JWT_SECRET}" \
               "GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}" \
               "GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}" \
+              "DEPLOY_RUN_ID=${{ github.run_id }}" \
               SERVER_PORT=8080 \
               SERVER_SSL_ENABLED=false
 
