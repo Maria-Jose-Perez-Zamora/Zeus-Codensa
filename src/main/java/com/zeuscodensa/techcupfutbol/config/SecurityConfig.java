@@ -100,7 +100,9 @@ public class SecurityConfig {
                 // Azure Container Apps — QA (ZEUS-144~149)
                 "https://techcup-qa.happymushroom-f55d56eb.eastus.azurecontainerapps.io",
                 // Azure Container Apps — PROD (ZEUS-151~156)
-                "https://techcup-prod.happymushroom-f55d56eb.eastus.azurecontainerapps.io"
+                "https://techcup-prod.happymushroom-f55d56eb.eastus.azurecontainerapps.io",
+                // Vercel Frontend Deployment
+                "https://zeus-codensa-front-end-2yow.vercel.app"
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
