@@ -5,8 +5,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.JoinColumn;
 
 @Entity
 @Table(name = "matches")
@@ -34,15 +32,6 @@ public class MatchEntity {
 
     private String refereeEmail;
 
-    // NUEVOS CAMPOS PARA EL SPRINT 5 (GESTIÓN DE BRACKETS)
-
-    @Column
-    private String phase; // Ejemplo: "OCTAVOS", "CUARTOS", "SEMIFINAL", "FINAL"
-
-    @ManyToOne
-    @JoinColumn(name = "next_match_id")
-    private MatchEntity nextMatch; // Referencia al siguiente partido en el bracket
-
     @Lob
     private String alineacionesJson;
 
@@ -54,8 +43,6 @@ public class MatchEntity {
 
     @Lob
     private String redCardsJson;
-
-    // --- GETTERS Y SETTERS ---
 
     public String getId() {
         return id;
@@ -127,23 +114,6 @@ public class MatchEntity {
 
     public void setRefereeEmail(String refereeEmail) {
         this.refereeEmail = refereeEmail;
-    }
-
-    // Getters y Setters nuevos
-    public String getPhase() {
-        return phase;
-    }
-
-    public void setPhase(String phase) {
-        this.phase = phase;
-    }
-
-    public MatchEntity getNextMatch() {
-        return nextMatch;
-    }
-
-    public void setNextMatch(MatchEntity nextMatch) {
-        this.nextMatch = nextMatch;
     }
 
     public String getAlineacionesJson() {

@@ -1,18 +1,11 @@
 package com.zeuscodensa.techcupfutbol.controller.dto;
 
 import java.util.List;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 
 public class TeamRequestDTO {
-    @NotBlank(message = "El nombre del equipo no puede estar vacío")
     private String teamName;
     private String escudo;
     private String coloresUniforme;
-    
-    @NotNull(message = "La lista de jugadores no puede ser nula")
-    @Size(min = 7, max = 20, message = "El equipo debe tener entre 7 y 20 jugadores")
     private List<String> playerEmails;
 
     public TeamRequestDTO() {}

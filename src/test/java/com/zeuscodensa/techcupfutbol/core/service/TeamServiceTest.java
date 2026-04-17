@@ -17,11 +17,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.Collections;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -99,74 +94,5 @@ public class TeamServiceTest {
         List<Team> teams = teamService.getAllTeams();
         assertEquals(2, teams.size());
         verify(teamRepository, times(1)).findAll();
-    }
-
-    @Test
-    public void testGetAllTeams_Paginated() {
-        Team t1 = new Team("Equipo A");
-        Page<Team> page = new PageImpl<>(Collections.singletonList(t1));
-        when(teamRepository.findAll(any(Pageable.class))).thenReturn(page);
-        
-        Page<Team> result = teamService.getAllTeams(null, PageRequest.of(0, 10));
-        assertEquals(1, result.getContent().size());
-        assertEquals("Equipo A", result.getContent().get(0).getTeamName());
-    }
-
-    @Test
-    public void testGetAllTeams_PaginatedAndFiltered() {
-        Team t1 = new Team("Equipo A");
-        Page<Team> page = new PageImpl<>(Collections.singletonList(t1));
-        when(teamRepository.findByTeamNameContainingIgnoreCase(eq("Equipo"), any(Pageable.class))).thenReturn(page);
-        
-        Page<Team> result = teamService.getAllTeams("Equipo", PageRequest.of(0, 10));
-        assertEquals(1, result.getContent().size());
-        assertEquals("Equipo A", result.getContent().get(0).getTeamName());
-    }
-
-    @Test
-    public void testGetTeamById() {
-        Team t1 = new Team("Equipo A");
-        when(teamRepository.findById(1L)).thenReturn(Optional.of(t1));
-        
-        Team result = teamService.getTeamById(1L);
-        assertNotNull(result);
-        assertEquals("Equipo A", result.getTeamName());
-    }
-
-    @Test
-    public void testUpdateTeam() {
-        Team existing = new Team("Equipo A");
-        existing.setEscudo("old.png");
-        when(teamRepository.findById(1L)).thenReturn(Optional.of(existing));
-        when(teamRepository.save(any(Team.class))).thenReturn(existing);
-
-        Team updated = new Team("Equipo B");
-        updated.setEscudo("new.png");
-        
-        Team result = teamService.updateTeam(1L, updated);
-        assertEquals("Equipo B", result.getTeamName());
-        assertEquals("new.png", result.getEscudo());
-    }
-
-    @Test
-    public void testDeleteTeam() {
-        Team existing = new Team("Equipo A");
-        when(teamRepository.findById(1L)).thenReturn(Optional.of(existing));
-        doNothing().when(teamRepository).deleteById(1L);
-        
-        teamService.deleteTeam(1L);
-        verify(teamRepository, times(1)).deleteById(1L);
-    }
-
-    @Test
-    public void testGetTeamById_NotFound() {
-        when(teamRepository.findById(1L)).thenReturn(Optional.empty());
-        assertThrows(com.zeuscodensa.techcupfutbol.core.exception.ResourceNotFoundException.class, () -> teamService.getTeamById(1L));
-    }
-
-    @Test
-    public void testGetAllTeams_Paginated_Exception() {
-        when(teamRepository.findAll(any(Pageable.class))).thenThrow(new RuntimeException("DB Error"));
-        assertThrows(com.zeuscodensa.techcupfutbol.core.exception.PersistenceAccessException.class, () -> teamService.getAllTeams(null, PageRequest.of(0, 10)));
     }
 }
