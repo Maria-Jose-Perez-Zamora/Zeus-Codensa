@@ -51,6 +51,7 @@ public class SecurityConfig {
     // -----------------------------------------------------------------
 
     @Bean
+    @SuppressWarnings("java:S4502") // NOSONAR - CSRF is safely disabled for stateless REST APIs using JWT
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
