@@ -40,6 +40,9 @@ public class TeamService {
             }
 
             List<User> foundPlayers = new ArrayList<>();
+            if (newTeam.getCaptainEmail() != null) {
+                userRepository.findByEmail(newTeam.getCaptainEmail()).ifPresent(foundPlayers::add);
+            }
             if (playerEmails != null) {
                 for (String correo : playerEmails) {
                     userRepository.findByEmail(correo).ifPresent(foundPlayers::add);
