@@ -24,6 +24,17 @@ spring:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/techcuo_db}
     username: ${SPRING_DATASOURCE_USERNAME:techcuo_user}
     password: ${SPRING_DATASOURCE_PASSWORD:password}
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
   jpa:
     open-in-view: false
     hibernate:

@@ -5,6 +5,7 @@ import com.zeuscodensa.techcupfutbol.core.exception.PersistenceAccessException;
 import com.zeuscodensa.techcupfutbol.core.model.User;
 import com.zeuscodensa.techcupfutbol.core.validator.UserValidator;
 import com.zeuscodensa.techcupfutbol.core.repository.IUserRepository;
+import com.zeuscodensa.techcupfutbol.core.repository.IEmailNotificationPort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder; // NUEVA IMPORTACIÓN
 import org.springframework.stereotype.Service;
@@ -20,13 +21,15 @@ public class UserService {
     private static final Logger log = LoggerFactory.getLogger(UserService.class);
     private final IUserRepository userRepository;
     private final UserValidator userValidator;
-    private final PasswordEncoder passwordEncoder; // NUEVA DEPENDENCIA
+    private final PasswordEncoder passwordEncoder;
+    private final IEmailNotificationPort emailPort; // NUEVA DEPENDENCIA
 
     @Autowired
-    public UserService(IUserRepository userRepository, UserValidator userValidator, PasswordEncoder passwordEncoder) {
+    public UserService(IUserRepository userRepository, UserValidator userValidator, PasswordEncoder passwordEncoder, IEmailNotificationPort emailPort) {
         this.userRepository = userRepository;
         this.userValidator = userValidator;
-        this.passwordEncoder = passwordEncoder; // INYECCIÓN EN CONSTRUCTOR
+        this.passwordEncoder = passwordEncoder;
+        this.emailPort = emailPort;
     }
 
     public User registerUser(User newUser) {
@@ -45,6 +48,7 @@ public class UserService {
             // ------------------------------------------------
 
             User saved = userRepository.save(newUser);
+            emailPort.sendAccountCreationEmail(saved.getEmail(), saved.getName());
             log.info("User created successfully in DB: {} with role {}", newUser.getEmail(), newUser.getRole());
             return saved;
         } catch (Exception ex) {

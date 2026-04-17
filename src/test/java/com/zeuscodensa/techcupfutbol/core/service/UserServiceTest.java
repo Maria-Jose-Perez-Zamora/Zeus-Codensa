@@ -11,6 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder; // NUEVA IMPORTACIÓN
+import com.zeuscodensa.techcupfutbol.core.repository.IEmailNotificationPort;
 
 import com.zeuscodensa.techcupfutbol.core.exception.BusinessRuleException;
 import com.zeuscodensa.techcupfutbol.core.exception.PersistenceAccessException;
@@ -32,6 +33,9 @@ public class UserServiceTest {
 
     @Mock
     private PasswordEncoder passwordEncoder; // NUEVA DEPENDENCIA MOCK
+
+    @Mock
+    private IEmailNotificationPort emailPort;
 
     @InjectMocks
     private UserService userService;
@@ -58,6 +62,7 @@ public class UserServiceTest {
 
         verify(passwordEncoder, times(1)).encode(anyString()); // VERIFICAR QUE SE LLAMÓ AL ENCODER
         verify(userRepository, times(1)).save(any(User.class));
+        verify(emailPort, times(1)).sendAccountCreationEmail(saved.getEmail(), saved.getName());
     }
 
     @Test

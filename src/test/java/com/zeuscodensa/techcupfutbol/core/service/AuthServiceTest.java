@@ -3,6 +3,7 @@ package com.zeuscodensa.techcupfutbol.core.service;
 import com.zeuscodensa.techcupfutbol.core.exception.BusinessRuleException;
 import com.zeuscodensa.techcupfutbol.core.model.User;
 import com.zeuscodensa.techcupfutbol.core.repository.IUserRepository;
+import com.zeuscodensa.techcupfutbol.core.repository.IEmailNotificationPort;
 import com.zeuscodensa.techcupfutbol.security.JwtService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,6 +29,9 @@ public class AuthServiceTest {
     @Mock
     private org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
 
+    @Mock
+    private IEmailNotificationPort emailPort;
+
     @InjectMocks
     private AuthService authService;
     
@@ -35,6 +39,7 @@ public class AuthServiceTest {
     public void testLogin_Success() {
         com.zeuscodensa.techcupfutbol.core.model.Player u = new com.zeuscodensa.techcupfutbol.core.model.Player();
         u.setEmail("user.test1-a@escuelaing.edu.co");
+        u.setName("Testname");
         u.setPassword("encodedSecret");
         u.setRole(com.zeuscodensa.techcupfutbol.core.model.Role.PLAYER);
         
@@ -46,6 +51,7 @@ public class AuthServiceTest {
 
         assertNotNull(responseToken);
         assertEquals("mockToken", responseToken);
+        org.mockito.Mockito.verify(emailPort, org.mockito.Mockito.times(1)).sendLoginAlertEmail("user.test1-a@escuelaing.edu.co", "Testname");
     }
 
     @Test
