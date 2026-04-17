@@ -40,6 +40,13 @@ Adicionalmente, el diagrama explicita reglas de negocio del torneo: mínimo y m�
 - Cobertura de pruebas: JaCoCo.
 - Herramienta de construcción y dependencias: Maven.
 
+#### Herramientas adicionales
+- Reducción de boilerplate: Lombok.
+- Mapeo automático: MapStruct.
+- Análisis de calidad: SonarCloud.
+- Contenerización y despliegue: Docker.
+- Despliegue en la nube: Azure.
+
 ### 2.2 Justificación por tecnología
 - Java 21: proporciona rendimiento estable, tipado fuerte y compatibilidad con el ecosistema empresarial de Spring.
 - Spring Boot 3.3.4: acelera la construcción de servicios REST mediante autoconfiguración y convenciones de desarrollo.
@@ -53,6 +60,12 @@ Adicionalmente, el diagrama explicita reglas de negocio del torneo: mínimo y m�
 - JUnit 5 y Mockito: permiten pruebas unitarias y de integración con aislamiento de dependencias.
 - JaCoCo: mide cobertura de pruebas para identificar módulos críticos sin validación suficiente.
 - Maven: gestiona dependencias, ciclos de build y ejecución estandarizada del proyecto.
+
+Lombok: reduce el código repetitivo en entidades y DTOs mediante anotaciones para getters, setters, constructores, etc.
+MapStruct: permite el mapeo automático y eficiente entre entidades y DTOs, facilitando la separación de capas.
+SonarCloud: realiza análisis estático de calidad y seguridad del código, ayudando a mantener buenas prácticas y detectar deuda técnica.
+Docker: permite crear contenedores para el backend, facilitando la portabilidad, pruebas y despliegue en cualquier entorno.
+Azure: plataforma cloud utilizada para el despliegue y operación del backend en ambientes QA y producción.
 
 ## 3. Funcionalidades
 
@@ -202,10 +215,10 @@ El diagrama de clases de Zeus-Codensa refleja la arquitectura de tres capas del 
 
 ### 5.2 Diagrama de Clases del Sistema
 
-A continuación se presenta el diagrama de clases que ilustra la estructura de los modelos del dominio, organizados por capas (presentación, lógica de negocio y persistencia), mostrando las entidades principales y sus relaciones.
+A continuación se presenta el diagrama de clases actualizado, generado automáticamente a partir del código fuente real del backend:
 
-![alt text](<docs/images/diagrama de clases1.1.png>)
-
+![Diagrama de Clases Zeus-Codensa](docs/images/diagrama_clases_actualizado.png)
+![alt text](docs/images/DiagreamaDeClasesActualizado.png)
 El diagrama muestra la arquitectura en tres capas:
 
 - **Controllers** (`AuthController`, `UserController`, `TeamController`, `TournamentController`, `MatchController`): Reciben solicitudes HTTP y delegan a servicios.
