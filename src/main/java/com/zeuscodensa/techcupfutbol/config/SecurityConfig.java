@@ -73,13 +73,13 @@ public class SecurityConfig {
                         .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll()
 
                         // Reglas de acceso por roles del proyecto TechCup
-                        .requestMatchers(HttpMethod.POST, "/api/teams/**").hasAuthority("CAPTAIN")
-                        .requestMatchers(HttpMethod.POST, "/api/tournaments/**").hasAuthority(TOURNAMENT_ORGANIZER)
-                        .requestMatchers(HttpMethod.PUT, "/api/tournaments/**").hasAuthority(TOURNAMENT_ORGANIZER)
-                        .requestMatchers(HttpMethod.POST, "/api/matches/**").hasAnyAuthority("REFEREE", TOURNAMENT_ORGANIZER)
-                        .requestMatchers(HttpMethod.PUT, "/api/matches/**").hasAnyAuthority("REFEREE", TOURNAMENT_ORGANIZER)
-                        .requestMatchers(HttpMethod.POST, "/api/registrations/**").hasAnyAuthority("CAPTAIN", TOURNAMENT_ORGANIZER)
-                        .requestMatchers(HttpMethod.PUT, "/api/registrations/**").hasAnyAuthority("ADMINISTRADOR_SISTEMA", TOURNAMENT_ORGANIZER)
+                        .requestMatchers(HttpMethod.POST, "/api/teams", "/api/teams/**").hasAuthority("CAPTAIN")
+                        .requestMatchers(HttpMethod.POST, "/api/tournaments", "/api/tournaments/**").hasAuthority(TOURNAMENT_ORGANIZER)
+                        .requestMatchers(HttpMethod.PUT, "/api/tournaments", "/api/tournaments/**").hasAuthority(TOURNAMENT_ORGANIZER)
+                        .requestMatchers(HttpMethod.POST, "/api/matches", "/api/matches/**").hasAnyAuthority("REFEREE", TOURNAMENT_ORGANIZER)
+                        .requestMatchers(HttpMethod.PUT, "/api/matches", "/api/matches/**").hasAnyAuthority("REFEREE", TOURNAMENT_ORGANIZER)
+                        .requestMatchers(HttpMethod.POST, "/api/registrations", "/api/registrations/**").hasAnyAuthority("CAPTAIN", TOURNAMENT_ORGANIZER)
+                        .requestMatchers(HttpMethod.PUT, "/api/registrations", "/api/registrations/**").hasAnyAuthority("ADMINISTRADOR_SISTEMA", TOURNAMENT_ORGANIZER)
 
                         .anyRequest().authenticated()
                 )

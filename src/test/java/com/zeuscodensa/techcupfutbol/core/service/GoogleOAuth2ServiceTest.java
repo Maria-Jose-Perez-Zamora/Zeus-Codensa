@@ -5,6 +5,7 @@ import com.zeuscodensa.techcupfutbol.core.model.UserType;
 import com.zeuscodensa.techcupfutbol.core.model.User;
 import com.zeuscodensa.techcupfutbol.core.model.Player;
 import com.zeuscodensa.techcupfutbol.core.repository.IUserRepository;
+import com.zeuscodensa.techcupfutbol.core.repository.IEmailNotificationPort;
 import com.zeuscodensa.techcupfutbol.security.JwtService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,6 +32,9 @@ public class GoogleOAuth2ServiceTest {
 
     @Mock
     private OAuth2User oAuth2User;
+
+    @Mock
+    private IEmailNotificationPort emailPort;
 
     @InjectMocks
     private GoogleOAuth2Service googleOAuth2Service;
@@ -75,6 +79,8 @@ public class GoogleOAuth2ServiceTest {
 
         assertNotNull(res);
         assertEquals("mocked_token", res);
+        
+        verify(emailPort, times(1)).sendLoginAlertEmail(anyString(), anyString());
         assertEquals("User", existing.getName());
         assertEquals("pic_url", existing.getPhoto());
         assertEquals(UserType.EXTERNAL, existing.getType());
@@ -99,6 +105,7 @@ public class GoogleOAuth2ServiceTest {
         assertNotNull(res);
         assertEquals("mocked_token", res);
         verify(userRepository, times(1)).save(any(User.class)); 
+        verify(emailPort, times(1)).sendAccountCreationEmail(anyString(), any());
     }
 
     @Test

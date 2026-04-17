@@ -9,7 +9,7 @@ import com.zeuscodensa.techcupfutbol.core.repository.IUserRepository;
 @Component
 public class UserValidator {
 
-    private static final String EMAIL_REGEX = "^[a-zA-Z0-9]+\\.[a-zA-Z0-9]+\\-[a-zA-Z]@escuelaing\\.edu\\.co$";
+    private static final String EMAIL_REGEX = "^[a-zA-Z0-9]+\\.[a-zA-Z0-9]+\\-[a-zA-Z]@(mail\\.)?escuelaing\\.edu\\.co$";
 
     private final IUserRepository userRepository;
 
@@ -36,6 +36,7 @@ public class UserValidator {
         if (user.getEmail() == null || user.getEmail().trim().isEmpty()) {
             throw new IllegalArgumentException("Email cannot be empty");
         }
+
         if (!user.getEmail().matches(EMAIL_REGEX)) {
             throw new IllegalArgumentException("El correo debe ser institucional (ej. nombre.apellido-a@escuelaing.edu.co)");
         }

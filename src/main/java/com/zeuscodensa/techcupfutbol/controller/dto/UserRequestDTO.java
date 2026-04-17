@@ -2,14 +2,28 @@ package com.zeuscodensa.techcupfutbol.controller.dto;
 
 import com.zeuscodensa.techcupfutbol.core.model.Role;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 public class UserRequestDTO {
+    @NotBlank(message = "El nombre no puede estar vacío")
     private String name;
+    
+    @NotBlank(message = "El email no puede estar vacío")
+    @Email(message = "Debe ser un email válido")
     private String email;
+    
+    @NotBlank(message = "La contraseña no puede estar vacía")
     private String password;
+    
     private String position;
     private Integer jerseyNumber;
     private String photo;
+    
+    @NotNull(message = "El rol no puede ser nulo")
     private Role role;
+    
     private String userType;
 
     public UserRequestDTO() {}
