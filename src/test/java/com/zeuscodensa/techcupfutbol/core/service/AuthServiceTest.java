@@ -15,7 +15,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class AuthServiceTest {
@@ -29,6 +29,9 @@ public class AuthServiceTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    @Mock
+    private EmailService emailService;
+
     @InjectMocks
     private AuthService authService;
     @Test
@@ -37,15 +40,18 @@ public class AuthServiceTest {
         u.setEmail("user.test1-a@escuelaing.edu.co");
         u.setPassword("secret");
         u.setRole(com.zeuscodensa.techcupfutbol.core.model.Role.PLAYER);
+        u.setName("Test User");
         
         when(userRepository.findByEmail("user.test1-a@escuelaing.edu.co")).thenReturn(Optional.of(u));
         when(passwordEncoder.matches("secret", "secret")).thenReturn(true);
         when(jwtService.generateToken(anyString(), anyString())).thenReturn("mockToken");
+        doNothing().when(emailService).sendLoginNotificationEmail(anyString(), anyString());
 
         String responseToken = authService.login("user.test1-a@escuelaing.edu.co", "secret");
 
         assertNotNull(responseToken);
         assertEquals("mockToken", responseToken);
+        verify(emailService, times(1)).sendLoginNotificationEmail(anyString(), anyString());
     }
 
     @Test

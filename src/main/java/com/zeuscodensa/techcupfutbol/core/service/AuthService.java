@@ -19,11 +19,14 @@ public class AuthService {
     private final ITokenService tokenService;
     private final IUserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
-    public AuthService(ITokenService tokenService, IUserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public AuthService(ITokenService tokenService, IUserRepository userRepository,
+                       PasswordEncoder passwordEncoder, EmailService emailService) {
         this.tokenService = tokenService;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.emailService = emailService;
     }
 
     public String login(String email, String password) {
@@ -45,6 +48,10 @@ public class AuthService {
         String token = tokenService.generateToken(user.getEmail(), user.getRole().name());
 
         log.info("Autenticacion exitosa: {} (Rol: {})", user.getEmail(), user.getRole().name());
+
+        // Send async login notification — non-blocking
+        emailService.sendLoginNotificationEmail(user.getEmail(), user.getName());
+
         return token;
     }
 }
