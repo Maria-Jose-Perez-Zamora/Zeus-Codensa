@@ -36,6 +36,7 @@ public class UserValidator {
         if (user.getEmail() == null || user.getEmail().trim().isEmpty()) {
             throw new IllegalArgumentException("Email cannot be empty");
         }
+
         if (!user.getEmail().matches(EMAIL_REGEX)) {
             throw new IllegalArgumentException("El correo debe ser institucional (ej. nombre.apellido-a@escuelaing.edu.co)");
         }
