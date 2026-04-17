@@ -150,7 +150,7 @@ public class PlayerService {
 
     public List<Invitation> getInvitationsByPlayer(String playerEmail) {
         return invitationRepository.findByPlayerEmail(playerEmail).stream()
-                .filter(i -> STATUS_PENDING.equals(i.getStatus()) || STATUS_SENT.equals(i.getStatus()) || "REQUESTED".equals(i.getStatus()))
+                .filter(i -> STATUS_PENDING.equals(i.getStatus()) || STATUS_SENT.equals(i.getStatus()))
                 .collect(Collectors.toList());
     }
 
