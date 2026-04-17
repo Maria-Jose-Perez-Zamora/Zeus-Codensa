@@ -9,6 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
@@ -25,6 +26,9 @@ public class AuthServiceTest {
     @Mock
     private IUserRepository userRepository;
 
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
     @InjectMocks
     private AuthService authService;
     @Test
@@ -35,6 +39,7 @@ public class AuthServiceTest {
         u.setRole(com.zeuscodensa.techcupfutbol.core.model.Role.PLAYER);
         
         when(userRepository.findByEmail("user.test1-a@escuelaing.edu.co")).thenReturn(Optional.of(u));
+        when(passwordEncoder.matches("secret", "secret")).thenReturn(true);
         when(jwtService.generateToken(anyString(), anyString())).thenReturn("mockToken");
 
         String responseToken = authService.login("user.test1-a@escuelaing.edu.co", "secret");
@@ -50,6 +55,7 @@ public class AuthServiceTest {
         u.setPassword("secret");
         
         when(userRepository.findByEmail("user.test1-a@escuelaing.edu.co")).thenReturn(Optional.of(u));
+        when(passwordEncoder.matches("wrong", "secret")).thenReturn(false);
 
         assertThrows(BusinessRuleException.class, () -> authService.login("user.test1-a@escuelaing.edu.co", "wrong"));
     }

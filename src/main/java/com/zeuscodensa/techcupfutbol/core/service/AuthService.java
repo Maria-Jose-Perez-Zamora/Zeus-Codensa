@@ -4,6 +4,7 @@ import com.zeuscodensa.techcupfutbol.core.exception.BusinessRuleException;
 import com.zeuscodensa.techcupfutbol.core.model.User;
 import com.zeuscodensa.techcupfutbol.core.repository.IUserRepository;
 import com.zeuscodensa.techcupfutbol.core.repository.ITokenService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,10 +18,12 @@ public class AuthService {
     
     private final ITokenService tokenService;
     private final IUserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public AuthService(ITokenService tokenService, IUserRepository userRepository) {
+    public AuthService(ITokenService tokenService, IUserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.tokenService = tokenService;
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public String login(String email, String password) {
@@ -33,7 +36,7 @@ public class AuthService {
 
         Optional<User> userOpt = userRepository.findByEmail(email);
 
-        if (userOpt.isEmpty() || !userOpt.get().getPassword().equals(password)) {
+        if (userOpt.isEmpty() || !passwordEncoder.matches(password, userOpt.get().getPassword())) {
             log.error("Credenciales invalidas intentadas contra {}", email);
             throw new BusinessRuleException("Credenciales incorrectas");
         }
