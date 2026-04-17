@@ -14,6 +14,10 @@ import com.zeuscodensa.techcupfutbol.core.service.TeamService;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Collections;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -63,12 +67,13 @@ public class TeamControllerTest {
     @Test
     public void testGetAllTeams() {
         Team t1 = new Team("Equipo1");
-        when(teamService.getAllTeams()).thenReturn(Collections.singletonList(t1));
+        Page<Team> page = new PageImpl<>(Collections.singletonList(t1));
+        when(teamService.getAllTeams(any(), any(Pageable.class))).thenReturn(page);
 
-        ResponseEntity<List<TeamResponseDTO>> responseEntity = teamController.getAllTeams();
+        ResponseEntity<Page<TeamResponseDTO>> responseEntity = teamController.getAllTeams(null, PageRequest.of(0, 10));
 
         assertEquals(200, responseEntity.getStatusCode().value());
-        assertEquals(1, responseEntity.getBody().size());
-        assertEquals("Equipo1", responseEntity.getBody().get(0).getTeamName());
+        assertEquals(1, responseEntity.getBody().getContent().size());
+        assertEquals("Equipo1", responseEntity.getBody().getContent().get(0).getTeamName());
     }
 }
