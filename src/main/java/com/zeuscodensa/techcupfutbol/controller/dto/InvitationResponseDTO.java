@@ -6,6 +6,7 @@ public class InvitationResponseDTO {
     private String id;
     private String playerEmail;
     private String teamName;
+    private String captainEmail;
     private String status;
     private String message;
 
@@ -15,6 +16,7 @@ public class InvitationResponseDTO {
         this.id = inv.getId();
         this.playerEmail = inv.getPlayerEmail();
         this.teamName = inv.getTeamName();
+        this.captainEmail = inv.getCaptainEmail();
         this.status = inv.getStatus();
         this.message = "Invitation successfully sent to player " + inv.getPlayerEmail();
     }
@@ -25,6 +27,8 @@ public class InvitationResponseDTO {
     public void setPlayerEmail(String playerEmail) { this.playerEmail = playerEmail; }
     public String getTeamName() { return teamName; }
     public void setTeamName(String teamName) { this.teamName = teamName; }
+    public String getCaptainEmail() { return captainEmail; }
+    public void setCaptainEmail(String captainEmail) { this.captainEmail = captainEmail; }
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
     public String getMessage() { return message; }

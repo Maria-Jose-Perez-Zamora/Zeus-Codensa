@@ -54,6 +54,23 @@ public class TeamController {
                 .collect(Collectors.toList()));
     }
 
+    @GetMapping("/my-team")
+    @Operation(summary = "Get My Team", description = "Returns the team where the authenticated user is captain or a player")
+    public ResponseEntity<TeamResponseDTO> getMyTeam(Authentication authentication) {
+        String email = authentication != null ? authentication.getName() : null;
+        log.info("REST request - getMyTeam para usuario: {}", email);
+        Team myTeam = teamService.getAllTeams().stream()
+                .filter(t -> (t.getCaptainEmail() != null && t.getCaptainEmail().equals(email)) ||
+                             (t.getPlayers() != null && t.getPlayers().stream().anyMatch(p -> p.getEmail().equals(email))))
+                .findFirst()
+                .orElse(null);
+        
+        if (myTeam == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(new TeamResponseDTO(myTeam));
+    }
+
     // ── Join-request endpoints (captain-side) ──────────────────────────────
 
     @GetMapping("/join-requests")
