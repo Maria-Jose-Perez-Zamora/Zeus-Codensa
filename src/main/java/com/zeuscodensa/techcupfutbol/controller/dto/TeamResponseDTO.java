@@ -10,6 +10,7 @@ public class TeamResponseDTO {
     private String escudo;
     private String coloresUniforme;
     private String captainName;
+    private String captainEmail;
     private List<UserResponseDTO> players;
 
     public TeamResponseDTO() {}
@@ -20,6 +21,7 @@ public class TeamResponseDTO {
         this.escudo = team.getEscudo();
         this.coloresUniforme = team.getColoresUniforme();
         this.captainName = team.getCaptainName();
+        this.captainEmail = team.getCaptainEmail();
         this.players = team.getPlayers().stream()
                 .map(UserResponseDTO::new)
                 .collect(Collectors.toList());
@@ -35,6 +37,8 @@ public class TeamResponseDTO {
     public void setColoresUniforme(String coloresUniforme) { this.coloresUniforme = coloresUniforme; }
     public String getCaptainName() { return captainName; }
     public void setCaptainName(String captainName) { this.captainName = captainName; }
+    public String getCaptainEmail() { return captainEmail; }
+    public void setCaptainEmail(String captainEmail) { this.captainEmail = captainEmail; }
     public List<UserResponseDTO> getPlayers() { return players; }
     public void setPlayers(List<UserResponseDTO> players) { this.players = players; }
 }

@@ -65,6 +65,7 @@ public final class EntityToModelMapper {
         model.setTeamName(entity.getTeamName());
         model.setEscudo(entity.getEscudo());
         model.setColoresUniforme(entity.getColoresUniforme());
+        model.setCaptainEmail(entity.getCaptainEmail());
 
         List<User> players = new ArrayList<>();
         if (entity.getPlayers() != null) {

@@ -41,7 +41,7 @@ public class TeamControllerTest {
         
         when(teamService.createTeam(any(Team.class), eq(validPlayers))).thenReturn(mockedSavedTeam);
 
-        ResponseEntity<TeamResponseDTO> responseEntity = teamController.createTeam(request);
+        ResponseEntity<TeamResponseDTO> responseEntity = teamController.createTeam(request, null);
 
         assertEquals(200, responseEntity.getStatusCode().value());
         assertNotNull(responseEntity.getBody());
@@ -56,7 +56,7 @@ public class TeamControllerTest {
         when(teamService.createTeam(any(Team.class), anyList()))
             .thenThrow(new IllegalArgumentException("Error de validacion"));
 
-        RuntimeException thrown = assertThrows(RuntimeException.class, () -> teamController.createTeam(request));
+        RuntimeException thrown = assertThrows(RuntimeException.class, () -> teamController.createTeam(request, null));
         assertEquals("Error de validacion", thrown.getMessage());
     }
 

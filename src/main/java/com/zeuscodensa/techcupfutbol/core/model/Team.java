@@ -8,6 +8,7 @@ public class Team {
     private String teamName;
     private String escudo;
     private String coloresUniforme;
+    private String captainEmail;
     private List<User> players;
 
     public Team() {
@@ -28,6 +29,8 @@ public class Team {
     public void setEscudo(String escudo) { this.escudo = escudo; }
     public String getColoresUniforme() { return coloresUniforme; }
     public void setColoresUniforme(String coloresUniforme) { this.coloresUniforme = coloresUniforme; }
+    public String getCaptainEmail() { return captainEmail; }
+    public void setCaptainEmail(String captainEmail) { this.captainEmail = captainEmail; }
     public List<User> getPlayers() { return players; }
     public void setPlayers(List<User> players) { this.players = players; }
 

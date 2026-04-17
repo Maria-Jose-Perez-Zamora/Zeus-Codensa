@@ -74,5 +74,19 @@ public class PlayerController {
         jugadorService.processInvitation(id, playerEmail, request.getStatus());
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/join-requests")
+    @Operation(summary = "Request to Join Team", description = "A player requests to join a team")
+    public ResponseEntity<InvitationResponseDTO> solicitarUnirse(
+            @RequestParam String teamName,
+            org.springframework.security.core.Authentication authentication) {
+        
+        String playerEmail = authentication != null ? authentication.getName() : null;
+        log.info("REST request - solicitarUnirse para player: {} a team: {}", playerEmail, teamName);
+        
+        Invitation savedInv = jugadorService.enviarSolicitudUnirse(playerEmail, teamName);
+        
+        return ResponseEntity.ok(new InvitationResponseDTO(savedInv));
+    }
 }
 

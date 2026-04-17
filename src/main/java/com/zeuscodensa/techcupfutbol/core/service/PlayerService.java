@@ -141,5 +141,82 @@ public class PlayerService {
             throw new BusinessRuleException("Estado de aceptación inválido. Use ACEPTADA o DECLINADA.");
         }
     }
+
+    public List<Invitation> getInvitationsByCaptain(String captainEmail) {
+        return invitationRepository.findByCaptainEmail(captainEmail).stream()
+                .filter(i -> STATUS_PENDING.equals(i.getStatus()) || "REQUESTED".equals(i.getStatus()) || STATUS_SENT.equals(i.getStatus()))
+                .collect(Collectors.toList());
+    }
+
+    public void captainProcessJoinRequest(String invitationId, String captainEmail, String status) {
+        Invitation inv = invitationRepository.findById(invitationId)
+                .orElseThrow(() -> new ResourceNotFoundException("Solicitud no encontrada"));
+
+        if (!inv.getCaptainEmail().equals(captainEmail)) {
+            throw new BusinessRuleException("El capitán no es el destinatario de esta solicitud.");
+        }
+
+        if (!"REQUESTED".equals(inv.getStatus()) && !STATUS_PENDING.equals(inv.getStatus()) && !STATUS_SENT.equals(inv.getStatus())) {
+            throw new BusinessRuleException("La solicitud ya fue respondida o no está pendiente.");
+        }
+
+        if ("ACEPTADA".equalsIgnoreCase(status) || "ACCEPTED".equalsIgnoreCase(status)) {
+            if (estaEnEquipo(inv.getPlayerEmail())) {
+                throw new BusinessRuleException("El jugador ya pertenece a un equipo.");
+            }
+
+            Team targetTeam = teamRepository.findByTeamName(inv.getTeamName())
+                    .orElseThrow(() -> new ResourceNotFoundException("El equipo " + inv.getTeamName() + " ya no existe."));
+
+            User player = userRepository.findByEmail(inv.getPlayerEmail())
+                    .orElseThrow(() -> new ResourceNotFoundException("Jugador no encontrado en el sistema"));
+
+            if (targetTeam.getPlayers() == null) {
+                targetTeam.setPlayers(new java.util.ArrayList<>());
+            }
+
+            targetTeam.getPlayers().add(player);
+            teamRepository.save(targetTeam);
+
+            inv.setStatus("ACEPTADA");
+            invitationRepository.save(inv);
+
+            log.info("El capitán {} aceptó al jugador {} en el equipo {}", captainEmail, inv.getPlayerEmail(), targetTeam.getTeamName());
+
+        } else if ("DECLINADA".equalsIgnoreCase(status) || "DECLINED".equalsIgnoreCase(status)) {
+            inv.setStatus("DECLINADA");
+            invitationRepository.save(inv);
+            log.info("El capitán {} declinó al jugador {} para el equipo {}", captainEmail, inv.getPlayerEmail(), inv.getTeamName());
+        } else {
+            throw new BusinessRuleException("Estado de aceptación inválido. Use ACEPTADA o DECLINADA.");
+        }
+    }
+
+    public Invitation enviarSolicitudUnirse(String playerEmail, String teamName) {
+        if (estaEnEquipo(playerEmail)) {
+            throw new BusinessRuleException("El jugador ya pertenece a un equipo.");
+        }
+        
+        Team targetTeam = teamRepository.findByTeamName(teamName)
+                .orElseThrow(() -> new ResourceNotFoundException("El equipo " + teamName + " no existe."));
+                
+        boolean yaInvitado = invitationRepository.findByPlayerEmail(playerEmail).stream()
+                .anyMatch(i -> i.getTeamName().equals(teamName) && 
+                              (STATUS_PENDING.equals(i.getStatus()) || STATUS_SENT.equals(i.getStatus()) || "REQUESTED".equals(i.getStatus())));
+                              
+        if (yaInvitado) {
+            throw new BusinessRuleException("Ya existe una solicitud o invitación pendiente para este equipo.");
+        }
+        
+        Invitation newInv = new Invitation();
+        newInv.setId(java.util.UUID.randomUUID().toString());
+        newInv.setCaptainEmail(targetTeam.getCaptainEmail());
+        newInv.setPlayerEmail(playerEmail);
+        newInv.setTeamName(teamName);
+        newInv.setStatus("REQUESTED");
+        
+        log.info("Jugador {} solicitó unirse al equipo {}", playerEmail, teamName);
+        return invitationRepository.save(newInv);
+    }
 }
 

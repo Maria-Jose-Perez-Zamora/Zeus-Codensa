@@ -47,4 +47,19 @@ public class JugadorControllerTest {
         ResponseEntity<InvitationResponseDTO> res = controller.enviarInvitacion(new InvitationRequestDTO());
         assertEquals(200, res.getStatusCode().value());
     }
+
+    @Test
+    public void testSolicitarUnirse() {
+        Invitation mockRes = new Invitation();
+        mockRes.setStatus("REQUESTED");
+        mockRes.setTeamName("My Team");
+
+        org.springframework.security.core.Authentication auth = org.mockito.Mockito.mock(org.springframework.security.core.Authentication.class);
+        when(auth.getName()).thenReturn("player@test.com");
+        when(jugadorService.enviarSolicitudUnirse("player@test.com", "My Team")).thenReturn(mockRes);
+
+        ResponseEntity<InvitationResponseDTO> res = controller.solicitarUnirse("My Team", auth);
+        assertEquals(200, res.getStatusCode().value());
+        assertEquals("REQUESTED", res.getBody().getStatus());
+    }
 }

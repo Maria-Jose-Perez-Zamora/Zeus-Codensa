@@ -29,6 +29,9 @@ public class TeamEntity {
 
     private String coloresUniforme;
 
+    @Column
+    private String captainEmail;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "team_players",
@@ -75,5 +78,13 @@ public class TeamEntity {
 
     public void setPlayers(List<UserEntity> players) {
         this.players = players;
+    }
+
+    public String getCaptainEmail() {
+        return captainEmail;
+    }
+
+    public void setCaptainEmail(String captainEmail) {
+        this.captainEmail = captainEmail;
     }
 }

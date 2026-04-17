@@ -296,4 +296,77 @@ public class PlayerServiceTest {
 
         assertThrows(BusinessRuleException.class, () -> playerService.enviarInvitacion(req));
     }
+
+    @Test
+    public void testGetInvitationsByCaptain() {
+        Invitation i1 = new Invitation();
+        i1.setStatus("PENDING");
+        Invitation i2 = new Invitation();
+        i2.setStatus("REQUESTED");
+        Invitation i3 = new Invitation();
+        i3.setStatus("DECLINADA");
+
+        when(invitationRepository.findByCaptainEmail("captain@test.com")).thenReturn(java.util.List.of(i1, i2, i3));
+
+        java.util.List<Invitation> res = playerService.getInvitationsByCaptain("captain@test.com");
+        assertEquals(2, res.size(), "Debería retornar las PENDING y REQUESTED");
+    }
+
+    @Test
+    public void testCaptainProcessJoinRequest_Accept_Success() {
+        Invitation inv = new Invitation();
+        inv.setId("inv-req");
+        inv.setCaptainEmail("cap@test.com");
+        inv.setPlayerEmail("player2@test.com");
+        inv.setTeamName("My Team");
+        inv.setStatus("REQUESTED");
+
+        Team team = new Team("My Team");
+        team.setPlayers(new ArrayList<>());
+        Player player = new Player();
+        player.setEmail("player2@test.com");
+
+        when(invitationRepository.findById("inv-req")).thenReturn(Optional.of(inv));
+        when(teamRepository.findByTeamName("My Team")).thenReturn(Optional.of(team));
+        when(userRepository.findByEmail("player2@test.com")).thenReturn(Optional.of(player));
+
+        playerService.captainProcessJoinRequest("inv-req", "cap@test.com", "ACEPTADA");
+
+        assertEquals("ACEPTADA", inv.getStatus());
+        assertEquals(1, team.getPlayers().size());
+        verify(invitationRepository, times(1)).save(inv);
+        verify(teamRepository, times(1)).save(team);
+    }
+
+    @Test
+    public void testCaptainProcessJoinRequest_Decline_Success() {
+        Invitation inv = new Invitation();
+        inv.setId("inv-req");
+        inv.setCaptainEmail("cap@test.com");
+        inv.setStatus("REQUESTED");
+
+        when(invitationRepository.findById("inv-req")).thenReturn(Optional.of(inv));
+
+        playerService.captainProcessJoinRequest("inv-req", "cap@test.com", "DECLINADA");
+
+        assertEquals("DECLINADA", inv.getStatus());
+        verify(invitationRepository, times(1)).save(inv);
+    }
+
+    @Test
+    public void testEnviarSolicitudUnirse_Success() {
+        Team targetTeam = new Team("My Team");
+        targetTeam.setCaptainEmail("cap@test.com");
+
+        when(teamRepository.findAll()).thenReturn(new ArrayList<>()); // simulated estaEnEquipo false
+        when(teamRepository.findByTeamName("My Team")).thenReturn(Optional.of(targetTeam));
+        when(invitationRepository.findByPlayerEmail("p@test.com")).thenReturn(new ArrayList<>());
+        when(invitationRepository.save(any(Invitation.class))).thenAnswer(i -> i.getArgument(0));
+
+        Invitation req = playerService.enviarSolicitudUnirse("p@test.com", "My Team");
+
+        assertEquals("REQUESTED", req.getStatus());
+        assertEquals("cap@test.com", req.getCaptainEmail());
+        verify(invitationRepository, times(1)).save(any(Invitation.class));
+    }
 }
