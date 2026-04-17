@@ -76,4 +76,36 @@ public class TeamControllerTest {
         assertEquals(1, responseEntity.getBody().getContent().size());
         assertEquals("Equipo1", responseEntity.getBody().getContent().get(0).getTeamName());
     }
+    @Test
+    public void testGetTeamById() {
+        Team t1 = new Team("Equipo1");
+        when(teamService.getTeamById(1L)).thenReturn(t1);
+
+        ResponseEntity<TeamResponseDTO> responseEntity = teamController.getTeamById(1L);
+
+        assertEquals(200, responseEntity.getStatusCode().value());
+        assertEquals("Equipo1", responseEntity.getBody().getTeamName());
+    }
+
+    @Test
+    public void testUpdateTeam() {
+        TeamRequestDTO request = new TeamRequestDTO("Equipo Modificado", "e.png", "Blanco", validPlayers);
+        Team t1 = new Team("Equipo Modificado");
+        when(teamService.updateTeam(eq(1L), any(Team.class))).thenReturn(t1);
+
+        ResponseEntity<TeamResponseDTO> responseEntity = teamController.updateTeam(1L, request);
+
+        assertEquals(200, responseEntity.getStatusCode().value());
+        assertEquals("Equipo Modificado", responseEntity.getBody().getTeamName());
+    }
+
+    @Test
+    public void testDeleteTeam() {
+        doNothing().when(teamService).deleteTeam(1L);
+
+        ResponseEntity<Void> responseEntity = teamController.deleteTeam(1L);
+
+        assertEquals(204, responseEntity.getStatusCode().value());
+        verify(teamService, times(1)).deleteTeam(1L);
+    }
 }
