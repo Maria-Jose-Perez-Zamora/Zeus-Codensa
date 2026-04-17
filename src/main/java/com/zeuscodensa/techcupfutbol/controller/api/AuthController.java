@@ -5,6 +5,9 @@ import com.zeuscodensa.techcupfutbol.controller.dto.LoginResponseDTO;
 import com.zeuscodensa.techcupfutbol.controller.mapper.UserMapper;
 import com.zeuscodensa.techcupfutbol.core.model.User;
 import com.zeuscodensa.techcupfutbol.core.service.UserService;
+import com.zeuscodensa.techcupfutbol.controller.dto.UserRequestDTO;
+import com.zeuscodensa.techcupfutbol.controller.dto.UserResponseDTO;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,9 +30,20 @@ public class AuthController {
         this.userService = userService;
     }
 
-    @PostMapping
+    @PostMapping("/register")
+    @Operation(summary = "Register User", description = "Registers a new user (Player, Organizer, Referee, Captain, or Admin) in the system")
+    public ResponseEntity<UserResponseDTO> register(@Valid @RequestBody UserRequestDTO request) {
+        log.info("REST request - register user: {}", request.getEmail());
+        
+        User userModel = UserMapper.toEntity(request);
+        User savedUser = userService.registerUser(userModel);
+        
+        return ResponseEntity.ok(UserMapper.toDTO(savedUser));
+    }
+
+    @PostMapping("/login")
     @Operation(summary = "Login", description = "Produces a simple JWT Base64 Token linked to the Role")
-    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO request) {
+    public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody LoginRequestDTO request) {
         log.info("REST request - intento de login de usuario: {}", request.getEmail());
         
         String token = authService.login(request.getEmail(), request.getPassword());

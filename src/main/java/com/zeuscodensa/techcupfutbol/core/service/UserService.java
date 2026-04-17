@@ -2,6 +2,7 @@ package com.zeuscodensa.techcupfutbol.core.service;
 
 import com.zeuscodensa.techcupfutbol.core.exception.BusinessRuleException;
 import com.zeuscodensa.techcupfutbol.core.exception.PersistenceAccessException;
+import com.zeuscodensa.techcupfutbol.core.exception.ResourceNotFoundException;
 import com.zeuscodensa.techcupfutbol.core.model.User;
 import com.zeuscodensa.techcupfutbol.core.validator.UserValidator;
 import com.zeuscodensa.techcupfutbol.core.repository.IUserRepository;
@@ -14,6 +15,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserService {
@@ -67,7 +71,53 @@ public class UserService {
         }
     }
 
+    public Page<User> getAllUsers(Pageable pageable) {
+        try {
+            return userRepository.findAll(pageable);
+        } catch (Exception ex) {
+            throw new PersistenceAccessException("Error al consultar usuarios paginados en base de datos", ex);
+        }
+    }
+
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
+    }
+
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con email: " + email));
+    }
+
+    @Transactional
+    public void deleteUser(String email) {
+        if (userRepository.findByEmail(email).isEmpty()) {
+            throw new ResourceNotFoundException("Usuario no encontrado con email: " + email);
+        }
+        try {
+            userRepository.deleteByEmail(email);
+        } catch (Exception ex) {
+            throw new PersistenceAccessException("Error al eliminar usuario en base de datos", ex);
+        }
+    }
+
+    public User updateUser(String email, User updateData) {
+        User existingUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new BusinessRuleException("Usuario no encontrado"));
+
+        if (updateData.getName() != null) {
+            existingUser.setName(updateData.getName());
+        }
+        if (updateData.getPhoto() != null) {
+            existingUser.setPhoto(updateData.getPhoto());
+        }
+        if (updateData.getPassword() != null && !updateData.getPassword().isEmpty()) {
+            existingUser.setPassword(passwordEncoder.encode(updateData.getPassword()));
+        }
+        
+        try {
+            return userRepository.save(existingUser);
+        } catch (Exception ex) {
+            throw new PersistenceAccessException("Error al actualizar el usuario", ex);
+        }
     }
 }
