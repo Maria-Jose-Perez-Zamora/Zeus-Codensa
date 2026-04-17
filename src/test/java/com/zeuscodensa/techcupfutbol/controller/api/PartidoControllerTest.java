@@ -91,7 +91,9 @@ public class PartidoControllerTest {
         when(matchService.registrarTarjetas(any(), any(), any()))
                 .thenThrow(new IllegalArgumentException("Match no encontrado"));
 
-        RuntimeException thrown = assertThrows(RuntimeException.class, () -> matchController.registrarTarjetas("999", new MatchCardsRequestDTO()));
+        MatchCardsRequestDTO body = new MatchCardsRequestDTO();
+
+        RuntimeException thrown = assertThrows(RuntimeException.class, () -> matchController.registrarTarjetas("999", body));
         assertEquals("Match no encontrado", thrown.getMessage());
     }
 
@@ -110,7 +112,9 @@ public class PartidoControllerTest {
         when(matchService.asignarArbitro(any(), any()))
                 .thenThrow(new IllegalArgumentException("No es árbitro"));
 
-        RuntimeException thrown = assertThrows(RuntimeException.class, () -> matchController.asignarArbitro("1", new RefereeAssignmentRequestDTO("user.test5-a@escuelaing.edu.co")));
+        RefereeAssignmentRequestDTO body = new RefereeAssignmentRequestDTO("user.test5-a@escuelaing.edu.co");
+
+        RuntimeException thrown = assertThrows(RuntimeException.class, () -> matchController.asignarArbitro("1", body));
         assertEquals("No es árbitro", thrown.getMessage());
     }
 
