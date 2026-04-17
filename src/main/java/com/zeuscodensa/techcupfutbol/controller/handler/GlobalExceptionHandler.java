@@ -11,6 +11,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import java.util.stream.Collectors;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -39,6 +42,25 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiErrorDTO> handlePersistenceAccessException(PersistenceAccessException ex, WebRequest request) {
         log.error("Persistence error: {}", ex.getMessage());
         return buildErrorResponse(ex, HttpStatus.SERVICE_UNAVAILABLE, request);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiErrorDTO> handleValidationExceptions(MethodArgumentNotValidException ex, WebRequest request) {
+        String errors = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                .collect(Collectors.joining(", "));
+        log.warn("Validation error: {}", errors);
+        
+        String path = request.getDescription(false).replace("uri=", "");
+        ApiErrorDTO errorResponse = new ApiErrorDTO(
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                errors,
+                path
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)
