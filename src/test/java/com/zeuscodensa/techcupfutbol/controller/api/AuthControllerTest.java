@@ -1,24 +1,27 @@
 package com.zeuscodensa.techcupfutbol.controller.api;
 
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import static org.mockito.ArgumentMatchers.any;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import static org.mockito.Mockito.when;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.ResponseEntity;
+
 import com.zeuscodensa.techcupfutbol.controller.dto.LoginRequestDTO;
 import com.zeuscodensa.techcupfutbol.controller.dto.LoginResponseDTO;
 import com.zeuscodensa.techcupfutbol.controller.dto.UserRequestDTO;
 import com.zeuscodensa.techcupfutbol.controller.dto.UserResponseDTO;
-import com.zeuscodensa.techcupfutbol.core.model.User;
 import com.zeuscodensa.techcupfutbol.core.model.Role;
-import com.zeuscodensa.techcupfutbol.core.service.UserService;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.http.ResponseEntity;
+import com.zeuscodensa.techcupfutbol.core.model.User;
 import com.zeuscodensa.techcupfutbol.core.service.AuthService;
-
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import com.zeuscodensa.techcupfutbol.core.service.UserService;
 
 public class AuthControllerTest {
 
@@ -32,12 +35,12 @@ public class AuthControllerTest {
     private AuthController authController;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    public void testLogin_Success() {
+    void testLogin_Success() {
         LoginRequestDTO req = new LoginRequestDTO("t@x.com", "pass");
         com.zeuscodensa.techcupfutbol.core.model.Player mockUser = new com.zeuscodensa.techcupfutbol.core.model.Player();
         mockUser.setEmail("t@x.com");
@@ -53,7 +56,7 @@ public class AuthControllerTest {
     }
 
     @Test
-    public void testLogin_Error() {
+    void testLogin_Error() {
         LoginRequestDTO req = new LoginRequestDTO("t", "pass");
 
         when(authService.login("t", "pass")).thenThrow(new IllegalArgumentException("error"));
@@ -63,7 +66,7 @@ public class AuthControllerTest {
     }
 
     @Test
-    public void testRegisterUser_Success() {
+    void testRegisterUser_Success() {
         UserRequestDTO request = new UserRequestDTO("Juan", "user.test1-a@escuelaing.edu.co", "123456", "Delantero", 9, null, Role.PLAYER);
         com.zeuscodensa.techcupfutbol.core.model.Player userMock = new com.zeuscodensa.techcupfutbol.core.model.Player();
         userMock.setName("Juan");
@@ -79,7 +82,7 @@ public class AuthControllerTest {
     }
 
     @Test
-    public void testRegisterUser_ValidationError() {
+    void testRegisterUser_ValidationError() {
         UserRequestDTO request = new UserRequestDTO();
         request.setRole(Role.PLAYER);
         request.setEmail("t@x.com");

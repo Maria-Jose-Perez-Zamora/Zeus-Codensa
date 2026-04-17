@@ -1,31 +1,41 @@
 package com.zeuscodensa.techcupfutbol.core.service;
 
-import com.zeuscodensa.techcupfutbol.core.model.Role;
-import com.zeuscodensa.techcupfutbol.core.model.User;
-import com.zeuscodensa.techcupfutbol.core.model.Player;
-import com.zeuscodensa.techcupfutbol.core.validator.UserValidator;
-import com.zeuscodensa.techcupfutbol.core.repository.IUserRepository;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.crypto.password.PasswordEncoder; // NUEVA IMPORTACIÓN
-import com.zeuscodensa.techcupfutbol.core.repository.IEmailNotificationPort;
-
-import com.zeuscodensa.techcupfutbol.core.exception.BusinessRuleException;
-import com.zeuscodensa.techcupfutbol.core.exception.PersistenceAccessException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.any; // NUEVA IMPORTACIÓN
+import static org.mockito.ArgumentMatchers.anyString;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import com.zeuscodensa.techcupfutbol.core.exception.ResourceNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import com.zeuscodensa.techcupfutbol.core.exception.BusinessRuleException;
+import com.zeuscodensa.techcupfutbol.core.exception.PersistenceAccessException;
+import com.zeuscodensa.techcupfutbol.core.exception.ResourceNotFoundException;
+import com.zeuscodensa.techcupfutbol.core.model.Player;
+import com.zeuscodensa.techcupfutbol.core.model.Role;
+import com.zeuscodensa.techcupfutbol.core.model.User;
+import com.zeuscodensa.techcupfutbol.core.repository.IEmailNotificationPort;
+import com.zeuscodensa.techcupfutbol.core.repository.IUserRepository;
+import com.zeuscodensa.techcupfutbol.core.validator.UserValidator;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
@@ -45,7 +55,7 @@ public class UserServiceTest {
     @InjectMocks
     private UserService userService;
     @Test
-    public void testRegisterUser_Success() {
+    void testRegisterUser_Success() {
         Player newUser = new Player();
         newUser.setName("Ana");
         newUser.setEmail("user.test1-a@escuelaing.edu.co");
@@ -71,7 +81,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testGetAllUsers() {
+    void testGetAllUsers() {
         Player u1 = new Player();
         u1.setName("Ana");
         u1.setEmail("user.test1-a@escuelaing.edu.co");
@@ -94,7 +104,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testRegisterUser_DuplicateEmail_Throws() {
+    void testRegisterUser_DuplicateEmail_Throws() {
         Player existing = new Player();
         existing.setEmail("user.test1-a@escuelaing.edu.co");
 
@@ -105,7 +115,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testRegisterUser_PersistenceError_Throws() {
+    void testRegisterUser_PersistenceError_Throws() {
         Player newUser = new Player();
         newUser.setEmail("user.test1-a@escuelaing.edu.co");
         newUser.setPassword("plain");
@@ -119,20 +129,20 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testGetAllUsers_Empty() {
+    void testGetAllUsers_Empty() {
         when(userRepository.findAll()).thenReturn(new ArrayList<>());
         List<User> users = userService.getAllUsers();
         assertTrue(users.isEmpty());
     }
 
     @Test
-    public void testGetAllUsers_PersistenceError_Throws() {
+    void testGetAllUsers_PersistenceError_Throws() {
         when(userRepository.findAll()).thenThrow(new RuntimeException("db error"));
         assertThrows(PersistenceAccessException.class, () -> userService.getAllUsers());
     }
 
     @Test
-    public void testGetAllUsersPaginated() {
+    void testGetAllUsersPaginated() {
         Player u1 = new Player();
         u1.setName("Ana");
         Page<User> page = new PageImpl<>(List.of(u1));
@@ -143,20 +153,21 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testGetAllUsersPaginated_Throws() {
+    void testGetAllUsersPaginated_Throws() {
         when(userRepository.findAll(any(Pageable.class))).thenThrow(new RuntimeException("db error"));
-        assertThrows(PersistenceAccessException.class, () -> userService.getAllUsers(PageRequest.of(0, 10)));
+        Pageable pageable = PageRequest.of(0, 10);
+        assertThrows(PersistenceAccessException.class, () -> userService.getAllUsers(pageable));
     }
 
     @Test
-    public void testFindByEmail() {
+    void testFindByEmail() {
         Player u1 = new Player();
         when(userRepository.findByEmail("test@test.com")).thenReturn(Optional.of(u1));
         assertTrue(userService.findByEmail("test@test.com").isPresent());
     }
 
     @Test
-    public void testGetUserByEmail_Success() {
+    void testGetUserByEmail_Success() {
         Player u1 = new Player();
         u1.setEmail("test@test.com");
         when(userRepository.findByEmail("test@test.com")).thenReturn(Optional.of(u1));
@@ -166,13 +177,13 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testGetUserByEmail_NotFound() {
+    void testGetUserByEmail_NotFound() {
         when(userRepository.findByEmail("test@test.com")).thenReturn(Optional.empty());
         assertThrows(ResourceNotFoundException.class, () -> userService.getUserByEmail("test@test.com"));
     }
 
     @Test
-    public void testDeleteUser_Success() {
+    void testDeleteUser_Success() {
         Player u1 = new Player();
         when(userRepository.findByEmail("test@test.com")).thenReturn(Optional.of(u1));
         doNothing().when(userRepository).deleteByEmail("test@test.com");
@@ -182,13 +193,13 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testDeleteUser_NotFound() {
+    void testDeleteUser_NotFound() {
         when(userRepository.findByEmail("test@test.com")).thenReturn(Optional.empty());
         assertThrows(ResourceNotFoundException.class, () -> userService.deleteUser("test@test.com"));
     }
 
     @Test
-    public void testDeleteUser_Throws() {
+    void testDeleteUser_Throws() {
         Player u1 = new Player();
         when(userRepository.findByEmail("test@test.com")).thenReturn(Optional.of(u1));
         doThrow(new RuntimeException("db error")).when(userRepository).deleteByEmail("test@test.com");
@@ -197,7 +208,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testUpdateUser_Success() {
+    void testUpdateUser_Success() {
         Player existing = new Player();
         existing.setName("Old Name");
         existing.setEmail("test@test.com");
@@ -219,18 +230,20 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testUpdateUser_NotFound() {
+    void testUpdateUser_NotFound() {
         when(userRepository.findByEmail("test@test.com")).thenReturn(Optional.empty());
-        assertThrows(BusinessRuleException.class, () -> userService.updateUser("test@test.com", new Player()));
+        Player updateData = new Player();
+        assertThrows(BusinessRuleException.class, () -> userService.updateUser("test@test.com", updateData));
     }
 
     @Test
-    public void testUpdateUser_Throws() {
+    void testUpdateUser_Throws() {
         Player existing = new Player();
         existing.setEmail("test@test.com");
         when(userRepository.findByEmail("test@test.com")).thenReturn(Optional.of(existing));
         when(userRepository.save(any())).thenThrow(new RuntimeException("db error"));
 
-        assertThrows(PersistenceAccessException.class, () -> userService.updateUser("test@test.com", new Player()));
+        Player updateData = new Player();
+        assertThrows(PersistenceAccessException.class, () -> userService.updateUser("test@test.com", updateData));
     }
 }
