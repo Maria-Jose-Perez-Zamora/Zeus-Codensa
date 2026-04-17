@@ -1,16 +1,20 @@
 package com.zeuscodensa.techcupfutbol.controller.handler;
 
-import com.zeuscodensa.techcupfutbol.controller.dto.ApiErrorDTO;
+import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.zeuscodensa.techcupfutbol.core.exception.BusinessRuleException;
-import com.zeuscodensa.techcupfutbol.core.exception.ResourceNotFoundException;
-import com.zeuscodensa.techcupfutbol.core.exception.PersistenceAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+
+import com.zeuscodensa.techcupfutbol.controller.dto.ApiErrorDTO;
+import com.zeuscodensa.techcupfutbol.core.exception.BusinessRuleException;
+import com.zeuscodensa.techcupfutbol.core.exception.PersistenceAccessException;
+import com.zeuscodensa.techcupfutbol.core.exception.ResourceNotFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -41,10 +45,36 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(ex, HttpStatus.SERVICE_UNAVAILABLE, request);
     }
 
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiErrorDTO> handleValidationExceptions(MethodArgumentNotValidException ex, WebRequest request) {
+        String errors = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                .collect(Collectors.joining(", "));
+        log.warn("Validation error: {}", errors);
+        
+        String path = request.getDescription(false).replace("uri=", "");
+        ApiErrorDTO errorResponse = new ApiErrorDTO(
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                errors,
+                path
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorDTO> handleAllExceptions(Exception ex, WebRequest request) {
         log.error("Internal server error: ", ex);
-        return buildErrorResponse(ex, HttpStatus.INTERNAL_SERVER_ERROR, request);
+        String path = request.getDescription(false).replace("uri=", "");
+        ApiErrorDTO errorResponse = new ApiErrorDTO(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+                "Ha ocurrido un error inesperado en el servidor",
+                path
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     private ResponseEntity<ApiErrorDTO> buildErrorResponse(Exception ex, HttpStatus status, WebRequest request) {

@@ -7,7 +7,6 @@ import com.zeuscodensa.techcupfutbol.core.repository.ITeamRepository;
 import com.zeuscodensa.techcupfutbol.core.repository.ITournamentRepository;
 import com.zeuscodensa.techcupfutbol.core.exception.ResourceNotFoundException;
 import com.zeuscodensa.techcupfutbol.core.exception.BusinessRuleException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -37,11 +36,6 @@ public class InscripcionServiceTest {
 
     @InjectMocks
     private RegistrationService inscripcionService;
-
-    @BeforeEach
-    public void setUp() {
-    }
-
     @Test
     public void testInscribir_Success() {
         Registration req = new Registration("Aguilas", "Nacional", "url_pago");

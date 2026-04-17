@@ -20,12 +20,15 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.zeuscodensa.techcupfutbol.security.JwtAuthFilter;
 import com.zeuscodensa.techcupfutbol.security.OAuth2AuthenticationSuccessHandler;
+
 import jakarta.servlet.http.HttpServletResponse;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
+
+    private static final String TOURNAMENT_ORGANIZER = "TOURNAMENT_ORGANIZER";
 
     private final JwtAuthFilter jwtAuthFilter;
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
@@ -59,6 +62,8 @@ public class SecurityConfig {
                 }))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .authorizeHttpRequests(auth -> auth
+                        // Health check público — requerido por CD workflows (ZEUS-148, ZEUS-155)
+                        .requestMatchers("/health").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/auth/google/**").permitAll()
                         .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
@@ -69,12 +74,12 @@ public class SecurityConfig {
 
                         // Reglas de acceso por roles del proyecto TechCup
                         .requestMatchers(HttpMethod.POST, "/api/teams/**").hasAuthority("CAPTAIN")
-                        .requestMatchers(HttpMethod.POST, "/api/tournaments/**").hasAuthority("TOURNAMENT_ORGANIZER")
-                        .requestMatchers(HttpMethod.PUT, "/api/tournaments/**").hasAuthority("TOURNAMENT_ORGANIZER")
-                        .requestMatchers(HttpMethod.POST, "/api/matches/**").hasAnyAuthority("REFEREE", "TOURNAMENT_ORGANIZER")
-                        .requestMatchers(HttpMethod.PUT, "/api/matches/**").hasAnyAuthority("REFEREE", "TOURNAMENT_ORGANIZER")
-                        .requestMatchers(HttpMethod.POST, "/api/registrations/**").hasAnyAuthority("CAPTAIN", "TOURNAMENT_ORGANIZER")
-                        .requestMatchers(HttpMethod.PUT, "/api/registrations/**").hasAnyAuthority("ADMINISTRADOR_SISTEMA", "TOURNAMENT_ORGANIZER")
+                        .requestMatchers(HttpMethod.POST, "/api/tournaments/**").hasAuthority(TOURNAMENT_ORGANIZER)
+                        .requestMatchers(HttpMethod.PUT, "/api/tournaments/**").hasAuthority(TOURNAMENT_ORGANIZER)
+                        .requestMatchers(HttpMethod.POST, "/api/matches/**").hasAnyAuthority("REFEREE", TOURNAMENT_ORGANIZER)
+                        .requestMatchers(HttpMethod.PUT, "/api/matches/**").hasAnyAuthority("REFEREE", TOURNAMENT_ORGANIZER)
+                        .requestMatchers(HttpMethod.POST, "/api/registrations/**").hasAnyAuthority("CAPTAIN", TOURNAMENT_ORGANIZER)
+                        .requestMatchers(HttpMethod.PUT, "/api/registrations/**").hasAnyAuthority("ADMINISTRADOR_SISTEMA", TOURNAMENT_ORGANIZER)
 
                         .anyRequest().authenticated()
                 )
@@ -87,7 +92,15 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:4200", "http://localhost:5173", "http://127.0.0.1:3000", "http://127.0.0.1:5173"));
+        configuration.setAllowedOrigins(Arrays.asList(
+                // Local development
+                "http://localhost:3000", "http://localhost:4200", "http://localhost:5173",
+                "http://127.0.0.1:3000", "http://127.0.0.1:5173",
+                // Azure Container Apps — QA (ZEUS-144~149)
+                "https://techcup-qa.happymushroom-f55d56eb.eastus.azurecontainerapps.io",
+                // Azure Container Apps — PROD (ZEUS-151~156)
+                "https://techcup-prod.happymushroom-f55d56eb.eastus.azurecontainerapps.io"
+        ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
         configuration.setAllowCredentials(true);

@@ -2,7 +2,6 @@ package com.zeuscodensa.techcupfutbol.core.validator;
 
 import com.zeuscodensa.techcupfutbol.core.model.Tournament;
 import com.zeuscodensa.techcupfutbol.core.repository.ITournamentRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,11 +22,6 @@ public class TorneoValidatorTest {
 
     @InjectMocks
     private TournamentValidator tournamentValidator;
-
-    @BeforeEach
-    public void setup() {
-    }
-
     @Test
     public void testValidCreation() {
         Tournament req = new Tournament();

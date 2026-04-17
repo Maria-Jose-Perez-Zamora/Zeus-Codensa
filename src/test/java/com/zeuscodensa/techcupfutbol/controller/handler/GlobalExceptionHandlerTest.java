@@ -51,6 +51,6 @@ public class GlobalExceptionHandlerTest {
         Exception ex = new Exception("Global");
         ResponseEntity<ApiErrorDTO> res = handler.handleAllExceptions(ex, createMockRequest());
         assertEquals(500, res.getStatusCode().value());
-        assertEquals("Global", res.getBody().getMessage());
+        assertEquals("Ha ocurrido un error inesperado en el servidor", res.getBody().getMessage());
     }
 }

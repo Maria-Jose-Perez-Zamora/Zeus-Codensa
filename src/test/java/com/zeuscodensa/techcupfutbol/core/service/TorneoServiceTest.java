@@ -3,7 +3,6 @@ package com.zeuscodensa.techcupfutbol.core.service;
 import com.zeuscodensa.techcupfutbol.core.model.Tournament;
 import com.zeuscodensa.techcupfutbol.core.validator.TournamentValidator;
 import com.zeuscodensa.techcupfutbol.core.repository.ITournamentRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -30,11 +29,6 @@ public class TorneoServiceTest {
 
     @InjectMocks
     private TournamentService torneoService;
-
-    @BeforeEach
-    public void setUp() {
-    }
-
     @Test
     public void testCreateTorneo() {
         Tournament req = new Tournament();
