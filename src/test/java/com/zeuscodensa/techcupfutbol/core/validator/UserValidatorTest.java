@@ -46,6 +46,21 @@ public class UserValidatorTest {
     }
 
     @Test
+    public void testValidateForRegistration_StudentEmail_Success() {
+        Player student = new Player();
+        student.setName("Student Name");
+        student.setEmail("john.doe-a@mail.escuelaing.edu.co");
+        student.setPassword("securePassword");
+        student.setRole(Role.PLAYER);
+        student.setPosition("Forward");
+        student.setJerseyNumber(10);
+        
+        when(userRepository.findByEmail(student.getEmail())).thenReturn(Optional.empty());
+
+        assertDoesNotThrow(() -> userValidator.validateForRegistration(student));
+    }
+
+    @Test
     public void testValidateForRegistration_NullName() {
         validUser.setName(null);
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, 
