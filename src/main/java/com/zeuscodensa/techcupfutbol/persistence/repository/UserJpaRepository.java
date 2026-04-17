@@ -8,5 +8,4 @@ import com.zeuscodensa.techcupfutbol.persistence.entity.UserEntity;
 
 public interface UserJpaRepository extends JpaRepository<UserEntity, Long> {
     Optional<UserEntity> findByEmail(String email);
-    void deleteByEmail(String email);
 }

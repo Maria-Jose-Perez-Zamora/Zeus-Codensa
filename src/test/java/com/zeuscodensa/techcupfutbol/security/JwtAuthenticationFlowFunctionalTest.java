@@ -37,7 +37,7 @@ class JwtAuthenticationFlowFunctionalTest {
 
     @Test
     void flujoCorrectoTokenValido() throws Exception {
-        String token = jwtService.generateToken("external.user@google.com", "ADMINISTRADOR_SISTEMA");
+        String token = jwtService.generateToken("external.user@google.com", "PLAYER");
 
         mockMvc.perform(get("/api/users")
                         .header("Authorization", "Bearer " + token))

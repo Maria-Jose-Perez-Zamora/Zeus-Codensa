@@ -11,8 +11,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 @Repository
 public class UserRepositoryAdapter implements IUserRepository {
@@ -40,16 +38,5 @@ public class UserRepositoryAdapter implements IUserRepository {
         return userJpaRepository.findAll().stream()
                 .map(EntityToModelMapper::toUserModel)
                 .collect(Collectors.toList());
-    }
-
-    @Override
-    public Page<User> findAll(Pageable pageable) {
-        return userJpaRepository.findAll(pageable)
-                .map(EntityToModelMapper::toUserModel);
-    }
-
-    @Override
-    public void deleteByEmail(String email) {
-        userJpaRepository.deleteByEmail(email);
     }
 }

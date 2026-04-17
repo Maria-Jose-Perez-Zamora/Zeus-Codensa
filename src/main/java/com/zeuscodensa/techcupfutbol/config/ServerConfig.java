@@ -5,7 +5,6 @@ import org.apache.catalina.connector.Connector;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -14,12 +13,6 @@ import org.springframework.context.annotation.Profile;
 @Profile("!h2")
 @org.springframework.boot.autoconfigure.condition.ConditionalOnProperty(name = "server.ssl.enabled", havingValue = "true")
 public class ServerConfig {
-
-    @Value("${server.port:8443}")
-    private int httpsPort;
-
-    @Value("${server.http.port:8080}")
-    private int httpPort;
 
     @Bean
     public TomcatServletWebServerFactory servletContainer() {
@@ -34,19 +27,16 @@ public class ServerConfig {
                 context.addConstraint(securityConstraint);
             }
         };
-        // Avoid adding a second connector on the same port when server.port is overridden.
-        if (httpPort != httpsPort) {
-            tomcat.addAdditionalTomcatConnectors(redirectConnector());
-        }
+        tomcat.addAdditionalTomcatConnectors(redirectConnector());
         return tomcat;
     }
 
     private Connector redirectConnector() {
         Connector connector = new Connector(TomcatServletWebServerFactory.DEFAULT_PROTOCOL);
         connector.setScheme("http");
-        connector.setPort(httpPort);
+        connector.setPort(8080);
         connector.setSecure(false);
-        connector.setRedirectPort(httpsPort);
+        connector.setRedirectPort(8443);
         return connector;
     }
 }
