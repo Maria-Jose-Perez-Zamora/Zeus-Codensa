@@ -51,7 +51,9 @@ class JwtAuthenticationFlowFunctionalTest {
         mockMvc.perform(get("/api/users")
                         .header("Authorization", "Bearer " + expiredToken))
                 .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.error").value("Token JWT expirado"));
+                .andExpect(jsonPath("$.code").value(401))
+                .andExpect(jsonPath("$.message").value("JWT token expired"))
+                .andExpect(jsonPath("$.timestamp").exists());
     }
 
     @Test
@@ -59,14 +61,18 @@ class JwtAuthenticationFlowFunctionalTest {
         mockMvc.perform(get("/api/users")
                         .header("Authorization", "Bearer token-invalido"))
                 .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.error").value("Token JWT invalido"));
+                .andExpect(jsonPath("$.code").value(401))
+                .andExpect(jsonPath("$.message").value("Invalid JWT token"))
+                .andExpect(jsonPath("$.timestamp").exists());
     }
 
     @Test
     void flujoSinEnviarToken() throws Exception {
         mockMvc.perform(get("/api/users"))
                 .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.error").value("Token requerido o no autorizado"));
+                .andExpect(jsonPath("$.code").value(401))
+                .andExpect(jsonPath("$.message").value("Token required or unauthorized"))
+                .andExpect(jsonPath("$.timestamp").exists());
     }
 
     private String buildExpiredToken(String username, String role) {

@@ -11,10 +11,11 @@ public class PojoCoverageTest {
 
     @Test
     public void testApiErrorDTO() {
-        ApiErrorDTO dto = new ApiErrorDTO(400, "Bad", "Test", "/path");
-        dto.setStatus(500); dto.setError("Error"); dto.setMessage("Msg"); dto.setPath("/new");
-        assertEquals(500, dto.getStatus()); assertEquals("Error", dto.getError());
-        assertEquals("Msg", dto.getMessage()); assertEquals("/new", dto.getPath());
+        ApiErrorDTO dto = new ApiErrorDTO(400, "Bad request");
+        dto.setCode(500); dto.setMessage("Msg");
+        assertEquals(500, dto.getCode());
+        assertEquals("Msg", dto.getMessage());
+        assertNotNull(dto.getTimestamp());
     }
 
     @Test

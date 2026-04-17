@@ -1,7 +1,11 @@
 package com.zeuscodensa.techcupfutbol.controller.api;
 
+import com.zeuscodensa.techcupfutbol.controller.dto.MatchCardsRequestDTO;
+import com.zeuscodensa.techcupfutbol.controller.dto.MatchLineupRequestDTO;
 import com.zeuscodensa.techcupfutbol.controller.dto.MatchRequestDTO;
 import com.zeuscodensa.techcupfutbol.controller.dto.MatchResponseDTO;
+import com.zeuscodensa.techcupfutbol.controller.dto.MatchScoreRequestDTO;
+import com.zeuscodensa.techcupfutbol.controller.dto.RefereeAssignmentRequestDTO;
 import com.zeuscodensa.techcupfutbol.core.model.Match;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,10 +23,10 @@ import static org.mockito.Mockito.*;
 public class PartidoControllerTest {
 
     @Mock
-    private MatchService partidoService;
+    private MatchService matchService;
 
     @InjectMocks
-    private MatchController partidoController;
+    private MatchController matchController;
 
     @BeforeEach
     public void setUp() {
@@ -32,9 +36,9 @@ public class PartidoControllerTest {
     @Test
     public void testRegistrarPartido_Success() {
         Match mockedMatch = new Match();
-        when(partidoService.registrarPartido(any(Match.class))).thenReturn(mockedMatch);
+        when(matchService.registrarPartido(any(Match.class))).thenReturn(mockedMatch);
 
-        ResponseEntity<?> response = partidoController.registrarPartido(new MatchRequestDTO());
+        ResponseEntity<?> response = matchController.registrarPartido(new MatchRequestDTO());
         assertEquals(200, response.getStatusCode().value());
     }
 
@@ -42,9 +46,9 @@ public class PartidoControllerTest {
     public void testActualizarMarcador_Success() {
         Match mockedMatch = new Match();
         mockedMatch.setHomeScore(2);
-        when(partidoService.actualizarMarcador("1", 2, 1)).thenReturn(mockedMatch);
+        when(matchService.actualizarMarcador("1", 2, 1)).thenReturn(mockedMatch);
 
-        ResponseEntity<?> response = partidoController.actualizarMarcador("1", Map.of("homeScore", 2, "awayScore", 1));
+        ResponseEntity<?> response = matchController.actualizarMarcador("1", new MatchScoreRequestDTO(2, 1));
         assertEquals(200, response.getStatusCode().value());
     }
 
@@ -52,48 +56,42 @@ public class PartidoControllerTest {
     public void testRegistrarAlineacion_Success() {
         Match mockedMatch = new Match();
         mockedMatch.setId("1");
-        when(partidoService.registrarAlineacion(eq("1"), eq("TeamA"), anyList())).thenReturn(mockedMatch);
+        when(matchService.registrarAlineacion(eq("1"), eq("TeamA"), anyList())).thenReturn(mockedMatch);
 
-        Map<String, Object> body = new HashMap<>();
-        body.put("teamName", "TeamA");
-        body.put("players", Arrays.asList("user.test1-a@escuelaing.edu.co", "user.test2-a@escuelaing.edu.co"));
+        MatchLineupRequestDTO body = new MatchLineupRequestDTO("TeamA", Arrays.asList("user.test1-a@escuelaing.edu.co", "user.test2-a@escuelaing.edu.co"));
 
-        ResponseEntity<?> response = partidoController.registrarAlineacion("1", body);
+        ResponseEntity<?> response = matchController.registrarAlineacion("1", body);
         assertEquals(200, response.getStatusCode().value());
     }
 
     @Test
     public void testRegistrarAlineacion_Error_Returns400() {
-        when(partidoService.registrarAlineacion(any(), any(), any()))
+        when(matchService.registrarAlineacion(any(), any(), any()))
                 .thenThrow(new IllegalArgumentException("Equipo no participa"));
 
-        Map<String, Object> body = new HashMap<>();
-        body.put("nombreEquipo", "Otro");
-        body.put("players", List.of("user.test3-a@escuelaing.edu.co"));
+        MatchLineupRequestDTO body = new MatchLineupRequestDTO("Otro", List.of("user.test3-a@escuelaing.edu.co"));
 
-        RuntimeException thrown = assertThrows(RuntimeException.class, () -> partidoController.registrarAlineacion("1", body));
+        RuntimeException thrown = assertThrows(RuntimeException.class, () -> matchController.registrarAlineacion("1", body));
         assertEquals("Equipo no participa", thrown.getMessage());
     }
 
     @Test
     public void testRegistrarTarjetas_Success() {
         Match mockedMatch = new Match();
-        when(partidoService.registrarTarjetas(eq("1"), anyMap(), anyMap())).thenReturn(mockedMatch);
+        when(matchService.registrarTarjetas(eq("1"), anyMap(), anyMap())).thenReturn(mockedMatch);
 
-        Map<String, Object> body = new HashMap<>();
-        body.put("yellowCards", new HashMap<>());
-        body.put("redCards", new HashMap<>());
+        MatchCardsRequestDTO body = new MatchCardsRequestDTO(new HashMap<>(), new HashMap<>());
 
-        ResponseEntity<?> response = partidoController.registrarTarjetas("1", body);
+        ResponseEntity<?> response = matchController.registrarTarjetas("1", body);
         assertEquals(200, response.getStatusCode().value());
     }
 
     @Test
     public void testRegistrarTarjetas_Error_Returns400() {
-        when(partidoService.registrarTarjetas(any(), any(), any()))
+        when(matchService.registrarTarjetas(any(), any(), any()))
                 .thenThrow(new IllegalArgumentException("Match no encontrado"));
 
-        RuntimeException thrown = assertThrows(RuntimeException.class, () -> partidoController.registrarTarjetas("999", new HashMap<>()));
+        RuntimeException thrown = assertThrows(RuntimeException.class, () -> matchController.registrarTarjetas("999", new MatchCardsRequestDTO()));
         assertEquals("Match no encontrado", thrown.getMessage());
     }
 
@@ -101,25 +99,25 @@ public class PartidoControllerTest {
     public void testAsignarArbitro_Success() {
         Match mockedMatch = new Match();
         mockedMatch.setRefereeEmail("user.test4-a@escuelaing.edu.co");
-        when(partidoService.asignarArbitro("1", "user.test4-a@escuelaing.edu.co")).thenReturn(mockedMatch);
+        when(matchService.asignarArbitro("1", "user.test4-a@escuelaing.edu.co")).thenReturn(mockedMatch);
 
-        ResponseEntity<?> response = partidoController.asignarArbitro("1", Map.of("correoArbitro", "user.test4-a@escuelaing.edu.co"));
+        ResponseEntity<?> response = matchController.asignarArbitro("1", new RefereeAssignmentRequestDTO("user.test4-a@escuelaing.edu.co"));
         assertEquals(200, response.getStatusCode().value());
     }
 
     @Test
     public void testAsignarArbitro_NotArbitro_Returns400() {
-        when(partidoService.asignarArbitro(any(), any()))
+        when(matchService.asignarArbitro(any(), any()))
                 .thenThrow(new IllegalArgumentException("No es árbitro"));
 
-        RuntimeException thrown = assertThrows(RuntimeException.class, () -> partidoController.asignarArbitro("1", Map.of("correoArbitro", "user.test5-a@escuelaing.edu.co")));
+        RuntimeException thrown = assertThrows(RuntimeException.class, () -> matchController.asignarArbitro("1", new RefereeAssignmentRequestDTO("user.test5-a@escuelaing.edu.co")));
         assertEquals("No es árbitro", thrown.getMessage());
     }
 
     @Test
     public void testGetMisPartidos_Success() {
-        when(partidoService.getMatchesByReferee("user.test4-a@escuelaing.edu.co")).thenReturn(Collections.emptyList());
-        ResponseEntity<List<MatchResponseDTO>> response = partidoController.getMisPartidos("user.test4-a@escuelaing.edu.co");
+        when(matchService.getMatchesByReferee("user.test4-a@escuelaing.edu.co")).thenReturn(Collections.emptyList());
+        ResponseEntity<List<MatchResponseDTO>> response = matchController.getMisPartidos("user.test4-a@escuelaing.edu.co");
         assertEquals(200, response.getStatusCode().value());
     }
 }

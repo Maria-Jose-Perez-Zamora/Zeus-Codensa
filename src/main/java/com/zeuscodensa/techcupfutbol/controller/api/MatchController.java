@@ -1,20 +1,29 @@
 package com.zeuscodensa.techcupfutbol.controller.api;
 
-import com.zeuscodensa.techcupfutbol.controller.dto.MatchRequestDTO;
-import com.zeuscodensa.techcupfutbol.controller.dto.MatchResponseDTO;
-import com.zeuscodensa.techcupfutbol.controller.mapper.MatchMapper;
-import com.zeuscodensa.techcupfutbol.core.model.Match;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import com.zeuscodensa.techcupfutbol.core.service.MatchService;
+import com.zeuscodensa.techcupfutbol.controller.dto.MatchCardsRequestDTO;
+import com.zeuscodensa.techcupfutbol.controller.dto.MatchLineupRequestDTO;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import com.zeuscodensa.techcupfutbol.controller.dto.MatchRequestDTO;
+import com.zeuscodensa.techcupfutbol.controller.dto.MatchResponseDTO;
+import com.zeuscodensa.techcupfutbol.controller.dto.MatchScoreRequestDTO;
+import com.zeuscodensa.techcupfutbol.controller.dto.RefereeAssignmentRequestDTO;
+import com.zeuscodensa.techcupfutbol.controller.mapper.MatchMapper;
+import com.zeuscodensa.techcupfutbol.core.model.Match;
+import com.zeuscodensa.techcupfutbol.core.service.MatchService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/matches")
@@ -22,57 +31,50 @@ import java.util.stream.Collectors;
 public class MatchController {
 
     private static final Logger log = LoggerFactory.getLogger(MatchController.class);
-    private final MatchService partidoService;
+    private final MatchService matchService;
 
-    public MatchController(MatchService partidoService) {
-        this.partidoService = partidoService;
+    public MatchController(MatchService matchService) {
+        this.matchService = matchService;
     }
 
     @PostMapping
     @Operation(summary = "Create Match", description = "Creates a new match in the tournament")
-    public ResponseEntity<MatchResponseDTO> registrarPartido(@RequestBody MatchRequestDTO request) {
+    public ResponseEntity<MatchResponseDTO> registrarPartido(@Valid @RequestBody MatchRequestDTO request) {
         log.info("REST request - registrarPartido");
         Match model = MatchMapper.toEntity(request);
-        Match saved = partidoService.registrarPartido(model);
+        Match saved = matchService.registrarPartido(model);
         return ResponseEntity.ok(MatchMapper.toDTO(saved));
     }
 
     @PutMapping("/{id}/score")
     @Operation(summary = "Update Score", description = "Updates the home and away score of a match")
-    public ResponseEntity<MatchResponseDTO> actualizarMarcador(@PathVariable String id, @RequestBody Map<String, Integer> body) {
+    public ResponseEntity<MatchResponseDTO> actualizarMarcador(@PathVariable String id, @Valid @RequestBody MatchScoreRequestDTO body) {
         log.info("REST request - actualizarMarcador para el match ID: {}", id);
-        Match updated = partidoService.actualizarMarcador(id, body.get("homeScore"), body.get("awayScore"));
+        Match updated = matchService.actualizarMarcador(id, body.getHomeScore(), body.getAwayScore());
         return ResponseEntity.ok(MatchMapper.toDTO(updated));
     }
 
     @PutMapping("/{id}/lineup")
     @Operation(summary = "Register Lineup", description = "Registers the players who will play in a team for a specific match")
-    public ResponseEntity<MatchResponseDTO> registrarAlineacion(@PathVariable String id, @RequestBody Map<String, Object> body) {
+    public ResponseEntity<MatchResponseDTO> registrarAlineacion(@PathVariable String id, @Valid @RequestBody MatchLineupRequestDTO body) {
         log.info("REST request - registrarAlineacion para el match ID: {}", id);
-        String teamName = (String) body.get("teamName");
-        @SuppressWarnings("unchecked")
-        List<String> players = (List<String>) body.get("players");
-        Match updated = partidoService.registrarAlineacion(id, teamName, players);
+        Match updated = matchService.registrarAlineacion(id, body.getTeamName(), body.getPlayers());
         return ResponseEntity.ok(MatchMapper.toDTO(updated));
     }
 
     @PutMapping("/{id}/cards")
     @Operation(summary = "Register Cards", description = "Adds yellow and red cards to the match per player")
-    public ResponseEntity<MatchResponseDTO> registrarTarjetas(@PathVariable String id, @RequestBody Map<String, Object> body) {
+    public ResponseEntity<MatchResponseDTO> registrarTarjetas(@PathVariable String id, @RequestBody MatchCardsRequestDTO body) {
         log.info("REST request - registrarTarjetas para el match ID: {}", id);
-        @SuppressWarnings("unchecked")
-        Map<String, List<String>> amarillas = (Map<String, List<String>>) body.get("yellowCards");
-        @SuppressWarnings("unchecked")
-        Map<String, List<String>> rojas = (Map<String, List<String>>) body.get("redCards");
-        Match updated = partidoService.registrarTarjetas(id, amarillas, rojas);
+        Match updated = matchService.registrarTarjetas(id, body.getYellowCards(), body.getRedCards());
         return ResponseEntity.ok(MatchMapper.toDTO(updated));
     }
 
     @PutMapping("/{id}/referee")
     @Operation(summary = "Assign Referee", description = "Assigns a referee to a match by email")
-    public ResponseEntity<MatchResponseDTO> asignarArbitro(@PathVariable String id, @RequestBody Map<String, String> body) {
+    public ResponseEntity<MatchResponseDTO> asignarArbitro(@PathVariable String id, @Valid @RequestBody RefereeAssignmentRequestDTO body) {
         log.info("REST request - asignarArbitro para el match ID: {}", id);
-        Match updated = partidoService.asignarArbitro(id, body.get("correoArbitro"));
+        Match updated = matchService.asignarArbitro(id, body.getRefereeEmail());
         return ResponseEntity.ok(MatchMapper.toDTO(updated));
     }
 
@@ -80,7 +82,7 @@ public class MatchController {
     @Operation(summary = "Get My Matches", description = "Returns all matches assigned to a referee")
     public ResponseEntity<List<MatchResponseDTO>> getMisPartidos(@PathVariable String refereeEmail) {
         log.info("REST request - getMisPartidos para el árbitro: {}", refereeEmail);
-        return ResponseEntity.ok(partidoService.getMatchesByReferee(refereeEmail).stream()
+        return ResponseEntity.ok(matchService.getMatchesByReferee(refereeEmail).stream()
                 .map(MatchMapper::toDTO)
                 .collect(Collectors.toList()));
     }
@@ -89,7 +91,7 @@ public class MatchController {
     @Operation(summary = "Get All Matches", description = "Returns all matches in the system")
     public ResponseEntity<List<MatchResponseDTO>> getAll() {
         log.info("REST request - getAll Partidos");
-        return ResponseEntity.ok(partidoService.getAll().stream()
+        return ResponseEntity.ok(matchService.getAll().stream()
                 .map(MatchMapper::toDTO)
                 .collect(Collectors.toList()));
     }

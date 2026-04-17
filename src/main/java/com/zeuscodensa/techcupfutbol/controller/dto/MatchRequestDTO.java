@@ -1,9 +1,15 @@
 package com.zeuscodensa.techcupfutbol.controller.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class MatchRequestDTO {
+    @NotBlank(message = "homeTeam is required")
     private String homeTeam;
+    @NotBlank(message = "awayTeam is required")
     private String awayTeam;
+    @NotBlank(message = "matchDate is required")
     private String matchDate;
+    @NotBlank(message = "tournamentName is required")
     private String tournamentName;
 
     public MatchRequestDTO() {}

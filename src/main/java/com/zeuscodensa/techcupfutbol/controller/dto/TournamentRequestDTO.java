@@ -1,15 +1,25 @@
 package com.zeuscodensa.techcupfutbol.controller.dto;
 
 import java.util.List;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 public class TournamentRequestDTO {
+    @NotBlank(message = "tournamentName is required")
     private String tournamentName;
+    @NotBlank(message = "fechaInicio is required")
     private String fechaInicio;
+    @NotBlank(message = "fechaFin is required")
     private String fechaFin;
+
+    @NotNull(message = "numeroEquipos is required")
+    @Positive(message = "numeroEquipos must be positive")
     private Integer numeroEquipos;
+    @NotNull(message = "costoInscripcion is required")
+    @Positive(message = "costoInscripcion must be positive")
     private Double costoInscripcion;
 
-    // Advanced Configuration (RF-005)
     private String rules;
     private String fechaCierreInscripciones;
     private String fechaInicioFaseGrupos;

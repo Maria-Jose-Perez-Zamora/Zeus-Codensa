@@ -1,8 +1,13 @@
 package com.zeuscodensa.techcupfutbol.controller.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class RegistrationRequestDTO {
+    @NotBlank(message = "teamName is required")
     private String teamName;
+    @NotBlank(message = "tournamentName is required")
     private String tournamentName;
+    @NotBlank(message = "comprobantePagoUrl is required")
     private String comprobantePagoUrl;
 
     public RegistrationRequestDTO() {}

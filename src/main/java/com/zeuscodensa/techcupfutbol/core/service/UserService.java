@@ -7,7 +7,7 @@ import com.zeuscodensa.techcupfutbol.core.validator.UserValidator;
 import com.zeuscodensa.techcupfutbol.core.repository.IUserRepository;
 import com.zeuscodensa.techcupfutbol.core.repository.IEmailNotificationPort;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder; // NUEVA IMPORTACIÓN
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +22,7 @@ public class UserService {
     private final IUserRepository userRepository;
     private final UserValidator userValidator;
     private final PasswordEncoder passwordEncoder;
-    private final IEmailNotificationPort emailPort; // NUEVA DEPENDENCIA
+    private final IEmailNotificationPort emailPort;
 
     @Autowired
     public UserService(IUserRepository userRepository, UserValidator userValidator, PasswordEncoder passwordEncoder, IEmailNotificationPort emailPort) {
@@ -41,11 +41,8 @@ public class UserService {
                 throw new BusinessRuleException("Ya existe un usuario con ese correo");
             }
 
-            //  CIFRADO DE CONTRASEÑA ---
-            // Se transforma el texto plano en un hash seguro antes de guardar
             String encodedPassword = passwordEncoder.encode(newUser.getPassword());
             newUser.setPassword(encodedPassword);
-            // ------------------------------------------------
 
             User saved = userRepository.save(newUser);
             emailPort.sendAccountCreationEmail(saved.getEmail(), saved.getName());

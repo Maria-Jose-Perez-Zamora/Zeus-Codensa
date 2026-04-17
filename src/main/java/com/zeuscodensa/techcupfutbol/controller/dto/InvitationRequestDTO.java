@@ -1,8 +1,16 @@
 package com.zeuscodensa.techcupfutbol.controller.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+
 public class InvitationRequestDTO {
+    @NotBlank(message = "captainEmail is required")
+    @Email(message = "captainEmail must be valid")
     private String captainEmail;
+    @NotBlank(message = "playerEmail is required")
+    @Email(message = "playerEmail must be valid")
     private String playerEmail;
+    @NotBlank(message = "teamName is required")
     private String teamName;
 
     public InvitationRequestDTO() {}

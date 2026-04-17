@@ -4,7 +4,6 @@ import com.zeuscodensa.techcupfutbol.controller.dto.ApiErrorDTO;
 import org.junit.jupiter.api.Test;
 import com.zeuscodensa.techcupfutbol.core.exception.BusinessRuleException;
 import com.zeuscodensa.techcupfutbol.core.exception.ResourceNotFoundException;
-import com.zeuscodensa.techcupfutbol.core.exception.PersistenceAccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.context.request.WebRequest;
 
@@ -51,6 +50,6 @@ public class GlobalExceptionHandlerTest {
         Exception ex = new Exception("Global");
         ResponseEntity<ApiErrorDTO> res = handler.handleAllExceptions(ex, createMockRequest());
         assertEquals(500, res.getStatusCode().value());
-        assertEquals("Global", res.getBody().getMessage());
+        assertEquals("Internal server error", res.getBody().getMessage());
     }
 }

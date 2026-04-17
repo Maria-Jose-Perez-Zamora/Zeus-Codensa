@@ -57,14 +57,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 }
             }
         } catch (ExpiredJwtException e) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType("application/json");
-            response.getWriter().write("{\"error\": \"Token JWT expirado\"}");
+            SecurityErrorResponseWriter.write(response, HttpServletResponse.SC_UNAUTHORIZED, "JWT token expired");
             return;
         } catch (Exception e) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType("application/json");
-            response.getWriter().write("{\"error\": \"Token JWT invalido\"}");
+            SecurityErrorResponseWriter.write(response, HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT token");
             return;
         }
         

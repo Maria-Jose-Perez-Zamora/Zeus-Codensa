@@ -2,13 +2,14 @@ package com.zeuscodensa.techcupfutbol.controller.dto;
 
 import jakarta.validation.constraints.NotBlank;
 
-public class InvitationAcceptanceDTO {
+public class RegistrationStatusUpdateRequestDTO {
     @NotBlank(message = "status is required")
     private String status;
 
-    public InvitationAcceptanceDTO() {}
+    public RegistrationStatusUpdateRequestDTO() {
+    }
 
-    public InvitationAcceptanceDTO(String status) {
+    public RegistrationStatusUpdateRequestDTO(String status) {
         this.status = status;
     }
 

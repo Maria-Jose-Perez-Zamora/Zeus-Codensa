@@ -2,10 +2,15 @@ package com.zeuscodensa.techcupfutbol.controller.dto;
 
 import java.util.List;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+
 public class TeamRequestDTO {
+    @NotBlank(message = "teamName is required")
     private String teamName;
     private String escudo;
     private String coloresUniforme;
+    @NotEmpty(message = "playerEmails cannot be empty")
     private List<String> playerEmails;
 
     public TeamRequestDTO() {}

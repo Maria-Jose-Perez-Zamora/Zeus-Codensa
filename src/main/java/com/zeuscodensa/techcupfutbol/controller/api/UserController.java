@@ -5,15 +5,19 @@ import com.zeuscodensa.techcupfutbol.controller.dto.UserResponseDTO;
 import com.zeuscodensa.techcupfutbol.controller.mapper.UserMapper;
 import com.zeuscodensa.techcupfutbol.core.model.User;
 import com.zeuscodensa.techcupfutbol.core.service.UserService;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/users")
@@ -29,7 +33,7 @@ public class UserController {
 
     @PostMapping("/register")
     @Operation(summary = "Register User", description = "Registers a new user (Player, Organizer, Referee, Captain, or Admin) in the system")
-    public ResponseEntity<UserResponseDTO> register(@RequestBody UserRequestDTO request) {
+    public ResponseEntity<UserResponseDTO> register(@Valid @RequestBody UserRequestDTO request) {
         log.info("REST request - register user: {}", request.getEmail());
         
         User userModel = UserMapper.toEntity(request);

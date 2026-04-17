@@ -20,8 +20,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.zeuscodensa.techcupfutbol.security.JwtAuthFilter;
 import com.zeuscodensa.techcupfutbol.security.OAuth2AuthenticationSuccessHandler;
-
-import jakarta.servlet.http.HttpServletResponse;
+import com.zeuscodensa.techcupfutbol.security.SecurityErrorResponseWriter;
 
 @Configuration
 @EnableWebSecurity
@@ -38,7 +37,6 @@ public class SecurityConfig {
         this.oAuth2AuthenticationSuccessHandler = oAuth2AuthenticationSuccessHandler;
     }
 
-    // --- FUSIÓN: Aquí añadimos lo que estaba en la carpeta security ---
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -48,36 +46,34 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
-    // -----------------------------------------------------------------
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
-                .exceptionHandling(ex -> ex.authenticationEntryPoint((request, response, authException) -> {
-                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    response.setContentType("application/json");
-                    response.getWriter().write("{\"error\": \"Token requerido o no autorizado\"}");
-                }))
+                .exceptionHandling(ex -> ex.authenticationEntryPoint((request, response, authException) ->
+                    SecurityErrorResponseWriter.write(response, 401, "Token required or unauthorized")
+                ))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .authorizeHttpRequests(auth -> auth
-                        // Health check público — requerido por CD workflows (ZEUS-148, ZEUS-155)
                         .requestMatchers("/health").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
+                    .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/api/auth/google/**").permitAll()
+                    .requestMatchers("/error").permitAll()
                         .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/users/register").permitAll()
                         .requestMatchers("/api/tournaments/consulta/**").permitAll()
                         .requestMatchers("/api/tournaments/query/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll()
 
-                        // Reglas de acceso por roles del proyecto TechCup
                         .requestMatchers(HttpMethod.POST, "/api/teams/**").hasAuthority("CAPTAIN")
                         .requestMatchers(HttpMethod.POST, "/api/tournaments/**").hasAuthority(TOURNAMENT_ORGANIZER)
                         .requestMatchers(HttpMethod.PUT, "/api/tournaments/**").hasAuthority(TOURNAMENT_ORGANIZER)
                         .requestMatchers(HttpMethod.POST, "/api/matches/**").hasAnyAuthority("REFEREE", TOURNAMENT_ORGANIZER)
                         .requestMatchers(HttpMethod.PUT, "/api/matches/**").hasAnyAuthority("REFEREE", TOURNAMENT_ORGANIZER)
+                        .requestMatchers(HttpMethod.PATCH, "/api/players/invitations/**").hasAuthority("PLAYER")
                         .requestMatchers(HttpMethod.POST, "/api/registrations/**").hasAnyAuthority("CAPTAIN", TOURNAMENT_ORGANIZER)
                         .requestMatchers(HttpMethod.PUT, "/api/registrations/**").hasAnyAuthority("ADMINISTRADOR_SISTEMA", TOURNAMENT_ORGANIZER)
 
@@ -93,12 +89,9 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList(
-                // Local development
                 "http://localhost:3000", "http://localhost:4200", "http://localhost:5173",
                 "http://127.0.0.1:3000", "http://127.0.0.1:5173",
-                // Azure Container Apps — QA (ZEUS-144~149)
                 "https://techcup-qa.happymushroom-f55d56eb.eastus.azurecontainerapps.io",
-                // Azure Container Apps — PROD (ZEUS-151~156)
                 "https://techcup-prod.happymushroom-f55d56eb.eastus.azurecontainerapps.io"
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));

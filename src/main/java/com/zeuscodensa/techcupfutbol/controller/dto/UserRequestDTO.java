@@ -2,13 +2,24 @@ package com.zeuscodensa.techcupfutbol.controller.dto;
 
 import com.zeuscodensa.techcupfutbol.core.model.Role;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+
 public class UserRequestDTO {
+    @NotBlank(message = "name is required")
     private String name;
+    @NotBlank(message = "email is required")
+    @Email(message = "email must be valid")
     private String email;
+    @NotBlank(message = "password is required")
     private String password;
     private String position;
+    @Positive(message = "jerseyNumber must be positive")
     private Integer jerseyNumber;
     private String photo;
+    @NotNull(message = "role is required")
     private Role role;
     private String userType;
 
@@ -25,7 +36,6 @@ public class UserRequestDTO {
         this.userType = userType;
     }
 
-    // Legacy 7-arg constructor for backward compatibility
     public UserRequestDTO(String name, String email, String password, String position, Integer jerseyNumber, String photo, Role role) {
         this(name, email, password, position, jerseyNumber, photo, role, "EXTERNAL");
     }
