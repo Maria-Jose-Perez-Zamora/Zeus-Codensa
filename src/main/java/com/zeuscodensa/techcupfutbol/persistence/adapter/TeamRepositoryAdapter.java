@@ -7,6 +7,7 @@ import com.zeuscodensa.techcupfutbol.persistence.mapper.EntityToModelMapper;
 import com.zeuscodensa.techcupfutbol.persistence.mapper.ModelToEntityMapper;
 import com.zeuscodensa.techcupfutbol.persistence.repository.TeamRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +23,7 @@ public class TeamRepositoryAdapter implements ITeamRepository {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Team> findAll() {
         return teamJpaRepository.findAll().stream()
                 .map(EntityToModelMapper::toTeamModel)
@@ -29,6 +31,7 @@ public class TeamRepositoryAdapter implements ITeamRepository {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<Team> findByTeamName(String teamName) {
         return teamJpaRepository.findByTeamName(teamName).map(EntityToModelMapper::toTeamModel);
     }
