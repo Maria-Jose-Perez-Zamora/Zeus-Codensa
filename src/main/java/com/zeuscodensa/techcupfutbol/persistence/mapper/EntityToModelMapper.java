@@ -160,11 +160,11 @@ public final class EntityToModelMapper {
         }
 
         return switch (role) {
-            case ADMINISTRADOR_SISTEMA -> new SystemAdministrator();
+            case ADMINISTRADOR_SISTEMA, ADMIN -> new SystemAdministrator();
             case TOURNAMENT_ORGANIZER -> new TournamentOrganizer();
             case REFEREE -> new Referee();
             case CAPTAIN -> new Captain();
-            case PLAYER -> new Player();
+            case PLAYER, USER -> new Player();
         };
     }
 

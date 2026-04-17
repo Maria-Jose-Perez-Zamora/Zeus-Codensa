@@ -73,7 +73,6 @@ public class SecurityConfig {
                         .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll()
 
                         // Reglas de acceso por roles del proyecto TechCup
-                        .requestMatchers(HttpMethod.POST, "/api/teams/**").hasAuthority("CAPTAIN")
                         .requestMatchers(HttpMethod.POST, "/api/tournaments/**").hasAuthority(TOURNAMENT_ORGANIZER)
                         .requestMatchers(HttpMethod.PUT, "/api/tournaments/**").hasAuthority(TOURNAMENT_ORGANIZER)
                         .requestMatchers(HttpMethod.POST, "/api/matches/**").hasAnyAuthority("REFEREE", TOURNAMENT_ORGANIZER)
