@@ -93,7 +93,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList(
+        configuration.setAllowedOriginPatterns(Arrays.asList(
                 // Local development
                 "http://localhost:3000", "http://localhost:4200", "http://localhost:5173",
                 "http://127.0.0.1:3000", "http://127.0.0.1:5173",
@@ -102,7 +102,8 @@ public class SecurityConfig {
                 // Azure Container Apps — PROD (ZEUS-151~156)
                 "https://techcup-prod.happymushroom-f55d56eb.eastus.azurecontainerapps.io",
                 // Vercel Frontend Deployment
-                "https://zeus-codensa-front-end-2yow.vercel.app"
+                "https://*.vercel.app",
+                "https://zeus-codensa-front-end-*.vercel.app"
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
