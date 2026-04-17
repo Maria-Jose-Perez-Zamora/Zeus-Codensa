@@ -9,7 +9,7 @@ import com.zeuscodensa.techcupfutbol.core.repository.IUserRepository;
 @Component
 public class UserValidator {
 
-    private static final String EMAIL_REGEX = "^[a-zA-Z0-9]+\\.[a-zA-Z0-9]+\\-[a-zA-Z]@escuelaing\\.edu\\.co$";
+    private static final String EMAIL_REGEX = "^[a-zA-Z0-9]+\\.[a-zA-Z0-9]+\\-[a-zA-Z]@(mail\\.)?escuelaing\\.edu\\.co$";
 
     private final IUserRepository userRepository;
 
