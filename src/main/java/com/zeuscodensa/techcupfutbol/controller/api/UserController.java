@@ -12,8 +12,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/users")
@@ -27,17 +29,27 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping("/register")
-    @Operation(summary = "Register User", description = "Registers a new user (Player, Organizer, Referee, Captain, or Admin) in the system")
-    public ResponseEntity<UserResponseDTO> register(@RequestBody UserRequestDTO request) {
-        log.info("REST request - register user: {}", request.getEmail());
+    @GetMapping("/me")
+    @Operation(summary = "Get current user profile", description = "Returns the profile of the authenticated user")
+    public ResponseEntity<UserResponseDTO> getProfile(Principal principal) {
+        log.info("REST request - get profile for user: {}", principal.getName());
         
-        User userModel = UserMapper.toEntity(request);
-        User savedUser = userService.registerUser(userModel);
-        
-        return ResponseEntity.ok(UserMapper.toDTO(savedUser));
+        User userModel = userService.findByEmail(principal.getName())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                
+        return ResponseEntity.ok(UserMapper.toDTO(userModel));
     }
 
+    @PutMapping("/me")
+    @Operation(summary = "Update current user profile", description = "Updates the profile of the authenticated user")
+    public ResponseEntity<UserResponseDTO> updateProfile(Principal principal, @Valid @RequestBody UserRequestDTO request) {
+        log.info("REST request - update profile for user: {}", principal.getName());
+        
+        User updateData = UserMapper.toEntity(request);
+        User updatedUser = userService.updateUser(principal.getName(), updateData);
+        
+        return ResponseEntity.ok(UserMapper.toDTO(updatedUser));
+    }
     @GetMapping
     @Operation(summary = "Get All Users", description = "Returns a list of all registered users")
     public ResponseEntity<List<UserResponseDTO>> getAll() {

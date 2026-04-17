@@ -70,4 +70,25 @@ public class UserService {
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
     }
+
+    public User updateUser(String email, User updateData) {
+        User existingUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new BusinessRuleException("Usuario no encontrado"));
+
+        if (updateData.getName() != null) {
+            existingUser.setName(updateData.getName());
+        }
+        if (updateData.getPhoto() != null) {
+            existingUser.setPhoto(updateData.getPhoto());
+        }
+        if (updateData.getPassword() != null && !updateData.getPassword().isEmpty()) {
+            existingUser.setPassword(passwordEncoder.encode(updateData.getPassword()));
+        }
+        
+        try {
+            return userRepository.save(existingUser);
+        } catch (Exception ex) {
+            throw new PersistenceAccessException("Error al actualizar el usuario", ex);
+        }
+    }
 }

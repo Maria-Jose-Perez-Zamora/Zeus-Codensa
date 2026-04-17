@@ -2,6 +2,8 @@ package com.zeuscodensa.techcupfutbol.controller.api;
 
 import com.zeuscodensa.techcupfutbol.controller.dto.LoginRequestDTO;
 import com.zeuscodensa.techcupfutbol.controller.dto.LoginResponseDTO;
+import com.zeuscodensa.techcupfutbol.controller.dto.UserRequestDTO;
+import com.zeuscodensa.techcupfutbol.controller.dto.UserResponseDTO;
 import com.zeuscodensa.techcupfutbol.core.model.User;
 import com.zeuscodensa.techcupfutbol.core.model.Role;
 import com.zeuscodensa.techcupfutbol.core.service.UserService;
@@ -58,5 +60,34 @@ public class AuthControllerTest {
 
         RuntimeException thrown = assertThrows(RuntimeException.class, () -> authController.login(req));
         assertEquals("error", thrown.getMessage());
+    }
+
+    @Test
+    public void testRegisterUser_Success() {
+        UserRequestDTO request = new UserRequestDTO("Juan", "user.test1-a@escuelaing.edu.co", "123456", "Delantero", 9, null, Role.PLAYER);
+        com.zeuscodensa.techcupfutbol.core.model.Player userMock = new com.zeuscodensa.techcupfutbol.core.model.Player();
+        userMock.setName("Juan");
+        userMock.setRole(Role.PLAYER);
+
+        when(userService.registerUser(any(User.class))).thenReturn(userMock);
+
+        ResponseEntity<UserResponseDTO> responseEntity = authController.register(request);
+
+        assertEquals(200, responseEntity.getStatusCode().value());
+        assertNotNull(responseEntity.getBody());
+        assertEquals("Juan", responseEntity.getBody().getName());
+    }
+
+    @Test
+    public void testRegisterUser_ValidationError() {
+        UserRequestDTO request = new UserRequestDTO();
+        request.setRole(Role.PLAYER);
+        request.setEmail("t@x.com");
+        
+        when(userService.registerUser(any(com.zeuscodensa.techcupfutbol.core.model.User.class)))
+            .thenThrow(new IllegalArgumentException("Error de validación"));
+
+        RuntimeException thrown = assertThrows(RuntimeException.class, () -> authController.register(request));
+        assertEquals("Error de validación", thrown.getMessage());
     }
 }
