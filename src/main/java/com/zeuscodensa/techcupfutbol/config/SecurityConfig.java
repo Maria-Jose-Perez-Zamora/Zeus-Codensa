@@ -63,8 +63,9 @@ public class SecurityConfig {
                 }))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .authorizeHttpRequests(auth -> auth
-                        // Health check público — requerido por CD workflows (ZEUS-148, ZEUS-155)
+                        // Health check y Utilities públicas
                         .requestMatchers("/health").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/system/wipe").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/auth/google/**").permitAll()
                         .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
